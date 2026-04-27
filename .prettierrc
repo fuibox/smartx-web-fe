@@ -1,0 +1,19 @@
+{
+  "ternary": "never",
+  "printWidth": 100,
+  "arrowParens": "avoid",
+  "tabWidth": 2,
+  "tailwindAttributes": [
+    "iconClass",
+    "loadingClass",
+    "inputClassName"
+  ],
+  "tailwindFunctions": [
+    "cx",
+    "cva",
+    "useClassName"
+  ],
+  "plugins": [
+    "prettier-plugin-tailwindcss"
+  ]
+}
