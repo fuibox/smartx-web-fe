@@ -106,25 +106,25 @@ export default function Home() {
         <div class="hero-inner">
           <h1
             class="hero-title reveal reveal-title-lock"
-            aria-label="Your market edge. Personalized by AI."
+            aria-label="The AI Trading Terminal Built Around You"
           >
             <span class="hero-title__line">
               <span
                 class="hero-title__phrase hero-title__phrase--first"
                 data-calibrate-text
-                >Your market edge</span
+                >The AI Trading Terminal</span
               >
             </span>
             <span class="hero-title__line">
               <span
                 class="hero-title__phrase hero-title__phrase--second"
                 data-calibrate-text
-                >Personalized by AI</span
+                >Built Around You</span
               >
             </span>
           </h1>
           <p class="hero-body reveal reveal-copy">
-            SmartX learns your interests, watchlist, and trading style to surface the signals that matter before consensus forms.
+            Alpha tuned to your focus, edge, and style
           </p>
 
           <!-- Restore this link when the beta is ready.
