@@ -115,6 +115,8 @@ a {
 }
 
 .site-header {
+  position: absolute;
+  inset: 0 0 auto;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -240,20 +242,24 @@ a {
 .hero {
   display: grid;
   place-items: center;
-  min-height: calc(100vh - 128px);
-  padding: 48px 58px 86px;
+  min-height: 100vh;
+  padding: 128px 58px;
 }
 
 .hero-inner {
   width: min(980px, calc(100vw - 116px));
-  display: grid;
-  justify-items: center;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 22px;
   text-align: center;
 }
 
 .hero-title {
   margin: 0;
+  width: 100%;
+  min-width: 0;
   max-width: 880px;
   color: #edf8f4;
   font-family: var(--font-pixel);
@@ -317,14 +323,17 @@ a {
 
 .hero-body {
   margin: 0;
-  max-width: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 780px;
   color: rgba(189, 209, 202, 0.76);
   font-family: var(--font-jb);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.58;
   letter-spacing: 0;
-  white-space: nowrap;
+  white-space: normal;
+  text-wrap: balance;
 }
 
 .hero-cta {
@@ -388,6 +397,11 @@ a {
 
 .hero-cta:active {
   transform: translateY(0);
+}
+
+.hero-cta--coming-soon:disabled {
+  color: #f3fffb;
+  cursor: default;
 }
 
 .hero-cta:focus-visible {
@@ -645,8 +659,8 @@ a {
   }
 
   .hero {
-    min-height: calc(100vh - 116px);
-    padding: 52px 28px 96px;
+    min-height: 100vh;
+    padding: 116px 28px;
   }
 
   .hero-inner {
@@ -675,9 +689,10 @@ a {
   }
 
   .site-header {
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
     padding-top: 24px;
+    text-align: center;
   }
 
   .brand-mark__full {
@@ -686,6 +701,7 @@ a {
 
   .signal-nav {
     gap: 8px;
+    justify-content: center;
     min-height: 28px;
   }
 
@@ -708,25 +724,30 @@ a {
   }
 
   .hero {
-    align-items: start;
-    min-height: auto;
-    padding-top: 92px;
+    align-items: center;
+    min-height: 100dvh;
+    padding-top: 96px;
+    padding-right: 20px;
     padding-bottom: 96px;
+    padding-left: 20px;
   }
 
   .hero-inner {
-    justify-items: start;
-    text-align: left;
+    width: 100%;
+    max-width: 520px;
+    justify-items: center;
+    text-align: center;
   }
 
   .hero-title {
-    font-size: 42px;
+    font-size: 35px;
     line-height: 1;
   }
 
   .hero-body {
-    max-width: 330px;
+    max-width: 340px;
     font-size: 14px;
+    margin-inline: auto;
   }
 
   .hero-cta {
@@ -742,6 +763,12 @@ a {
     width: 52px;
   }
 
+}
+
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 32px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

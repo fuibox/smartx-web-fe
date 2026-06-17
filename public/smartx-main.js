@@ -1,6 +1,9 @@
-const canvas = document.getElementById("kinetic-grid");
-const ctx = canvas.getContext("2d");
+let canvas = null;
+let ctx = null;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+let animationFrameId = 0;
+let syncQueued = false;
+let pageObserver = null;
 
 const state = {
   width: 0,
@@ -217,8 +220,16 @@ function prepareCalibrationText() {
   const targets = document.querySelectorAll("[data-calibrate-text]");
 
   for (const target of targets) {
-    const text = target.textContent || "";
+    const text = (target.textContent || "").replace(/\u00a0/g, " ");
+    if (
+      target.getAttribute("data-calibrated-text") === text &&
+      target.querySelector(".hero-title__char")
+    ) {
+      continue;
+    }
+
     target.textContent = "";
+    target.setAttribute("data-calibrated-text", text);
     target.style.setProperty("--char-count", text.length);
 
     for (const [index, char] of [...text].entries()) {
@@ -726,6 +737,10 @@ function rebuildGrid() {
 }
 
 function resize() {
+  if (!canvas || !ctx) {
+    return;
+  }
+
   state.dpr = Math.min(window.devicePixelRatio || 1, 2);
   state.width = window.innerWidth;
   state.height = window.innerHeight;
@@ -1856,6 +1871,10 @@ function renderFindings(time) {
 }
 
 function renderGrid(time) {
+  if (!ctx) {
+    return;
+  }
+
   ctx.globalCompositeOperation = "source-over";
   ctx.fillStyle = reduceMotion.matches ? "rgba(6, 25, 21, 0.95)" : "rgba(6, 25, 21, 0.5)";
   ctx.fillRect(0, 0, state.width, state.height);
@@ -1938,6 +1957,12 @@ function renderGrid(time) {
 }
 
 function tick(now) {
+  if (!canvas || !ctx || !canvas.isConnected) {
+    schedulePageSync();
+    animationFrameId = window.requestAnimationFrame(tick);
+    return;
+  }
+
   const time = now * 0.001;
   const dt = state.lastTime === 0 ? 0.016 : Math.min(time - state.lastTime, 0.1);
   state.lastTime = time;
@@ -1963,7 +1988,108 @@ function tick(now) {
   }
 
   renderGrid(time);
-  window.requestAnimationFrame(tick);
+  animationFrameId = window.requestAnimationFrame(tick);
+}
+
+function resetAnimationState() {
+  state.lastTime = 0;
+  state.signalClock = 0;
+  state.autoSweepClock = 0;
+  state.screenFlash = 0;
+  state.pointerDown = false;
+  state.introPrimed = false;
+}
+
+function bindCanvas() {
+  const nextCanvas = document.getElementById("kinetic-grid");
+  if (!(nextCanvas instanceof HTMLCanvasElement)) {
+    canvas = null;
+    ctx = null;
+    return false;
+  }
+
+  if (nextCanvas !== canvas) {
+    canvas = nextCanvas;
+    ctx = canvas.getContext("2d");
+    resetAnimationState();
+  }
+
+  resize();
+  renderGrid(0);
+  return true;
+}
+
+function syncPageExperience() {
+  syncQueued = false;
+  prepareCalibrationText();
+
+  if (bindCanvas() && !animationFrameId) {
+    animationFrameId = window.requestAnimationFrame(tick);
+  }
+}
+
+function schedulePageSync() {
+  if (syncQueued) {
+    return;
+  }
+
+  syncQueued = true;
+  window.requestAnimationFrame(syncPageExperience);
+}
+
+function nodeAffectsExperience(node) {
+  if (!(node instanceof Element)) {
+    return false;
+  }
+
+  return (
+    node.id === "kinetic-grid" ||
+    node.matches("[data-calibrate-text]") ||
+    Boolean(node.querySelector("#kinetic-grid, [data-calibrate-text]"))
+  );
+}
+
+function observePageChanges() {
+  if (pageObserver || !document.body || !("MutationObserver" in window)) {
+    return;
+  }
+
+  pageObserver = new MutationObserver((mutations) => {
+    const shouldSync = mutations.some((mutation) => {
+      const changedNodes = [...mutation.addedNodes, ...mutation.removedNodes];
+      return changedNodes.some(nodeAffectsExperience);
+    });
+
+    if (shouldSync) {
+      schedulePageSync();
+    }
+  });
+
+  pageObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+}
+
+function startExperience() {
+  observePageChanges();
+  schedulePageSync();
+}
+
+function destroyExperience() {
+  if (animationFrameId) {
+    window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+  }
+
+  if (pageObserver) {
+    pageObserver.disconnect();
+    pageObserver = null;
+  }
+
+  canvas = null;
+  ctx = null;
+  syncQueued = false;
 }
 
 function pointerPosition(event) {
@@ -2014,7 +2140,13 @@ reduceMotion.addEventListener("change", () => {
   resize();
 });
 
-prepareCalibrationText();
-resize();
-renderGrid(0);
-window.requestAnimationFrame(tick);
+window.SmartXKineticGrid = {
+  start: startExperience,
+  destroy: destroyExperience,
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startExperience, { once: true });
+} else {
+  startExperience();
+}
