@@ -117,6 +117,7 @@ a {
 .site-header {
   position: absolute;
   inset: 0 0 auto;
+  z-index: 4;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
