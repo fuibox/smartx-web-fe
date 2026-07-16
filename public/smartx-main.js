@@ -4,6 +4,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let animationFrameId = 0;
 let syncQueued = false;
 let pageObserver = null;
+let rendererPaused = false;
 
 const state = {
   width: 0,
@@ -183,22 +184,22 @@ labelMetrics.iconCenter = labelMetrics.iconLeft + labelMetrics.iconSize * 0.5;
 labelMetrics.textLeft = labelMetrics.iconLeft + labelMetrics.iconSize + labelMetrics.iconTextGap;
 
 const tagIconMeta = {
-  civic: { path: "./assets/tag-icons/civic.svg", tones: ["expert"], inset: [0.93, 0, 0.93, 1] },
-  coin: { path: "./assets/tag-icons/coin.svg", tones: ["expert"], inset: [0, 0, 1, 1] },
-  sports: { path: "./assets/tag-icons/sports.svg", tones: ["expert"], inset: [0.93, 0.93, 0.93, 0.93] },
-  flame: { path: "./assets/tag-icons/flame.svg", tones: ["hot"], inset: [0, 0, 0, 0] },
-  whale: { path: "./assets/tag-icons/whale.svg", tones: ["status"], inset: [0, 0, 0, 0] },
-  medal: { path: "./assets/tag-icons/medal.svg", tones: ["status"], inset: [0, 0, 0, 0] },
-  brain: { path: "./assets/tag-icons/brain.svg", tones: ["status"], inset: [0, 0, 0, 0] },
-  pnl: { path: "./assets/tag-icons/pnl.svg", tones: ["status"], inset: [0, 0, 0, 0] },
-  wave: { path: "./assets/tag-icons/wave.svg", tones: ["style"], inset: [0, 0, 0, 0] },
-  spiral: { path: "./assets/tag-icons/spiral.svg", tones: ["style"], inset: [0, 0, 0, 0] },
-  short: { path: "./assets/tag-icons/short.svg", tones: ["style"], inset: [0, 0, 0, 0] },
-  veteran: { path: "./assets/tag-icons/veteran.svg", tones: ["style"], inset: [1, 1, 1, 1] },
-  spark: { path: "./assets/tag-icons/spark.svg", tones: ["style"], inset: [0, 0, 0, 0] },
-  flip: { path: "./assets/tag-icons/flip.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
-  oneHit: { path: "./assets/tag-icons/oneHit.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
-  bot: { path: "./assets/tag-icons/bot.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
+  civic: { path: "/assets/tag-icons/civic.svg", tones: ["expert"], inset: [0.93, 0, 0.93, 1] },
+  coin: { path: "/assets/tag-icons/coin.svg", tones: ["expert"], inset: [0, 0, 1, 1] },
+  sports: { path: "/assets/tag-icons/sports.svg", tones: ["expert"], inset: [0.93, 0.93, 0.93, 0.93] },
+  flame: { path: "/assets/tag-icons/flame.svg", tones: ["hot"], inset: [0, 0, 0, 0] },
+  whale: { path: "/assets/tag-icons/whale.svg", tones: ["status"], inset: [0, 0, 0, 0] },
+  medal: { path: "/assets/tag-icons/medal.svg", tones: ["status"], inset: [0, 0, 0, 0] },
+  brain: { path: "/assets/tag-icons/brain.svg", tones: ["status"], inset: [0, 0, 0, 0] },
+  pnl: { path: "/assets/tag-icons/pnl.svg", tones: ["status"], inset: [0, 0, 0, 0] },
+  wave: { path: "/assets/tag-icons/wave.svg", tones: ["style"], inset: [0, 0, 0, 0] },
+  spiral: { path: "/assets/tag-icons/spiral.svg", tones: ["style"], inset: [0, 0, 0, 0] },
+  short: { path: "/assets/tag-icons/short.svg", tones: ["style"], inset: [0, 0, 0, 0] },
+  veteran: { path: "/assets/tag-icons/veteran.svg", tones: ["style"], inset: [1, 1, 1, 1] },
+  spark: { path: "/assets/tag-icons/spark.svg", tones: ["style"], inset: [0, 0, 0, 0] },
+  flip: { path: "/assets/tag-icons/flip.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
+  oneHit: { path: "/assets/tag-icons/oneHit.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
+  bot: { path: "/assets/tag-icons/bot.svg", tones: ["behavior"], inset: [0, 0, 0, 0] },
 };
 
 const tagIconImages = Object.fromEntries(
@@ -1870,14 +1871,40 @@ function renderFindings(time) {
   ctx.restore();
 }
 
+function renderAmbientStars(time) {
+  const area = state.width * state.height;
+  const count = Math.max(56, Math.min(118, Math.round(area / 10500)));
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+
+  for (let index = 0; index < count; index += 1) {
+    const xSeed = Math.sin((index + 1) * 12.9898) * 43758.5453;
+    const ySeed = Math.sin((index + 1) * 78.233) * 24634.6345;
+    const sizeSeed = Math.sin((index + 1) * 37.719) * 15431.743;
+    const x = (xSeed - Math.floor(xSeed)) * state.width;
+    const y = (ySeed - Math.floor(ySeed)) * state.height;
+    const sizeUnit = sizeSeed - Math.floor(sizeSeed);
+    const twinkle = 0.72 + Math.sin(time * (0.22 + sizeUnit * 0.18) + index * 1.7) * 0.18;
+    const alpha = (0.1 + sizeUnit * 0.22) * twinkle;
+    const size = sizeUnit > 0.86 ? 1.45 : 0.8;
+
+    ctx.fillStyle = `rgba(183, 224, 215, ${alpha.toFixed(3)})`;
+    ctx.fillRect(x, y, size, size);
+  }
+
+  ctx.restore();
+}
+
 function renderGrid(time) {
   if (!ctx) {
     return;
   }
 
   ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = reduceMotion.matches ? "rgba(6, 25, 21, 0.95)" : "rgba(6, 25, 21, 0.5)";
+  ctx.fillStyle = reduceMotion.matches ? "rgba(2, 9, 8, 0.96)" : "rgba(2, 9, 8, 0.58)";
   ctx.fillRect(0, 0, state.width, state.height);
+  renderAmbientStars(time);
 
   if (state.screenFlash > 0.001) {
     ctx.fillStyle = `rgba(110, 232, 210, ${state.screenFlash.toFixed(4)})`;
@@ -1958,8 +1985,8 @@ function renderGrid(time) {
 
 function tick(now) {
   if (!canvas || !ctx || !canvas.isConnected) {
+    animationFrameId = 0;
     schedulePageSync();
-    animationFrameId = window.requestAnimationFrame(tick);
     return;
   }
 
@@ -1988,7 +2015,7 @@ function tick(now) {
   }
 
   renderGrid(time);
-  animationFrameId = window.requestAnimationFrame(tick);
+  animationFrameId = rendererPaused ? 0 : window.requestAnimationFrame(tick);
 }
 
 function resetAnimationState() {
@@ -2023,7 +2050,7 @@ function syncPageExperience() {
   syncQueued = false;
   prepareCalibrationText();
 
-  if (bindCanvas() && !animationFrameId) {
+  if (bindCanvas() && !animationFrameId && !rendererPaused) {
     animationFrameId = window.requestAnimationFrame(tick);
   }
 }
@@ -2072,8 +2099,43 @@ function observePageChanges() {
 }
 
 function startExperience() {
+  rendererPaused = false;
   observePageChanges();
   schedulePageSync();
+}
+
+function pauseRenderer() {
+  rendererPaused = true;
+  if (animationFrameId) {
+    window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+  }
+  state.lastTime = 0;
+}
+
+function resumeRenderer() {
+  rendererPaused = false;
+  if (bindCanvas() && !animationFrameId) {
+    animationFrameId = window.requestAnimationFrame(tick);
+  }
+}
+
+function renderOnce() {
+  if (!canvas || !ctx || !canvas.isConnected) {
+    if (!bindCanvas()) {
+      return;
+    }
+  }
+  renderGrid(performance.now() * 0.001);
+}
+
+function getCanvas() {
+  if (canvas?.isConnected) {
+    return canvas;
+  }
+
+  const nextCanvas = document.getElementById("kinetic-grid");
+  return nextCanvas instanceof HTMLCanvasElement ? nextCanvas : null;
 }
 
 function destroyExperience() {
@@ -2090,6 +2152,7 @@ function destroyExperience() {
   canvas = null;
   ctx = null;
   syncQueued = false;
+  rendererPaused = false;
 }
 
 function pointerPosition(event) {
@@ -2143,6 +2206,10 @@ reduceMotion.addEventListener("change", () => {
 window.SmartXKineticGrid = {
   start: startExperience,
   destroy: destroyExperience,
+  getCanvas,
+  pause: pauseRenderer,
+  resume: resumeRenderer,
+  renderOnce,
 };
 
 if (document.readyState === "loading") {

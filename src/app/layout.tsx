@@ -3,23 +3,23 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SmartX | Trade Conviction Before Consensus",
+  title: "SmartX | The AI Trading Terminal Built Around You",
   description:
-    "SmartX distills prediction flow, smart money behavior, and live context into actionable signals for prediction market traders.",
+    "SmartX connects live market signals, smart money context, watchlists, and trading in one AI-native terminal.",
   icons: {
     icon: "/assets/favicon.ico",
   },
   openGraph: {
-    title: "SmartX | Trade Conviction Before Consensus",
+    title: "SmartX | The AI Trading Terminal Built Around You",
     description:
-      "Distill prediction flow, smart money behavior, and live context into actionable market signals.",
+      "See the move, understand the context, and act from one AI-native trading terminal.",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "SmartX | Trade Conviction Before Consensus",
+    title: "SmartX | The AI Trading Terminal Built Around You",
     description:
-      "Distill prediction flow, smart money behavior, and live context into actionable market signals.",
+      "See the move, understand the context, and act from one AI-native trading terminal.",
   },
 };
 

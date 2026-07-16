@@ -1,0 +1,14 @@
+const SMARTX_APP_URL = "https://app.smartx.io/";
+
+export function createSmartXAppHref(
+  content: "hero_cta" | "market_demo_cta" | "closing_cta" | "footer_link",
+) {
+  const params = new URLSearchParams({
+    utm_source: "smartx_website",
+    utm_medium: "website",
+    utm_campaign: "homepage_launch",
+    utm_content: content,
+  });
+
+  return `${SMARTX_APP_URL}?${params.toString()}`;
+}

@@ -1,0 +1,116 @@
+.relay {
+  position: relative;
+  min-height: 100vh;
+  overflow: clip;
+  background: #020706;
+  color: #edf8f4;
+  font-family: var(--font-jb);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 620px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #020706;
+}
+
+.runtime,
+.canvas,
+.backdrop,
+.heroSource {
+  position: absolute !important;
+  inset: 0;
+}
+
+.runtime {
+  z-index: 0;
+}
+
+.canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.backdrop {
+  z-index: 1;
+  background: rgba(2, 7, 6, 0.12);
+  pointer-events: none;
+}
+
+.heroSource {
+  z-index: 2;
+}
+
+.heroSource :global(.page-shell) {
+  height: 100%;
+  min-height: 100%;
+  background: transparent;
+}
+
+.heroSource :global(.hero-content) {
+  height: 100%;
+  min-height: 100%;
+}
+
+.heroSource :global(.hero) {
+  height: 100%;
+  min-height: 100%;
+}
+
+.sceneCopy {
+  position: absolute;
+  left: 7vw;
+  top: 48%;
+  z-index: 4;
+  max-width: min(620px, 72vw);
+  color: #edf8f4;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.sceneCopy span {
+  display: block;
+  margin-bottom: 18px;
+  color: #08dfb5;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.sceneCopy h2 {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: clamp(48px, 6vw, 82px);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .stage {
+    min-height: 100dvh;
+  }
+
+  .sceneCopy {
+    left: 24px;
+    top: auto;
+    bottom: 14vh;
+    max-width: calc(100vw - 48px);
+    transform: none;
+  }
+
+  .sceneCopy span {
+    margin-bottom: 12px;
+    font-size: 9px;
+  }
+
+  .sceneCopy h2 {
+    font-size: clamp(42px, 14vw, 58px);
+  }
+}
