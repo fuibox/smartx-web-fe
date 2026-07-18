@@ -106,27 +106,28 @@ export default function Home() {
         <div class="hero-inner">
           <h1
             class="hero-title reveal reveal-title-lock"
-            aria-label="Trade conviction before consensus."
+            aria-label="The AI Trading Terminal Built Around You"
           >
             <span class="hero-title__line">
               <span
                 class="hero-title__phrase hero-title__phrase--first"
                 data-calibrate-text
-                >Trade conviction</span
+                >The AI Trading Terminal</span
               >
             </span>
             <span class="hero-title__line">
               <span
                 class="hero-title__phrase hero-title__phrase--second"
                 data-calibrate-text
-                >before consensus.</span
+                >Built Around You</span
               >
             </span>
           </h1>
           <p class="hero-body reveal reveal-copy">
-            Turn market flow, smart money, and live context into tradable signals.
+            Alpha tuned to your focus, edge, and style
           </p>
 
+          <!-- Restore this link when the beta is ready.
           <a
             href="https://app.smartx.io/"
             class="hero-cta reveal reveal-control"
@@ -149,6 +150,38 @@ export default function Home() {
               </svg>
             </span>
           </a>
+          -->
+          <button
+            type="button"
+            class="hero-cta hero-cta--coming-soon reveal reveal-control"
+            aria-label="SmartX Beta coming soon"
+            disabled
+          >
+            <span class="hero-cta__label">
+              <span class="hero-cta__text hero-cta__text--default">Coming Soon</span>
+              <span class="hero-cta__text hero-cta__text--hover" aria-hidden="true">Coming Soon</span>
+            </span>
+            <span class="hero-cta__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="presentation">
+                <path
+                  d="M12 5v7l4 2.4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.7"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                />
+              </svg>
+            </span>
+          </button>
         </div>
       </main>
           `,
