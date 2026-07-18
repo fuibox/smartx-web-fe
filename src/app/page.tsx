@@ -128,7 +128,7 @@ export default function Home() {
           </p>
 
           <a
-            href="https://app.smartx.io"
+            href="https://app.smartx.io/"
             class="hero-cta reveal reveal-control"
             aria-label="Launch SmartX Beta"
           >

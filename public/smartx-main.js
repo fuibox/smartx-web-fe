@@ -1980,8 +1980,12 @@ function pointerPosition(event) {
   };
 }
 
+function isInteractiveTarget(target) {
+  return target instanceof Element && Boolean(target.closest("a, button, input, textarea, select, label"));
+}
+
 window.addEventListener("pointerdown", (event) => {
-  if (reduceMotion.matches) {
+  if (reduceMotion.matches || isInteractiveTarget(event.target)) {
     return;
   }
 
@@ -1992,7 +1996,7 @@ window.addEventListener("pointerdown", (event) => {
 });
 
 window.addEventListener("pointermove", (event) => {
-  if (!state.pointerDown || reduceMotion.matches) {
+  if (!state.pointerDown || reduceMotion.matches || isInteractiveTarget(event.target)) {
     return;
   }
 
