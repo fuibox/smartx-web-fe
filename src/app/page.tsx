@@ -135,8 +135,8 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <span class="hero-cta__label">
-              <span class="hero-cta__text hero-cta__text--default">alpha</span>
-              <span class="hero-cta__text hero-cta__text--hover" aria-hidden="true">alpha</span>
+              <span class="hero-cta__text hero-cta__text--default">LAUNCH ALPHA</span>
+              <span class="hero-cta__text hero-cta__text--hover" aria-hidden="true">LAUNCH ALPHA</span>
             </span>
             <span class="hero-cta__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" role="presentation">
