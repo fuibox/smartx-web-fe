@@ -67,7 +67,7 @@ export default function Home() {
           </a>
           <a
             class="signal-link"
-            href="https://smartx.gitbook.io/smartx.mvp-guidebook.io"
+            href="https://smartx.gitbook.io/smartx.docs.io"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="SmartX Docs"
