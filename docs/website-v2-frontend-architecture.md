@@ -1,7 +1,7 @@
 # SmartX 官网 V2：前端架构与实现方案
 
-> 状态：Narrative Core 与 Trade-to-Memory 已完成集成验证，正式首页接入前  
-> 更新日期：2026-07-15  
+> 状态：正式首页 `/` 已接入叙事 runtime；`/original` 与 `/motion-lab/*` 验证路由已于 2026-07-20 删除（§2.2-2.5 中对这些路由的描述仅作历史记录）。场景时间窗口已收敛至 `story.config.ts` 的 `MARKET_SCENE` / `STORY_TAIL` 单一来源；§6.1 的节奏参数表以该文件为准。首屏采用 cosmic 星空 surface（见设计意图文档 V2.1 记录）。  
+> 更新日期：2026-07-20  
 > 适用范围：官网首页 V2 的 Hero、Universe、Planet Inspection、Product、AI Memory、Updates 和 Footer  
 > 设计依据：`docs/website-v2-space-narrative-design-intent.md`  
 > 技术决策记录：`docs/adr/001-motion-runtime-and-spike.md`

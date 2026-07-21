@@ -15,11 +15,12 @@ type MemorySceneProps = {
   reducedMotion: boolean;
 };
 
+/** 集群锚点故意不对称（参考 vc-demo Memory Universe 的有机分布），避免十字对称的呆板感。 */
 const DOMAIN_ANCHORS = [
-  new THREE.Vector3(-1.92, 1.08, 0),
-  new THREE.Vector3(1.94, 1.02, 0),
-  new THREE.Vector3(1.82, -1.16, 0),
-  new THREE.Vector3(-1.9, -1.12, 0),
+  new THREE.Vector3(-2.16, 0.92, -0.2),
+  new THREE.Vector3(1.98, 1.18, 0.1),
+  new THREE.Vector3(2.28, -0.92, -0.15),
+  new THREE.Vector3(-1.72, -1.32, 0.05),
 ];
 
 function clamp(value: number, min = 0, max = 1) {
@@ -122,19 +123,22 @@ function DomainCluster({
   const { gl } = useThree();
   const anchor = DOMAIN_ANCHORS[index];
   const { curve, points } = useMemo(() => createMemoryCurve(anchor), [anchor]);
-  const factorPositions = useMemo(
-    () =>
-      domain.dimensions.map((dimension, factorIndex) => {
-        const angle = -Math.PI / 2 + (factorIndex / domain.dimensions.length) * Math.PI * 2;
-        const radius = 0.48 + dimension.weight / 720;
-        return new THREE.Vector3(
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          (dimension.weight - 80) / 220,
-        );
-      }),
-    [domain.dimensions],
-  );
+  const factorPositions = useMemo(() => {
+    const random = seededRandom(3301 + index * 97);
+    return domain.dimensions.map((dimension, factorIndex) => {
+      // 角度带抖动、半径按权重拉开距离——星座感来自不规则分布，不是均匀圆环。
+      const angle =
+        -Math.PI / 2 +
+        (factorIndex / domain.dimensions.length) * Math.PI * 2 +
+        (random() - 0.5) * 0.9;
+      const radius = 0.42 + dimension.weight / 340 + random() * 0.14;
+      return new THREE.Vector3(
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius * 0.82,
+        (dimension.weight - 80) / 260,
+      );
+    });
+  }, [domain.dimensions, index]);
 
   useFrame(({ clock }, delta) => {
     const group = groupRef.current;
@@ -162,17 +166,16 @@ function DomainCluster({
     );
     nodeMaterial.emissiveIntensity = THREE.MathUtils.damp(
       nodeMaterial.emissiveIntensity,
-      active ? 1.15 : 0.42,
+      active ? 0.62 : 0.28,
       8,
       delta,
     );
-    glowMaterial.opacity = reveal * (active ? 0.13 : 0.035);
+    glowMaterial.opacity = reveal * (active ? 0.07 : 0.02);
 
     ringRefs.current.forEach((ring, ringIndex) => {
-      ring.rotation.z = clock.elapsedTime * (ringIndex % 2 === 0 ? 0.28 : -0.2) + ringIndex;
-      ring.rotation.y = Math.sin(clock.elapsedTime * 0.55 + ringIndex) * 0.12;
+      ring.rotation.z = clock.elapsedTime * (ringIndex % 2 === 0 ? 0.16 : -0.11) + ringIndex;
       const material = ring.material as THREE.MeshBasicMaterial;
-      material.opacity = reveal * (ringIndex === 0 ? 0.42 : active ? 0.24 - ringIndex * 0.045 : 0.015);
+      material.opacity = reveal * (ringIndex === 0 ? 0.4 : active ? 0.2 : 0.06);
     });
 
     factorRefs.current.forEach((factor, factorIndex) => {
@@ -227,7 +230,7 @@ function DomainCluster({
         </mesh>
       ))}
       <group ref={groupRef} visible={false}>
-        <mesh scale={2.6}>
+        <mesh scale={2.0}>
           <sphereGeometry args={[0.22, 24, 24]} />
           <meshBasicMaterial
             ref={glowMaterialRef}
@@ -239,26 +242,28 @@ function DomainCluster({
             toneMapped={false}
           />
         </mesh>
+        {/* vc-demo 语言：主星是扁平饱和色圆盘，配一圈细椭圆环，而不是发光实心球 */}
         <mesh>
-          <sphereGeometry args={[0.16, 28, 28]} />
+          <sphereGeometry args={[0.15, 28, 28]} />
           <meshStandardMaterial
             ref={nodeMaterialRef}
-            color="#06110f"
+            color={domain.color}
             emissive={domain.color}
             emissiveIntensity={0.42}
-            roughness={0.34}
-            metalness={0.16}
+            roughness={0.62}
+            metalness={0.05}
           />
         </mesh>
-        {[0.28, 0.48, 0.66].map((radius, ringIndex) => (
+        {[0.26, 0.5].map((radius, ringIndex) => (
           <mesh
             ref={(ring) => {
               if (ring) ringRefs.current[ringIndex] = ring;
             }}
-            rotation={[Math.PI / 2.25 + ringIndex * 0.18, ringIndex * 0.3, ringIndex * 0.42]}
+            rotation={[Math.PI / 2.2 + ringIndex * 0.2, ringIndex * 0.3, 0.35]}
+            scale={[1.35, 1, 1]}
             key={radius}
           >
-            <torusGeometry args={[radius, ringIndex === 0 ? 0.007 : 0.004, 8, 96]} />
+            <torusGeometry args={[radius, ringIndex === 0 ? 0.006 : 0.004, 8, 96]} />
             <meshBasicMaterial color={domain.color} transparent opacity={0} depthWrite={false} />
           </mesh>
         ))}
@@ -281,14 +286,10 @@ function DomainCluster({
               }}
               position={position}
             >
-              <sphereGeometry args={[0.04 + domain.dimensions[factorIndex].weight / 2400, 14, 14]} />
-              <meshBasicMaterial
-                color={domain.color}
-                transparent
-                opacity={0}
-                blending={THREE.AdditiveBlending}
-                depthWrite={false}
+              <sphereGeometry
+                args={[0.026 + domain.dimensions[factorIndex].weight / 1050, 14, 14]}
               />
+              <meshBasicMaterial color={domain.color} transparent opacity={0} depthWrite={false} />
             </mesh>
           </group>
         ))}
@@ -413,15 +414,36 @@ export function MemoryScene({
             toneMapped={false}
           />
         </mesh>
+        {/* vc-demo 的标志性核心：线框球体 + 内部暗核，轻盈通透而不是实心亮球 */}
         <mesh>
-          <icosahedronGeometry args={[0.46, 4]} />
+          <sphereGeometry args={[0.34, 20, 14]} />
           <meshStandardMaterial
             ref={coreMaterialRef}
-            color="#06110f"
-            emissive="#08dfb5"
+            color="#03110e"
+            emissive="#062e26"
             emissiveIntensity={0.7}
-            roughness={0.28}
-            metalness={0.3}
+            roughness={0.5}
+            metalness={0.1}
+          />
+        </mesh>
+        <mesh>
+          <icosahedronGeometry args={[0.47, 2]} />
+          <meshBasicMaterial
+            color="#12e9c2"
+            wireframe
+            transparent
+            opacity={0.34}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh scale={1.08}>
+          <icosahedronGeometry args={[0.47, 1]} />
+          <meshBasicMaterial
+            color="#0aa78c"
+            wireframe
+            transparent
+            opacity={0.14}
+            depthWrite={false}
           />
         </mesh>
         <points>

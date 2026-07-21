@@ -18,10 +18,13 @@ import { MotionLabNarrativeOverlay } from "./motion-lab-narrative-overlay";
 import type { HandoffAnchorRef } from "./motion-lab-scene";
 import motionStyles from "./motion-lab.module.css";
 import {
+  MARKET_SCENE,
   STORY_MARKET_END,
   STORY_SCROLL_VIEWPORTS,
   STORY_SNAP_POINTS,
   STORY_STATES,
+  STORY_TAIL,
+  type SceneWindow,
 } from "./story.config";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -48,6 +51,7 @@ export function IntegratedNarrativeRuntime() {
     height: 0.5,
   });
   const lockCopyRef = useRef<HTMLDivElement>(null);
+  const orbitLabelsRef = useRef<HTMLElement | null>(null);
   const [webglReady, setWebglReady] = useState(false);
   const [effectsEnabled, setEffectsEnabled] = useState(false);
   const [narrativeActive, setNarrativeActive] = useState(true);
@@ -71,6 +75,29 @@ export function IntegratedNarrativeRuntime() {
   useLayoutEffect(() => {
     const root = runtimeRef.current?.closest<HTMLElement>("[data-integrated-narrative-root]");
     sourceCanvasRef.current = root?.querySelector<HTMLCanvasElement>("#kinetic-grid") ?? null;
+    orbitLabelsRef.current =
+      runtimeRef.current?.querySelector<HTMLElement>("[data-why-orbit-legend]") ?? null;
+  }, []);
+
+  // 停留在 Know the Why 时按时间轮播四个证据维度（每档 3.4s，播完停在最后一档）；
+  // 用户手动点击后停止自动轮播，离开区间由 timeline onUpdate 复位。
+  useEffect(() => {
+    let enteredAt: number | null = null;
+    const id = window.setInterval(() => {
+      const stage = document.querySelector<HTMLElement>("[data-integrated-narrative-stage]");
+      if (stage?.dataset.snapState !== "inspection") {
+        enteredAt = null;
+        return;
+      }
+      if (evidenceInteractedRef.current) return;
+      if (enteredAt === null) enteredAt = Date.now();
+      const nextIndex = Math.min(3, Math.floor((Date.now() - enteredAt) / 3400));
+      if (nextIndex !== activeEvidenceIndexRef.current) {
+        activeEvidenceIndexRef.current = nextIndex;
+        setActiveEvidenceIndex(nextIndex);
+      }
+    }, 400);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -158,12 +185,15 @@ export function IntegratedNarrativeRuntime() {
       const productChart = "[data-product-chart]";
       const productParts = '[data-product-part="narrative"]';
       const chartBridge = "[data-chart-bridge]";
+      const orbitLegend = "[data-why-orbit-legend]";
       const memoryLayer = "[data-memory-layer]";
       const memoryReceipt = "[data-memory-receipt]";
       const decisionBridge = runtime.querySelector<HTMLElement>("[data-decision-bridge]");
       const tradeNode = runtime.querySelector<HTMLElement>("[data-trade-node]");
       const memoryCoreAnchor = runtime.querySelector<HTMLElement>("[data-memory-core-anchor]");
       const marketTime = (value: number) => value * STORY_MARKET_END;
+      const windowAt = (window: SceneWindow) => marketTime(window[0]);
+      const windowDuration = (window: SceneWindow) => marketTime(window[1] - window[0]);
       const chartClip = () => "inset(0% 0% 0% 100%)";
       const relativeRect = (element: HTMLElement | null) => {
         const runtimeRect = runtime.getBoundingClientRect();
@@ -199,6 +229,7 @@ export function IntegratedNarrativeRuntime() {
       gsap.set(productChart, { autoAlpha: 0, clipPath: chartClip });
       gsap.set(productParts, { autoAlpha: 0, y: 16 });
       gsap.set(chartBridge, { autoAlpha: 0 });
+      gsap.set(orbitLegend, { autoAlpha: 0, y: 12, pointerEvents: "none" });
       gsap.set(memoryLayer, { autoAlpha: 0, pointerEvents: "none" });
       gsap.set(memoryReceipt, { autoAlpha: 0 });
       if (decisionBridge) gsap.set(decisionBridge, { autoAlpha: 0 });
@@ -230,13 +261,14 @@ export function IntegratedNarrativeRuntime() {
           end: () => `+=${Math.round(window.innerHeight * STORY_SCROLL_VIEWPORTS)}`,
           pin: stage,
           pinSpacing: true,
-          scrub: 0.32,
+          scrub: 0.5,
           snap: {
             snapTo: STORY_SNAP_POINTS,
             directional: true,
-            delay: 0.1,
-            duration: { min: 0.24, max: 0.58 },
-            ease: "power1.out",
+            delay: 0.12,
+            // 吸附时长放宽：过渡里的镜头/交接演出需要可读，不能被 0.5s 内闪完
+            duration: { min: 0.55, max: 1.2 },
+            ease: "power1.inOut",
             inertia: false,
           },
           anticipatePin: 1,
@@ -258,28 +290,19 @@ export function IntegratedNarrativeRuntime() {
             const marketValue = clamp(value / STORY_MARKET_END);
             storyProgressRef.current = value;
             marketProgressRef.current = marketValue;
-            relayProgressRef.current = clamp(value / marketTime(0.28));
+            relayProgressRef.current = clamp(value / marketTime(MARKET_SCENE.hero.relayEnd));
             stage.dataset.progress = value.toFixed(3);
 
-            if (marketValue >= 0.41 && marketValue <= 0.65) {
-              if (!evidenceInteractedRef.current) {
-                const nextEvidenceIndex = Math.min(
-                  3,
-                  Math.max(0, Math.floor((marketValue - 0.41) / 0.05)),
-                );
-                if (nextEvidenceIndex !== activeEvidenceIndexRef.current) {
-                  activeEvidenceIndexRef.current = nextEvidenceIndex;
-                  setActiveEvidenceIndex(nextEvidenceIndex);
-                }
-              }
-            } else if (marketValue < 0.38 || marketValue > 0.69) {
+            // 证据切换不再由滚动位置驱动（会被磁吸一闪而过），
+            // 改为下方 interval 在 inspection 停留期间按时间轮播；离开区间时复位。
+            if (marketValue < 0.38 || marketValue > 0.69) {
               evidenceInteractedRef.current = false;
             }
 
-            if (value >= 0.82 && !tradeCommittedRef.current) {
+            if (value >= STORY_TAIL.tradeCommit && !tradeCommittedRef.current) {
               tradeCommittedRef.current = true;
               setTradeCommitted(true);
-            } else if (value <= 0.68 && tradeCommittedRef.current) {
+            } else if (value <= STORY_TAIL.tradeRelease && tradeCommittedRef.current) {
               tradeCommittedRef.current = false;
               setTradeCommitted(false);
             }
@@ -292,19 +315,19 @@ export function IntegratedNarrativeRuntime() {
             stage.dataset.snapState = nearestState.id;
 
             const controller = window.SmartXKineticGrid;
-            if (value >= marketTime(0.13) && !rendererPausedRef.current && controller) {
+            if (value >= marketTime(MARKET_SCENE.hero.rendererPause) && !rendererPausedRef.current && controller) {
               controller.renderOnce();
               controller.pause();
               rendererPausedRef.current = true;
-            } else if (value <= marketTime(0.08) && rendererPausedRef.current && controller) {
+            } else if (value <= marketTime(MARKET_SCENE.hero.rendererResume) && rendererPausedRef.current && controller) {
               controller.resume();
               rendererPausedRef.current = false;
             }
 
-            if (value >= marketTime(0.31) && !effectsEnabledRef.current) {
+            if (value >= marketTime(MARKET_SCENE.effects.on) && !effectsEnabledRef.current) {
               effectsEnabledRef.current = true;
               setEffectsEnabled(true);
-            } else if (value <= marketTime(0.25) && effectsEnabledRef.current) {
+            } else if (value <= marketTime(MARKET_SCENE.effects.off) && effectsEnabledRef.current) {
               effectsEnabledRef.current = false;
               setEffectsEnabled(false);
             }
@@ -313,71 +336,96 @@ export function IntegratedNarrativeRuntime() {
         0,
       );
 
-      timeline.to(sourceCanvas, { autoAlpha: 0, duration: marketTime(0.11) }, marketTime(0.045));
-      timeline.to(backdrop, { autoAlpha: 0, duration: marketTime(0.13) }, marketTime(0.05));
+      const { hero, copy, product } = MARKET_SCENE;
+      timeline.to(
+        sourceCanvas,
+        { autoAlpha: 0, duration: windowDuration(hero.canvasFade) },
+        windowAt(hero.canvasFade),
+      );
+      timeline.to(
+        backdrop,
+        { autoAlpha: 0, duration: windowDuration(hero.backdropFade) },
+        windowAt(hero.backdropFade),
+      );
       timeline.to(
         heroCopy,
         {
-          y: () => -Math.min(84, window.innerHeight * 0.09),
-          scale: 0.99,
-          duration: marketTime(0.14),
+          y: () => -Math.min(150, window.innerHeight * 0.16),
+          scale: 0.97,
+          duration: windowDuration(hero.copyLift),
           ease: "power2.inOut",
           immediateRender: false,
         },
-        marketTime(0.006),
+        windowAt(hero.copyLift),
       );
       timeline.to(
         chrome,
-        { autoAlpha: 0, duration: marketTime(0.08), ease: "power2.in", immediateRender: false },
-        marketTime(0.09),
+        {
+          autoAlpha: 0,
+          duration: windowDuration(hero.chromeFade),
+          ease: "power2.in",
+          immediateRender: false,
+        },
+        windowAt(hero.chromeFade),
       );
-      timeline.to(sourceTexture, { autoAlpha: 0, duration: marketTime(0.07) }, marketTime(0.115));
-      timeline.set(source, { pointerEvents: "none" }, marketTime(0.16));
+      timeline.to(
+        sourceTexture,
+        { autoAlpha: 0, duration: windowDuration(hero.textureFade) },
+        windowAt(hero.textureFade),
+      );
+      timeline.set(source, { pointerEvents: "none" }, marketTime(hero.pointerRelease));
 
       timeline.fromTo(
         "[data-move-copy]",
         { autoAlpha: 0, y: 28 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.09), ease: "power2.out" },
-        marketTime(0.13),
+        marketTime(copy.moveIn),
       );
       timeline.fromTo(
         "[data-signal-legend]",
         { autoAlpha: 0, y: 12 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.09), ease: "power2.out" },
-        marketTime(0.16),
+        marketTime(copy.legendIn),
       );
-      timeline.to("[data-move-copy]", { autoAlpha: 0, y: -22, duration: marketTime(0.05) }, marketTime(0.26));
-      timeline.to("[data-signal-legend]", { autoAlpha: 0, y: -10, duration: marketTime(0.05) }, marketTime(0.255));
+      timeline.to("[data-move-copy]", { autoAlpha: 0, y: -22, duration: marketTime(0.05) }, marketTime(copy.moveOut));
+      timeline.to("[data-signal-legend]", { autoAlpha: 0, y: -10, duration: marketTime(0.05) }, marketTime(copy.legendOut));
       timeline.fromTo(
         "[data-lock-copy]",
         { autoAlpha: 0, y: 8 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.07), ease: "power2.out" },
-        marketTime(0.32),
+        marketTime(copy.lockIn),
       );
-      timeline.to("[data-lock-copy]", { autoAlpha: 0, y: -6, duration: marketTime(0.055) }, marketTime(0.45));
+      timeline.to("[data-lock-copy]", { autoAlpha: 0, y: -6, duration: marketTime(0.055) }, marketTime(copy.lockOut));
       timeline.fromTo(
         "[data-why-copy]",
         { autoAlpha: 0, y: 24 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.08), ease: "power2.out" },
-        marketTime(0.43),
+        marketTime(copy.whyIn),
       );
       timeline.fromTo(
         "[data-evidence-panel]",
         { autoAlpha: 0, y: 12 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.08), ease: "power2.out" },
-        marketTime(0.45),
+        marketTime(copy.evidenceIn),
       );
-      timeline.set("[data-evidence-panel]", { pointerEvents: "auto" }, marketTime(0.49));
-      timeline.to("[data-why-copy]", { autoAlpha: 0, y: -20, duration: marketTime(0.055) }, marketTime(0.64));
-      timeline.set("[data-evidence-panel]", { pointerEvents: "none" }, marketTime(0.655));
-      timeline.to("[data-evidence-panel]", { autoAlpha: 0, y: -8, duration: marketTime(0.055) }, marketTime(0.66));
-      timeline.fromTo(chartBridge, { autoAlpha: 0 }, { autoAlpha: 1, duration: marketTime(0.07) }, marketTime(0.68));
-      timeline.fromTo(productShell, { autoAlpha: 0 }, { autoAlpha: 1, duration: marketTime(0.06) }, marketTime(0.71));
+      timeline.fromTo(
+        orbitLegend,
+        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 1, y: 0, duration: marketTime(0.08), ease: "power2.out" },
+        marketTime(copy.orbitLegendIn),
+      );
+      timeline.set("[data-evidence-panel]", { pointerEvents: "auto" }, marketTime(copy.evidenceInteractiveFrom));
+      timeline.to("[data-why-copy]", { autoAlpha: 0, y: -20, duration: marketTime(0.055) }, marketTime(copy.whyOut));
+      timeline.set("[data-evidence-panel]", { pointerEvents: "none" }, marketTime(copy.evidenceInteractiveTo));
+      timeline.to(orbitLegend, { autoAlpha: 0, y: -8, duration: marketTime(0.055) }, marketTime(copy.orbitLegendOut));
+      timeline.to("[data-evidence-panel]", { autoAlpha: 0, y: -8, duration: marketTime(0.055) }, marketTime(copy.evidenceOut));
+      timeline.fromTo(chartBridge, { autoAlpha: 0 }, { autoAlpha: 1, duration: marketTime(0.07) }, marketTime(product.bridgeIn));
+      timeline.fromTo(productShell, { autoAlpha: 0 }, { autoAlpha: 1, duration: marketTime(0.06) }, marketTime(product.shellIn));
       timeline.fromTo(
         productFrame,
         { autoAlpha: 0, y: 12 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.07), ease: "power2.out" },
-        marketTime(0.715),
+        marketTime(product.frameIn),
       );
       timeline.fromTo(
         productChart,
@@ -388,20 +436,20 @@ export function IntegratedNarrativeRuntime() {
           duration: marketTime(0.13),
           ease: "power2.inOut",
         },
-        marketTime(0.73),
+        marketTime(product.chartIn),
       );
       timeline.fromTo(
         productParts,
         { autoAlpha: 0, y: 16 },
         { autoAlpha: 1, y: 0, duration: marketTime(0.085), ease: "power2.out" },
-        marketTime(0.8),
+        marketTime(product.partsIn),
       );
-      timeline.to(chartBridge, { autoAlpha: 0, duration: marketTime(0.06) }, marketTime(0.81));
-      timeline.set(productShell, { pointerEvents: "auto" }, marketTime(0.84));
+      timeline.to(chartBridge, { autoAlpha: 0, duration: marketTime(0.06) }, marketTime(product.bridgeOut));
+      timeline.set(productShell, { pointerEvents: "auto" }, marketTime(product.interactiveFrom));
 
-      timeline.call(() => placeDecisionBridge(tradeNode), [], 0.822);
+      timeline.call(() => placeDecisionBridge(tradeNode), [], STORY_TAIL.decisionBridge.place);
       if (decisionBridge) {
-        timeline.to(decisionBridge, { autoAlpha: 1, duration: 0.018 }, 0.824);
+        timeline.to(decisionBridge, { autoAlpha: 1, duration: 0.018 }, STORY_TAIL.decisionBridge.show);
         timeline.to(
           decisionBridge,
           {
@@ -419,7 +467,7 @@ export function IntegratedNarrativeRuntime() {
             duration: 0.045,
             ease: "power2.inOut",
           },
-          0.834,
+          STORY_TAIL.decisionBridge.mid,
         );
         timeline.to(
           decisionBridge,
@@ -436,25 +484,29 @@ export function IntegratedNarrativeRuntime() {
             duration: 0.07,
             ease: "power2.inOut",
           },
-          0.872,
+          STORY_TAIL.decisionBridge.dock,
         );
-        timeline.to(decisionBridge, { autoAlpha: 0, scale: 0.42, duration: 0.035 }, 0.925);
+        timeline.to(
+          decisionBridge,
+          { autoAlpha: 0, scale: 0.42, duration: 0.035 },
+          STORY_TAIL.decisionBridge.hide,
+        );
       }
 
-      timeline.set(productShell, { pointerEvents: "none" }, 0.835);
+      timeline.set(productShell, { pointerEvents: "none" }, STORY_TAIL.productExit);
       timeline.to(
         productShell,
         { autoAlpha: 0, y: -18, scale: 0.99, duration: 0.07, ease: "power2.inOut" },
-        0.835,
+        STORY_TAIL.productExit,
       );
       timeline.fromTo(
         memoryLayer,
         { autoAlpha: 0, y: 16 },
         { autoAlpha: 1, y: 0, duration: 0.08, ease: "power2.out" },
-        0.855,
+        STORY_TAIL.memoryIn,
       );
-      timeline.to(memoryReceipt, { autoAlpha: 1, duration: 0.035 }, 0.9);
-      timeline.set(canvasLayer, { pointerEvents: "auto" }, 0.93);
+      timeline.to(memoryReceipt, { autoAlpha: 1, duration: 0.035 }, STORY_TAIL.receiptIn);
+      timeline.set(canvasLayer, { pointerEvents: "auto" }, STORY_TAIL.memoryInteractive);
 
       return () => {
         if (rendererPausedRef.current) {
@@ -517,7 +569,8 @@ export function IntegratedNarrativeRuntime() {
               lockCopyRef={lockCopyRef}
               reducedMotion={reducedMotion}
               enablePostprocessing={effectsEnabled}
-              activeEvidenceIndex={activeEvidenceIndex}
+              activeEvidenceRef={activeEvidenceIndexRef}
+              orbitLabels={orbitLabelsRef}
               activeDomainId={activeDomainId}
               onDomainChange={setActiveDomainId}
             />
@@ -526,7 +579,6 @@ export function IntegratedNarrativeRuntime() {
         <div className={motionStyles.grain} aria-hidden="true" />
         <div className={motionStyles.scanlines} aria-hidden="true" />
         <MotionLabNarrativeOverlay
-          showTradeCopy={false}
           activeEvidenceIndex={activeEvidenceIndex}
           onEvidenceChange={handleEvidenceChange}
           lockCopyRef={lockCopyRef}

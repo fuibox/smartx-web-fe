@@ -291,6 +291,61 @@ V2 实现进入正式首页前，至少应满足以下判断：
 
 ## 15. 版本记录
 
+### V3 原型 / 2026-07-21（并行路由 `/v3`，方向探索）
+
+- 新增编辑化原型 `/v3`（"终端即主角"）：普通文档流 + 排版节奏，与叙事版并行对照，未替换正式首页。
+- 结构：Hero（复用）→ 四章编辑化章节（See the move = 真实信号流 / Know the why = 证据 pin 图表 + 证据栏 / Make the trade = 策略卡 + 仓位 / Memory = 全页唯一 3D 时刻）→ Updates/Footer（复用）。
+- 签名 spine：一条信号线沿左缘贯穿全部章节，滚动驱动绘制，章节节点随 reveal 点亮——全页唯一的连续视觉对象。
+- `ProbabilityChart` 抽取为 `product-demo/probability-chart.tsx`，叙事版与 v3 共用。
+- 证据截图：`output/playwright/round10/`。
+
+### V2.6 / 2026-07-21（同日第四轮）
+
+- Know the Why 定稿为**证据汇流**方案：轨道/扫描环全部移除，四条数据流从 context 卡（`WHY_CONTEXT_PLACEMENTS` 反投影）流向行星表面，粒子沿流向行星移动、命中点脉冲；激活维度流更亮更快（×1.7）。运动方向即语义——证据流入市场、汇聚成一个价格，与文案完全同构。
+- context 卡位置常量收敛到 `story.config.ts`，overlay 排版与 WebGL 流起点共用，保证精确对齐。
+- 验证证据：`output/playwright/round9/`。
+
+### V2.5 / 2026-07-21（同日第三轮）
+
+- 磁吸节奏放缓：snap 时长 0.24-0.58s → 0.55-1.2s（power1.inOut）、scrub 0.32 → 0.5，过渡演出不再被闪过。
+- SEE THE MOVE 标题与 legend 延长到 Lock 阶段（copy.moveOut 0.26 → 0.34），第二静态屏保留章节语义。
+- 证据切换改为停留时间轮播（3.4s/档，interval 驱动），不再被磁吸滚动一闪跳到最后一档；用户点击后停止自动轮播。
+- Know the Why 轨道改为 2.5D 扫描环：浅倾角（0.34-0.55 rad）同心椭圆 + depthTest 关闭，HUD 语义，从根上消除遮挡接缝；删除双 pass。
+- 卡片高级化：context 卡 / MARKET NODE / legend 去盒子化——色点标识 + 大号 mono 数值（16-17px）+ 发丝底线替代描边盒。
+- 验证证据：`output/playwright/round8/`。
+
+### V2.4 / 2026-07-21（同日第二轮）
+
+- Know the Why 改为群星（Stellaris）式勘查视角：四张 context 属性卡固定屏幕位置环绕行星（11-14px 可读字号、引线指向行星、可点击切换），不再跟随轨道节点投影；仅激活维度的轨道做完整遮挡渲染，其余只保留幽灵弧，消除多轨道遮挡接缝的杂乱感。
+- Make the Trade 意象化：拆除终端面板的盒子边框与底色，图表/市场标题/证据 chips 漂浮于宇宙背景，保留真实 lightweight-charts 与策略卡内容。
+- Memory 视觉向 `smartx-fe-vc-demo` 对齐：线框球核心 + 内部暗核，集群改为扁平饱和色星盘 + 细椭圆环 + 权重驱动的不规则星座因子节点，锚点非对称分布。
+- 全站字号 sweep：所有 <11px 文本提升至 11px 下限；删除已被 MarketInstrument 取代的 MarketDemo 组件链（market-demo.tsx / chart-view / module.css）。
+- 验证证据：`output/playwright/round7/`。
+
+### V2.3 / 2026-07-21
+
+- 新增 `docs/visual-motion-spec.md` 作为全部屏幕精修的验收标准（发光预算、流星渲染标准、遮挡规则、字阶）。
+- 首屏：环境流星密度提升并拆分远/近两层，生命周期与路径完成绑定（不再中途消失）；~15% 快闪星 + 大星偶发 glint；信号头光晕收敛。
+- Universe 流星头改为 billboard shader 精灵（白核 + 色晕），脉冲走亮度 uniform，目标流星锁定时带十字 glint；尾迹近头端偏白。
+- Know the Why：轨道双 pass 遮挡（前景亮弧被行星正确遮挡 + 幽灵弧暗示闭环），行星 wireframe 降密度，节点转入背面时标签降权、激活标签始终可读。
+- Make the Trade：信号事件以 series markers 锚定图表时间轴（按 tone 着色 + AUTO 触发标记）；右栏新增 Automation 策略卡（IF/AND/THEN 触发规则、30d 模拟回测、跟单入口标注 Coming）。
+- Memory：面板字体从 system-ui 修正为全站 `--font-ui`，字阶按规范重排（20px 面板题 / 13px 正文 / 12-13px mono 数据 / 11px kicker）。
+- 验证证据：`output/playwright/round6/`。
+
+### V2.2 / 2026-07-20（同日第二轮）
+
+- 流星方向统一为单一辐射方位（左上 → 右下）：首屏 cosmic（Canvas 2D）与 Universe 章节（WebGL）共用同一方位语义，信号流星（彩色、更亮、头部脉冲）与环境流星（暗白、平行）分层；流星头部在吸附静止时保持呼吸脉冲。
+- `smartx-main.js` 从 2702 行精简至约 600 行：删除全部旧网格模拟，仅保留 cosmic 渲染、标题字符校准与生命周期接口；`OriginalHero` 不再有 grid/cosmic 开关。
+- Hero → See the Move 过渡加强：文案上移距离从 9vh 提高到 16vh，相机新增入场前推（`universe.cameraApproach`）。
+- Know the Why 轨道系统全部进入 WebGL：SVG 图例废弃，4 条彩色倾斜轨道与行星共享同一变换空间，证据节点沿轨道运行（相位保持约 90° 间隔），DOM 标签沿"行星中心 → 节点"方向投影环绕定位，MARKET NODE 价格 chip 锚定行星下方投影点。
+- 验证证据：`output/playwright/round5/`。
+
+### V2.1 / 2026-07-20
+
+- 首屏方向变更：Hero 背景从动力学网格切换为 cosmic 星空（`OriginalHero surface="cosmic"`，由 `smartx-main.js` 的 Canvas 2D cosmic renderer 驱动）。Hero 的 DOM、标题、CTA 与 reveal 机制保持不变；本条目取代 §5 Scene 01 中"保持当前首屏网格"的表述。
+- `/original` 旧首页与 `/motion-lab` 全部验证路由已删除（Phase 1-4 验证完成后按计划回收）；回归对照使用 `output/playwright/` 截图。
+- 全部场景时间窗口收敛到 `story.config.ts`（`MARKET_SCENE` / `STORY_TAIL`），GSAP timeline 与 WebGL 场景共同消费，调节奏只改一个文件。
+
 ### V2 / 2026-07-14
 
 - 保持现有 Hero。

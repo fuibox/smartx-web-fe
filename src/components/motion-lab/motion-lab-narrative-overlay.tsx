@@ -2,14 +2,12 @@
 
 import {
   Activity,
-  ArrowLeft,
   BellRing,
   Crosshair,
   Newspaper,
   Tags,
   WalletCards,
 } from "lucide-react";
-import Link from "next/link";
 import type { CSSProperties, MutableRefObject } from "react";
 
 import { MarketInstrument } from "@/components/product-demo/market-instrument";
@@ -21,16 +19,12 @@ import {
   STORY_SCROLL_VIEWPORTS,
   STORY_SIGNAL_TYPES,
   STORY_STATES,
+  WHY_CONTEXT_PLACEMENTS,
 } from "./story.config";
 
 const handoffChartPaths = createMarketChartPaths();
 
 type MotionLabNarrativeOverlayProps = {
-  showStudyChrome?: boolean;
-  showStudyHero?: boolean;
-  showScrollMarker?: boolean;
-  studyId?: string;
-  showTradeCopy?: boolean;
   activeEvidenceIndex?: number;
   onEvidenceChange?: (index: number) => void;
   tradeCommitted?: boolean;
@@ -46,6 +40,7 @@ const storyLabels = {
   product: "Act",
   memory: "Learn",
 } as const;
+
 
 function SignalIcon({ tone }: { tone: (typeof STORY_SIGNAL_TYPES)[number]["tone"] }) {
   if (tone === "smart") return <WalletCards aria-hidden="true" />;
@@ -93,11 +88,6 @@ function StoryProgress() {
 }
 
 export function MotionLabNarrativeOverlay({
-  showStudyChrome = false,
-  showStudyHero = false,
-  showScrollMarker = false,
-  studyId = "01",
-  showTradeCopy = true,
   activeEvidenceIndex = 0,
   onEvidenceChange = () => undefined,
   tradeCommitted = false,
@@ -112,32 +102,7 @@ export function MotionLabNarrativeOverlay({
 
   return (
     <>
-      {!showStudyChrome ? <StoryProgress /> : null}
-      {showStudyChrome ? (
-        <header className={styles.labHeader}>
-          <Link href="/" aria-label="Back to SmartX home">
-            <ArrowLeft aria-hidden="true" />
-            SmartX
-          </Link>
-          <span>Motion study / {studyId}</span>
-          <span className={styles.liveStatus}>
-            <i aria-hidden="true" />
-            WebGL live
-          </span>
-        </header>
-      ) : null}
-
-      {showStudyHero ? (
-        <section className={styles.heroCopy} data-lab-hero aria-label="SmartX hero continuity study">
-          <span>Market intelligence / spatial study</span>
-          <h1>
-            The AI Trading Terminal
-            <br />
-            Built Around You
-          </h1>
-          <p>Alpha tuned to your focus, edge, and style</p>
-        </section>
-      ) : null}
+      <StoryProgress />
 
       <section className={`${styles.sceneCopy} ${styles.moveCopy}`} data-scene-copy data-move-copy>
         <span>Market movement</span>
@@ -171,6 +136,7 @@ export function MotionLabNarrativeOverlay({
       <section className={`${styles.sceneCopy} ${styles.whyCopy}`} data-scene-copy data-why-copy>
         <span>Decision context</span>
         <h2>Know the why.</h2>
+        <p>Four signal threads converge on one price.</p>
       </section>
 
       <section className={styles.evidenceExplorer} data-evidence-panel aria-label="Inspect market evidence">
@@ -194,6 +160,42 @@ export function MotionLabNarrativeOverlay({
             </button>
           ))}
         </nav>
+      </section>
+
+      <section
+        className={styles.orbitLegend}
+        data-why-orbit-legend
+        aria-label="Decision map"
+        data-active-index={resolvedEvidenceIndex}
+      >
+        <div className={styles.orbitCenter}>
+          <span>MARKET NODE</span>
+          <strong>68.4¢</strong>
+          <small>4 signals aligned</small>
+        </div>
+
+        {STORY_EVIDENCE.map((item, index) => {
+          const placement = WHY_CONTEXT_PLACEMENTS[index];
+          return (
+            <button
+              type="button"
+              className={styles.orbitKey}
+              data-tone={item.tone}
+              data-active={index === resolvedEvidenceIndex}
+              data-side={placement.side}
+              aria-pressed={index === resolvedEvidenceIndex}
+              onClick={() => onEvidenceChange(index)}
+              style={
+                { left: `${placement.left}%`, top: `${placement.top}%` } as CSSProperties
+              }
+              key={item.label}
+            >
+              <span>{item.navLabel}</span>
+              <strong>{item.metric}</strong>
+              <small>{item.headline}</small>
+            </button>
+          );
+        })}
       </section>
 
       <svg
@@ -220,19 +222,6 @@ export function MotionLabNarrativeOverlay({
         <i />
       </div>
 
-      {showTradeCopy ? (
-        <section className={styles.tradeCopy} data-trade-copy data-scene-copy>
-          <span>03 / Execute</span>
-          <h2>Make the trade.</h2>
-        </section>
-      ) : null}
-
-      {showScrollMarker ? (
-        <div className={styles.scrollMarker} aria-hidden="true">
-          <span>Scroll</span>
-          <i />
-        </div>
-      ) : null}
     </>
   );
 }

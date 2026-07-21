@@ -5,7 +5,7 @@ import type { MutableRefObject } from "react";
 import { MemoryScene } from "@/components/memory-demo/memory-scene";
 import type { MemoryDomainId } from "@/components/memory-demo/memory-demo.types";
 
-import { RelayTexture } from "./hero-relay-scene";
+import { RelayTexture } from "./relay-texture";
 import { MotionLabScene, type HandoffAnchorRef, type LockCopyRef } from "./motion-lab-scene";
 
 type IntegratedNarrativeSceneProps = {
@@ -17,7 +17,8 @@ type IntegratedNarrativeSceneProps = {
   lockCopyRef: LockCopyRef;
   reducedMotion: boolean;
   enablePostprocessing: boolean;
-  activeEvidenceIndex: number;
+  activeEvidenceRef: MutableRefObject<number>;
+  orbitLabels: MutableRefObject<HTMLElement | null>;
   activeDomainId: MemoryDomainId;
   onDomainChange: (domainId: MemoryDomainId) => void;
 };
@@ -31,7 +32,8 @@ export function IntegratedNarrativeScene({
   lockCopyRef,
   reducedMotion,
   enablePostprocessing,
-  activeEvidenceIndex,
+  activeEvidenceRef,
+  orbitLabels,
   activeDomainId,
   onDomainChange,
 }: IntegratedNarrativeSceneProps) {
@@ -43,8 +45,8 @@ export function IntegratedNarrativeScene({
         handoffAnchor={handoffAnchor}
         lockCopyRef={lockCopyRef}
         enablePostprocessing={enablePostprocessing}
-        showHeroGrid={false}
-        activeEvidenceIndex={activeEvidenceIndex}
+        activeEvidenceRef={activeEvidenceRef}
+        orbitLabels={orbitLabels}
       />
       <MemoryScene
         progress={storyProgress}

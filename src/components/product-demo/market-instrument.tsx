@@ -1,15 +1,6 @@
 "use client";
 
 import {
-  CandlestickSeries,
-  ColorType,
-  CrosshairMode,
-  createChart,
-  type CandlestickData,
-  type Time,
-  type UTCTimestamp,
-} from "lightweight-charts";
-import {
   Activity,
   Check,
   GitCompareArrows,
@@ -18,10 +9,10 @@ import {
   TrendingUp,
   WalletCards,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { fedRateMarketFixture } from "./market-demo.fixture";
 import type { MarketEvidence } from "./market-demo.types";
+import { EVENT_POSITIONS, ProbabilityChart } from "./probability-chart";
 import styles from "./market-instrument.module.css";
 
 type MarketInstrumentProps = {
@@ -31,115 +22,12 @@ type MarketInstrumentProps = {
   onEvidenceChange: (index: number) => void;
 };
 
-const START_TIME = Date.UTC(2026, 6, 14, 5, 0, 0) / 1000;
-const EVENT_POSITIONS = [
-  { left: 19, top: 66 },
-  { left: 38, top: 49 },
-  { left: 54, top: 58 },
-  { left: 69, top: 31 },
-  { left: 84, top: 24 },
-] as const;
-
-function createProbabilityCandles(): CandlestickData<Time>[] {
-  let previousClose = 56.8;
-
-  return Array.from({ length: 72 }, (_, index) => {
-    const ratio = index / 71;
-    const trend = 56.2 + ratio * 11.5;
-    const wave = Math.sin(ratio * Math.PI * 4.6) * 1.65 + Math.sin(ratio * 19.4) * 0.48;
-    const close = index === 71 ? 68.4 : Number((trend + wave).toFixed(2));
-    const open = Number(previousClose.toFixed(2));
-    const spread = 0.32 + Math.abs(Math.sin(index * 1.71)) * 0.54;
-    const high = Number((Math.max(open, close) + spread).toFixed(2));
-    const low = Number((Math.min(open, close) - spread * 0.82).toFixed(2));
-    previousClose = close;
-
-    return {
-      time: (START_TIME + index * 900) as UTCTimestamp,
-      open,
-      high,
-      low,
-      close,
-    };
-  });
-}
-
-const probabilityCandles = createProbabilityCandles();
-
 function EvidenceIcon({ evidence }: { evidence: MarketEvidence }) {
   if (evidence.tone === "smart") return <WalletCards aria-hidden="true" />;
   if (evidence.tone === "news") return <Newspaper aria-hidden="true" />;
   if (evidence.tone === "structure") return <Layers3 aria-hidden="true" />;
   if (evidence.tone === "related") return <GitCompareArrows aria-hidden="true" />;
   return <TrendingUp aria-hidden="true" />;
-}
-
-function ProbabilityChart() {
-  const hostRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-
-    const chart = createChart(host, {
-      autoSize: true,
-      layout: {
-        background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#71847f",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
-        fontSize: 10,
-        attributionLogo: false,
-      },
-      grid: {
-        vertLines: { color: "rgba(90, 127, 119, 0.11)" },
-        horzLines: { color: "rgba(90, 127, 119, 0.13)" },
-      },
-      crosshair: {
-        mode: CrosshairMode.Magnet,
-        vertLine: {
-          color: "rgba(154, 231, 214, 0.34)",
-          labelBackgroundColor: "#10302a",
-        },
-        horzLine: {
-          color: "rgba(154, 231, 214, 0.24)",
-          labelBackgroundColor: "#10302a",
-        },
-      },
-      rightPriceScale: {
-        borderColor: "rgba(97, 136, 127, 0.22)",
-        scaleMargins: { top: 0.12, bottom: 0.12 },
-      },
-      timeScale: {
-        borderColor: "rgba(97, 136, 127, 0.22)",
-        timeVisible: true,
-        secondsVisible: false,
-        rightOffset: 3,
-        barSpacing: 10,
-      },
-      handleScroll: false,
-      handleScale: false,
-      localization: {
-        priceFormatter: (price: number) => `${price.toFixed(1)}%`,
-      },
-    });
-
-    const series = chart.addSeries(CandlestickSeries, {
-      upColor: "#0ed5b0",
-      downColor: "#d76063",
-      borderVisible: false,
-      wickUpColor: "#65e4ca",
-      wickDownColor: "#dd7b7d",
-      priceLineColor: "rgba(8, 223, 181, 0.36)",
-      priceLineWidth: 1,
-      lastValueVisible: true,
-    });
-    series.setData(probabilityCandles);
-    chart.timeScale().fitContent();
-
-    return () => chart.remove();
-  }, []);
-
-  return <div ref={hostRef} className={styles.chartCanvas} />;
 }
 
 export function MarketInstrument({
@@ -184,7 +72,7 @@ export function MarketInstrument({
             <span>YES probability</span>
             <strong>Evidence stays attached to price</strong>
           </div>
-          <ProbabilityChart />
+          <ProbabilityChart className={styles.chartCanvas} />
           <div className={styles.eventLayer} aria-label="Events on the market chart">
             {evidence.map((item, index) => {
               const position = EVENT_POSITIONS[index] ?? EVENT_POSITIONS[EVENT_POSITIONS.length - 1];
@@ -246,6 +134,32 @@ export function MarketInstrument({
           </div>
           <strong>{activeEvidence.headline}</strong>
           <p>{activeEvidence.detail}</p>
+        </div>
+
+        <div className={styles.strategyCard} aria-label="Automation strategy">
+          <header>
+            <span>Automation</span>
+            <b>Triggered · 2m ago</b>
+          </header>
+          <p className={styles.strategyRule}>
+            <code>IF</code> Smart money net flow ≥ $2M / 10m
+            <code>AND</code> YES &lt; 70¢
+            <code>THEN</code> Buy YES $1,000
+          </p>
+          <div className={styles.strategyMeta}>
+            <svg viewBox="0 0 96 26" aria-hidden="true">
+              <polyline points="0,20 12,18 22,19 32,15 44,16 54,11 66,12 78,7 88,8 96,4" />
+            </svg>
+            <div>
+              <strong>+18.4%</strong>
+              <span>30d simulated</span>
+            </div>
+          </div>
+          <div className={styles.copyTradeRow}>
+            <WalletCards aria-hidden="true" />
+            <span>Mirror 9 macro-specialist wallets</span>
+            <b>Coming</b>
+          </div>
         </div>
 
         <div className={styles.positionSummary}>

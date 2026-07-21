@@ -4,13 +4,20 @@ import { AdaptiveDpr, Line } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { damp3, dampLookAt } from "maath/easing";
-import { useMemo, useRef, type ElementRef, type MutableRefObject } from "react";
+import {
+  useMemo,
+  useRef,
+  type ElementRef,
+  type MutableRefObject,
+} from "react";
 import * as THREE from "three";
 
 import {
   sampleMarketChart,
   sampleMarketChartX,
 } from "@/components/product-demo/market-demo-chart";
+
+import { MARKET_SCENE, WHY_CONTEXT_PLACEMENTS, type SceneWindow } from "./story.config";
 
 type ProgressRef = { current: number };
 
@@ -35,6 +42,7 @@ const SIGNAL_COLORS = {
   smart: "#36c7e8",
   fast: "#ff9b3e",
   orders: "#ffc45e",
+  cohort: "#88b8d8",
   risk: "#ff6d70",
 };
 
@@ -47,9 +55,8 @@ function smoothstep(start: number, end: number, value: number) {
   return t * t * (3 - 2 * t);
 }
 
-function smootherstep(start: number, end: number, value: number) {
-  const t = clamp((value - start) / (end - start));
-  return t * t * t * (t * (t * 6 - 15) + 10);
+function windowStep(window: SceneWindow, value: number) {
+  return smoothstep(window[0], window[1], value);
 }
 
 function lerp(start: number, end: number, amount: number) {
@@ -99,15 +106,16 @@ function SceneDirector({ progress, reducedMotion }: SceneProps) {
 
   useFrame((_, delta) => {
     const rawProgress = reducedMotion ? 0.78 : progress.current;
-    const flight = smoothstep(0.14, 0.46, rawProgress);
-    const signalTrack = smoothstep(0.28, 0.46, rawProgress);
-    const inspection = smoothstep(0.4, 0.62, rawProgress);
-    const handoff = smoothstep(0.64, 0.84, rawProgress);
+    const approach = windowStep(MARKET_SCENE.universe.cameraApproach, rawProgress);
+    const flight = windowStep(MARKET_SCENE.universe.cameraFlight, rawProgress);
+    const signalTrack = windowStep(MARKET_SCENE.universe.cameraSignalTrack, rawProgress);
+    const inspection = windowStep(MARKET_SCENE.universe.cameraInspection, rawProgress);
+    const handoff = windowStep(MARKET_SCENE.universe.cameraHandoff, rawProgress);
 
     flightPath.getPointAt(flight, positionTarget);
     positionTarget.x = lerp(positionTarget.x, 0.42, signalTrack) - handoff * 0.42;
     positionTarget.y = lerp(positionTarget.y, -0.08, inspection) + handoff * 0.08;
-    positionTarget.z += handoff * 1.9;
+    positionTarget.z += (1 - approach) * 0.5 + handoff * 1.9;
 
     lookAtTarget.set(
       lerp(0, -0.55, handoff),
@@ -137,95 +145,6 @@ function SceneDirector({ progress, reducedMotion }: SceneProps) {
   return null;
 }
 
-function HeroGrid({ progress, reducedMotion }: SceneProps) {
-  const groupRef = useRef<THREE.Group>(null);
-  const materialRef = useRef<THREE.LineBasicMaterial>(null);
-  const pointMaterialRef = useRef<THREE.PointsMaterial>(null);
-
-  const { linePositions, pointPositions } = useMemo(() => {
-    const lines: number[] = [];
-    const points: number[] = [];
-    const columns = 22;
-    const rows = 14;
-    const width = 15;
-    const height = 9;
-
-    for (let column = 0; column <= columns; column += 1) {
-      const x = -width / 2 + (width * column) / columns;
-      lines.push(x, -height / 2, 0, x, height / 2, 0);
-    }
-
-    for (let row = 0; row <= rows; row += 1) {
-      const y = -height / 2 + (height * row) / rows;
-      lines.push(-width / 2, y, 0, width / 2, y, 0);
-    }
-
-    for (let row = 0; row <= rows; row += 1) {
-      for (let column = 0; column <= columns; column += 1) {
-        points.push(
-          -width / 2 + (width * column) / columns,
-          -height / 2 + (height * row) / rows,
-          0,
-        );
-      }
-    }
-
-    return {
-      linePositions: new Float32Array(lines),
-      pointPositions: new Float32Array(points),
-    };
-  }, []);
-
-  useFrame(() => {
-    const group = groupRef.current;
-    const material = materialRef.current;
-    const pointMaterial = pointMaterialRef.current;
-    if (!group || !material || !pointMaterial) return;
-
-    const value = reducedMotion ? 0.18 : progress.current;
-    const depth = smoothstep(0.02, 0.23, value);
-    const fade = 1 - smootherstep(0.19, 0.3, value);
-
-    group.rotation.x = 0;
-    group.position.y = 0;
-    group.position.z = lerp(-1.8, 2.75, depth);
-    group.scale.setScalar(lerp(1, 2.85, depth));
-    material.opacity = 0.2 * fade;
-    pointMaterial.opacity = 0.48 * fade;
-  });
-
-  return (
-    <group ref={groupRef}>
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial
-          ref={materialRef}
-          color={SIGNAL_COLORS.primary}
-          transparent
-          opacity={0.2}
-          depthWrite={false}
-        />
-      </lineSegments>
-      <points>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[pointPositions, 3]} />
-        </bufferGeometry>
-        <pointsMaterial
-          ref={pointMaterialRef}
-          color="#9ae8d8"
-          size={0.028}
-          transparent
-          opacity={0.48}
-          depthWrite={false}
-          sizeAttenuation
-        />
-      </points>
-    </group>
-  );
-}
-
 function SignalField({ progress, reducedMotion }: SceneProps) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const positions = useMemo(() => {
@@ -246,6 +165,18 @@ function SignalField({ progress, reducedMotion }: SceneProps) {
     return new Float32Array(Array.from({ length: 720 }, () => 0.55 + random() * 1.45));
   }, []);
 
+  const twinklePhases = useMemo(() => {
+    const random = seededRandom(137);
+    return new Float32Array(Array.from({ length: 720 }, () => random()));
+  }, []);
+
+  const twinkleAmplitudes = useMemo(() => {
+    const random = seededRandom(211);
+    return new Float32Array(
+      Array.from({ length: 720 }, () => (random() > 0.82 ? 0.12 + random() * 0.08 : 0.035 + random() * 0.055)),
+    );
+  }, []);
+
   const uniforms = useMemo(
     () => ({
       uProgress: { value: 0 },
@@ -261,9 +192,9 @@ function SignalField({ progress, reducedMotion }: SceneProps) {
     if (!material) return;
 
     const value = reducedMotion ? 0.48 : progress.current;
-    const fadeIn = smoothstep(0.12, 0.28, value);
-    const fadeOut = 1 - smoothstep(0.72, 0.9, value);
-    const heroDepth = 1 - smoothstep(0.08, 0.24, value);
+    const fadeIn = windowStep(MARKET_SCENE.universe.starsIn, value);
+    const fadeOut = 1 - windowStep(MARKET_SCENE.universe.starsOut, value);
+    const heroDepth = 1 - windowStep(MARKET_SCENE.universe.heroDepth, value);
     material.uniforms.uProgress.value = value;
     material.uniforms.uOpacity.value = (heroDepth * 0.12 + fadeIn * 0.82) * fadeOut;
     material.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.5);
@@ -275,6 +206,8 @@ function SignalField({ progress, reducedMotion }: SceneProps) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
+        <bufferAttribute attach="attributes-aTwinklePhase" args={[twinklePhases, 1]} />
+        <bufferAttribute attach="attributes-aTwinkleAmplitude" args={[twinkleAmplitudes, 1]} />
       </bufferGeometry>
       <shaderMaterial
         ref={materialRef}
@@ -284,10 +217,14 @@ function SignalField({ progress, reducedMotion }: SceneProps) {
         blending={THREE.AdditiveBlending}
         vertexShader={`
           attribute float aSize;
+          attribute float aTwinklePhase;
+          attribute float aTwinkleAmplitude;
           uniform float uProgress;
           uniform float uPixelRatio;
           uniform float uTime;
           varying float vDepth;
+          varying float vTwinklePhase;
+          varying float vTwinkleAmplitude;
 
           void main() {
             vec3 transformed = position;
@@ -297,20 +234,26 @@ function SignalField({ progress, reducedMotion }: SceneProps) {
             transformed.y += cos(position.x * 0.72 + uTime * 0.07) * 0.08;
             vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
             vDepth = smoothstep(-30.0, 1.0, transformed.z);
+            vTwinklePhase = aTwinklePhase;
+            vTwinkleAmplitude = aTwinkleAmplitude;
             gl_PointSize = min(7.0, aSize * uPixelRatio * (38.0 / max(1.0, -mvPosition.z)));
             gl_Position = projectionMatrix * mvPosition;
           }
         `}
         fragmentShader={`
           uniform float uOpacity;
+          uniform float uTime;
           varying float vDepth;
+          varying float vTwinklePhase;
+          varying float vTwinkleAmplitude;
 
           void main() {
             vec2 centered = gl_PointCoord - vec2(0.5);
             float distanceFromCenter = length(centered);
             float alpha = smoothstep(0.5, 0.04, distanceFromCenter);
+            float twinkle = 1.0 + sin(uTime * (0.72 + vTwinklePhase * 1.24) + vTwinklePhase * 24.0) * vTwinkleAmplitude;
             vec3 color = mix(vec3(0.19, 0.50, 0.56), vec3(0.62, 0.96, 0.88), vDepth);
-            gl_FragColor = vec4(color, alpha * uOpacity);
+            gl_FragColor = vec4(color, alpha * uOpacity * twinkle);
           }
         `}
       />
@@ -328,37 +271,42 @@ type MeteorConfig = {
   target?: boolean;
 };
 
+/**
+ * 所有流星共享同一个方位（左上 → 右下），与首屏 cosmic 流星雨保持连续；
+ * 只有目标流星的终点固定在行星揭示锚点（0, -0.05, -2.8）。
+ * 路径避免让流星头部停留在左侧中带（SEE THE MOVE 标题区）。
+ */
 const METEORS: MeteorConfig[] = [
   {
-    start: [-6.4, 2.4, -8],
-    controlA: [-4.4, 3.1, -7.1],
-    controlB: [1.8, -0.1, -4.8],
-    end: [5.5, -2.4, -4],
+    start: [-7.2, 3.4, -7.5],
+    controlA: [-3.8, 3.0, -6.6],
+    controlB: [1.2, 2.2, -5.4],
+    end: [4.6, 1.4, -4.6],
     color: SIGNAL_COLORS.fast,
     delay: 0,
   },
   {
-    start: [6.3, 1.8, -9.5],
-    controlA: [5.1, 2.7, -8.1],
-    controlB: [2.4, 0.44, -4.1],
+    start: [-6.0, 2.8, -9.8],
+    controlA: [-3.6, 2.4, -7.6],
+    controlB: [-1.4, 1.0, -4.6],
     end: [0, -0.05, -2.8],
     color: "#91aaa4",
     delay: 0.035,
     target: true,
   },
   {
-    start: [-4.8, -2.5, -9],
-    controlA: [-3.1, -3.1, -8.2],
-    controlB: [2.8, 0.6, -7.1],
-    end: [6.5, 1.3, -6],
+    start: [-3.6, 1.6, -10.5],
+    controlA: [-0.6, 0.8, -9.4],
+    controlB: [3.4, -0.6, -7.8],
+    end: [6.4, -1.8, -6.5],
     color: SIGNAL_COLORS.smart,
     delay: 0.08,
   },
   {
-    start: [5.8, -1.8, -10.5],
-    controlA: [3.4, -2.8, -10.2],
-    controlB: [-1.8, 0.9, -9.1],
-    end: [-5.5, 2.6, -8],
+    start: [0.4, 3.8, -8.5],
+    controlA: [2.4, 3.0, -7.4],
+    controlB: [4.8, 1.6, -6.2],
+    end: [6.8, 0.2, -5.2],
     color: SIGNAL_COLORS.orders,
     delay: 0.13,
   },
@@ -366,8 +314,17 @@ const METEORS: MeteorConfig[] = [
 
 function Meteor({ config, progress, reducedMotion }: SceneProps & { config: MeteorConfig }) {
   const headRef = useRef<THREE.Group>(null);
-  const headMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
-  const headGlowMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
+  const headSpriteRef = useRef<THREE.Mesh>(null);
+  const headMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const headUniforms = useMemo(
+    () => ({
+      uColor: { value: new THREE.Color(config.color) },
+      uOpacity: { value: 0 },
+      uIntensity: { value: 1 },
+      uGlint: { value: 0 },
+    }),
+    [config.color],
+  );
   const tailGeometryRef = useRef<THREE.BufferGeometry>(null);
   const tailMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const coreLineRef = useRef<ElementRef<typeof Line>>(null);
@@ -406,29 +363,35 @@ function Meteor({ config, progress, reducedMotion }: SceneProps & { config: Mete
     [config],
   );
   const samplePoint = useMemo(() => new THREE.Vector3(), []);
-  const tangent = useMemo(() => new THREE.Vector3(), []);
-  const forward = useMemo(() => new THREE.Vector3(0, 0, 1), []);
   const baseColor = useMemo(() => new THREE.Color(config.color), [config.color]);
   const selectedColor = useMemo(() => new THREE.Color(SIGNAL_COLORS.primary), []);
   const currentColor = useMemo(() => new THREE.Color(config.color), [config.color]);
 
-  useFrame(({ gl, clock, size }, delta) => {
+  useFrame(({ gl, camera, clock, size }, delta) => {
     const head = headRef.current;
     const coreLine = coreLineRef.current;
     const tailGeometry = tailGeometryRef.current;
     const tailMaterial = tailMaterialRef.current;
     const headMaterial = headMaterialRef.current;
-    const headGlowMaterial = headGlowMaterialRef.current;
-    if (!head || !coreLine || !tailGeometry || !tailMaterial || !headMaterial || !headGlowMaterial) return;
+    if (!head || !coreLine || !tailGeometry || !tailMaterial || !headMaterial) return;
 
+    const meteorWindows = MARKET_SCENE.meteor;
     const value = reducedMotion ? 0.34 : progress.current;
-    const local = smoothstep(0.13 + config.delay, 0.4 + config.delay, value);
-    const targetHold = config.target ? 1 - smoothstep(0.43, 0.55, value) : 1;
-    const lockFocus = config.target ? smoothstep(0.29, 0.37, value) : 0;
-    const backgroundSignal = config.target ? 1 : 1 - smoothstep(0.3, 0.43, value) * 0.78;
-    const visible = smoothstep(0.08, 0.16, value) * (1 - smoothstep(0.56, 0.68, value));
-    const flickerWave = 0.5 + 0.5 * Math.sin(clock.elapsedTime * (1.4 + config.delay * 2.8) + config.delay * 42);
-    const flicker = reducedMotion ? 1 : 0.82 + flickerWave * 0.18;
+    const arrival = meteorWindows.travelEnd + config.delay;
+    const local = smoothstep(meteorWindows.travelStart + config.delay, arrival, value);
+    const lockFocus = config.target ? windowStep(meteorWindows.lockFocus, value) : 0;
+    const departureStart = config.target ? meteorWindows.targetDeparture[0] : arrival + 0.015;
+    const departureEnd = config.target ? meteorWindows.targetDeparture[1] : arrival + 0.1;
+    const visible =
+      windowStep(meteorWindows.appear, value) *
+      (1 - smoothstep(departureStart, departureEnd, value));
+    const backgroundSignal = config.target
+      ? 1
+      : 1 - smoothstep(meteorWindows.dimOthersFrom, arrival + 0.04, value) * 0.42;
+    const idleAmount = 1 - Math.min(1, velocityRef.current * 2.2);
+    const pulseWave =
+      0.5 + 0.5 * Math.sin(clock.elapsedTime * (2.1 + config.delay * 3.5) + config.delay * 42);
+    const flicker = reducedMotion ? 1 : 0.86 + pulseWave * 0.14;
     const viewportXScale = size.width <= 720 ? 0.42 : size.width <= 980 ? 0.78 : 1;
 
     const instantVelocity = Math.min(
@@ -457,30 +420,30 @@ function Meteor({ config, progress, reducedMotion }: SceneProps & { config: Mete
 
     curve.getPointAt(local, samplePoint);
     head.position.set(samplePoint.x * viewportXScale, samplePoint.y, samplePoint.z);
-    curve.getTangentAt(local, tangent).normalize();
-    tangent.x *= viewportXScale;
-    tangent.normalize();
-    head.quaternion.setFromUnitVectors(forward, tangent);
-    const speedStretch = 1 + Math.min(velocityRef.current * 0.28, 0.8);
-    head.scale.set(
-      config.target ? lerp(0.72, 1.05, local) : 0.78,
-      config.target ? lerp(0.72, 1.05, local) : 0.78,
-      speedStretch,
-    );
+    head.scale.setScalar(config.target ? lerp(0.85, 1.2, local) : 0.9);
+    if (headSpriteRef.current) {
+      headSpriteRef.current.quaternion.copy(camera.quaternion);
+    }
 
     currentColor.lerpColors(baseColor, selectedColor, lockFocus);
     tailMaterial.uniforms.uColor.value.copy(currentColor);
     coreLine.material.color.copy(currentColor);
-    headMaterial.color.copy(currentColor);
-    headGlowMaterial.color.copy(currentColor);
+    headMaterial.uniforms.uColor.value.copy(currentColor);
 
-    const opacity = visible * targetHold * backgroundSignal * flicker;
+    const opacity = visible * backgroundSignal * flicker;
     head.visible = opacity > 0.01;
     coreLine.material.opacity = opacity * (config.target ? 0.76 : 0.44);
     tailMaterial.uniforms.uOpacity.value = opacity * (config.target ? 0.9 : 0.62);
     tailMaterial.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.5);
-    headMaterial.opacity = opacity;
-    headGlowMaterial.opacity = opacity * 0.16;
+
+    // 脉冲走亮度 uniform（禁止几何缩放脉冲）；静止时呼吸更明显，滚动时收敛。
+    headMaterial.uniforms.uOpacity.value = opacity;
+    headMaterial.uniforms.uIntensity.value = reducedMotion
+      ? 1
+      : 1 + pulseWave * (0.18 + idleAmount * 0.4);
+    headMaterial.uniforms.uGlint.value = config.target
+      ? lockFocus * (0.55 + pulseWave * 0.45)
+      : 0;
   });
 
   return (
@@ -520,7 +483,8 @@ function Meteor({ config, progress, reducedMotion }: SceneProps & { config: Mete
               float radius = length(point);
               float core = smoothstep(0.48, 0.03, radius);
               float halo = smoothstep(0.5, 0.18, radius) * 0.34;
-              gl_FragColor = vec4(uColor, (core + halo) * vAlpha * uOpacity);
+              vec3 color = mix(uColor, vec3(1.0), pow(vAlpha, 3.0) * 0.45);
+              gl_FragColor = vec4(color, (core + halo) * vAlpha * uOpacity);
             }
           `}
         />
@@ -537,28 +501,41 @@ function Meteor({ config, progress, reducedMotion }: SceneProps & { config: Mete
         toneMapped={false}
       />
       <group ref={headRef}>
-        <mesh>
-          <sphereGeometry args={[0.085, 20, 20]} />
-          <meshBasicMaterial
+        <mesh ref={headSpriteRef}>
+          <planeGeometry args={[0.55, 0.55]} />
+          <shaderMaterial
             ref={headMaterialRef}
-            color={config.color}
+            uniforms={headUniforms}
             transparent
-            opacity={0}
-            blending={THREE.AdditiveBlending}
             depthWrite={false}
-            toneMapped={false}
-          />
-        </mesh>
-        <mesh scale={2.15}>
-          <sphereGeometry args={[0.085, 16, 16]} />
-          <meshBasicMaterial
-            ref={headGlowMaterialRef}
-            color={config.color}
-            transparent
-            opacity={0}
             blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            toneMapped={false}
+            vertexShader={`
+              varying vec2 vUv;
+
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `}
+            fragmentShader={`
+              uniform vec3 uColor;
+              uniform float uOpacity;
+              uniform float uIntensity;
+              uniform float uGlint;
+              varying vec2 vUv;
+
+              void main() {
+                vec2 centered = vUv - 0.5;
+                float dist = length(centered);
+                float core = exp(-dist * dist * 220.0);
+                float halo = exp(-dist * dist * 26.0) * 0.5;
+                float rays = (exp(-abs(centered.x) * 34.0) + exp(-abs(centered.y) * 34.0))
+                  * exp(-dist * 5.0) * 0.6 * uGlint;
+                vec3 color = mix(uColor, vec3(1.0), clamp(core * 0.9, 0.0, 1.0));
+                float alpha = (core + halo + rays) * uOpacity * uIntensity;
+                gl_FragColor = vec4(color, alpha);
+              }
+            `}
           />
         </mesh>
       </group>
@@ -597,12 +574,18 @@ function TargetLock({ progress, reducedMotion, lockCopyRef }: SceneProps & { loc
     const group = groupRef.current;
     if (!group) return;
     const value = reducedMotion ? 0.42 : progress.current;
-    const show = smoothstep(0.29, 0.36, value) * (1 - smoothstep(0.48, 0.56, value));
-    const targetProgress = smoothstep(0.13 + targetConfig.delay, 0.4 + targetConfig.delay, value);
+    const show =
+      windowStep(MARKET_SCENE.lock.frameIn, value) *
+      (1 - windowStep(MARKET_SCENE.lock.frameOut, value));
+    const targetProgress = smoothstep(
+      MARKET_SCENE.meteor.travelStart + targetConfig.delay,
+      MARKET_SCENE.meteor.travelEnd + targetConfig.delay,
+      value,
+    );
     const viewportXScale = size.width <= 720 ? 0.42 : size.width <= 980 ? 0.78 : 1;
     targetCurve.getPointAt(targetProgress, group.position);
     group.position.x *= viewportXScale;
-    group.scale.setScalar(lerp(1.45, 0.92, smoothstep(0.29, 0.4, value)));
+    group.scale.setScalar(lerp(1.45, 0.92, windowStep(MARKET_SCENE.lock.settle, value)));
     group.rotation.z = Math.sin(value * 14) * 0.012;
     linesRef.current.forEach((line) => {
       line.material.opacity = show * 0.82;
@@ -645,69 +628,95 @@ function TargetLock({ progress, reducedMotion, lockCopyRef }: SceneProps & { loc
   );
 }
 
-function ellipseArcPoints(
-  radiusX: number,
-  radiusY: number,
-  start: number,
-  end: number,
-  segments = 180,
-) {
-  return Array.from({ length: segments }, (_, index) => {
-    const angle = lerp(start, end, index / (segments - 1));
-    return new THREE.Vector3(Math.cos(angle) * radiusX, Math.sin(angle) * radiusY, 0);
-  });
-}
+/**
+ * Know the Why 的证据汇流（方案 A）：四条数据流从 context 卡（WHY_CONTEXT_PLACEMENTS
+ * 反投影到世界空间）流向行星表面——运动方向即语义：证据流入市场，汇聚成一个价格。
+ * 激活维度的流更亮更快，命中点带脉冲。
+ */
+const EVIDENCE_STREAMS = [
+  { tone: "fast", color: "#ff9b3e", bend: 0.5, speed: 0.22, phase: 0 },
+  { tone: "smart", color: "#36c7e8", bend: -0.38, speed: 0.2, phase: 0.35 },
+  { tone: "cohort", color: "#88b8d8", bend: 0.42, speed: 0.18, phase: 0.62 },
+  { tone: "news", color: "#ffc45e", bend: -0.46, speed: 0.21, phase: 0.18 },
+] as const;
 
-export function MotionLabUniversePrelude({
-  progress,
-  reducedMotion,
-  driveCamera = true,
-  showHeroGrid = true,
-}: SceneProps & { driveCamera?: boolean; showHeroGrid?: boolean }) {
-  return (
-    <>
-      {driveCamera ? <SceneDirector progress={progress} reducedMotion={reducedMotion} /> : null}
-      {showHeroGrid ? <HeroGrid progress={progress} reducedMotion={reducedMotion} /> : null}
-      <SignalField progress={progress} reducedMotion={reducedMotion} />
-      {METEORS.map((config, index) => (
-        <Meteor
-          key={`${config.color}-${index}`}
-          config={config}
-          progress={progress}
-          reducedMotion={reducedMotion}
-        />
-      ))}
-    </>
-  );
-}
+const STREAM_LINE_SEGMENTS = 24;
+const STREAM_PARTICLES = 12;
+
+type ActiveEvidenceRef = { current: number };
+type OrbitLabelsRef = MutableRefObject<HTMLElement | null>;
 
 function PlanetInspection({
   progress,
   reducedMotion,
   handoffAnchor,
-  activeEvidenceIndex,
-}: SceneProps & { handoffAnchor: HandoffAnchorRef; activeEvidenceIndex: number }) {
+  activeEvidenceRef,
+  orbitLabels,
+}: SceneProps & {
+  handoffAnchor: HandoffAnchorRef;
+  activeEvidenceRef?: ActiveEvidenceRef;
+  orbitLabels?: OrbitLabelsRef;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const shellMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
   const pointMaterialRef = useRef<THREE.PointsMaterial>(null);
   const coreMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
   const atmosphereMaterialRef = useRef<THREE.ShaderMaterial>(null);
-  const orbitLinesRef = useRef<Array<ElementRef<typeof Line>>>([]);
-  const markerRefs = useRef<THREE.Mesh[]>([]);
+  const streamLineRefs = useRef<Array<ElementRef<typeof Line> | null>>([]);
+  const streamGeometryRefs = useRef<Array<THREE.BufferGeometry | null>>([]);
+  const streamMaterialRefs = useRef<Array<THREE.ShaderMaterial | null>>([]);
+  const impactRefs = useRef<Array<THREE.Mesh | null>>([]);
+  const impactMaterialRefs = useRef<Array<THREE.MeshBasicMaterial | null>>([]);
+  const centerAnchorRef = useRef<THREE.Object3D>(null);
+  const streamLinePositions = useMemo(
+    () => EVIDENCE_STREAMS.map(() => new Float32Array((STREAM_LINE_SEGMENTS + 1) * 3)),
+    [],
+  );
+  const streamLineInitialPoints = useMemo(
+    () =>
+      EVIDENCE_STREAMS.map(() =>
+        Array.from({ length: STREAM_LINE_SEGMENTS + 1 }, () => new THREE.Vector3()),
+      ),
+    [],
+  );
+  const streamParticlePositions = useMemo(
+    () => EVIDENCE_STREAMS.map(() => new Float32Array(STREAM_PARTICLES * 3)),
+    [],
+  );
+  const streamParticleAlphas = useMemo(
+    () => EVIDENCE_STREAMS.map(() => new Float32Array(STREAM_PARTICLES)),
+    [],
+  );
+  const streamUniforms = useMemo(
+    () =>
+      EVIDENCE_STREAMS.map((spec) => ({
+        uColor: { value: new THREE.Color(spec.color) },
+        uOpacity: { value: 0 },
+        uPixelRatio: { value: 1 },
+      })),
+    [],
+  );
+  const streamCurve = useMemo(
+    () =>
+      new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+      ),
+    [],
+  );
   const { camera } = useThree();
   const endpointTarget = useMemo(() => new THREE.Vector3(), []);
   const projected = useMemo(() => new THREE.Vector3(), []);
   const direction = useMemo(() => new THREE.Vector3(), []);
+  const labelWorld = useMemo(() => new THREE.Vector3(), []);
+  const planetWorld = useMemo(() => new THREE.Vector3(), []);
+  const streamStart = useMemo(() => new THREE.Vector3(), []);
+  const streamEnd = useMemo(() => new THREE.Vector3(), []);
+  const toPlanet = useMemo(() => new THREE.Vector3(), []);
+  const streamPerp = useMemo(() => new THREE.Vector3(), []);
+  const streamSample = useMemo(() => new THREE.Vector3(), []);
 
-  const orbitSpecs = useMemo(
-    () => [
-      { radiusX: 1.56, radiusY: 0.54, start: -2.82, end: -2.82 + Math.PI * 2, rotation: [0.16, 0.18, 0.05] as const, color: SIGNAL_COLORS.primary },
-      { radiusX: 1.92, radiusY: 0.76, start: -0.42, end: -0.42 + Math.PI * 2, rotation: [-0.08, -0.12, -0.09] as const, color: SIGNAL_COLORS.smart },
-      { radiusX: 2.28, radiusY: 0.98, start: -2.58, end: -2.58 + Math.PI * 2, rotation: [0.24, 0.08, 0.14] as const, color: SIGNAL_COLORS.orders },
-      { radiusX: 2.66, radiusY: 1.14, start: 0.2, end: 0.2 + Math.PI * 2, rotation: [-0.18, 0.12, -0.16] as const, color: SIGNAL_COLORS.fast },
-    ],
-    [],
-  );
   const surfacePoints = useMemo(() => {
     const random = seededRandom(731);
     const positions = new Float32Array(240 * 3);
@@ -729,7 +738,7 @@ function PlanetInspection({
     [],
   );
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const group = groupRef.current;
     const shellMaterial = shellMaterialRef.current;
     const pointMaterial = pointMaterialRef.current;
@@ -738,8 +747,8 @@ function PlanetInspection({
     if (!group || !shellMaterial || !pointMaterial || !coreMaterial || !atmosphereMaterial) return;
 
     const value = reducedMotion ? 0.6 : progress.current;
-    const reveal = smoothstep(0.42, 0.58, value);
-    const morph = smoothstep(0.66, 0.84, value);
+    const reveal = windowStep(MARKET_SCENE.planet.reveal, value);
+    const morph = windowStep(MARKET_SCENE.planet.morph, value);
     const breathe = 1 + Math.sin(state.clock.elapsedTime * 1.2) * 0.012 * (1 - morph);
     const inspectionScale = state.size.width <= 720 ? 0.52 : state.size.width <= 980 ? 0.8 : 1;
     const anchor = handoffAnchor.current;
@@ -767,26 +776,108 @@ function PlanetInspection({
     shellMaterial.opacity = reveal * (1 - morph) * 0.055;
     coreMaterial.opacity = reveal * lerp(0.88, 0.96, morph);
     pointMaterial.opacity = reveal * (1 - morph) * 0.2;
-    atmosphereMaterial.uniforms.uOpacity.value = reveal * lerp(0.2, 0.38, morph);
-    orbitLinesRef.current.forEach((line, index) => {
-      const active = index === Math.min(Math.max(activeEvidenceIndex, 0), orbitSpecs.length - 1);
-      const targetOpacity = reveal * (1 - morph) * (active ? 0.68 : 0.16);
-      line.material.opacity = THREE.MathUtils.damp(line.material.opacity, targetOpacity, 10, delta);
+    atmosphereMaterial.uniforms.uOpacity.value = reveal * lerp(0.12, 0.26, morph);
+
+    const streamVisibility = reveal * (1 - morph);
+    const activeIndex = activeEvidenceRef?.current ?? 0;
+    const labelsElement = orbitLabels?.current ?? null;
+    const time = state.clock.elapsedTime;
+    const pixelRatio = Math.min(state.gl.getPixelRatio(), 1.5);
+
+    group.getWorldPosition(planetWorld);
+    const surfaceRadius = 0.74 * group.scale.x * 1.06;
+
+    EVIDENCE_STREAMS.forEach((spec, index) => {
+      const line = streamLineRefs.current[index];
+      const geometry = streamGeometryRefs.current[index];
+      const material = streamMaterialRefs.current[index];
+      const impact = impactRefs.current[index];
+      const impactMaterial = impactMaterialRefs.current[index];
+      if (!line || !geometry || !material || !impact || !impactMaterial) return;
+
+      const isActive = index === activeIndex;
+      const placement = WHY_CONTEXT_PLACEMENTS[index];
+
+      // 起点：context 卡的屏幕位置反投影到行星所在深度平面
+      screenPointToWorld(
+        camera,
+        placement.left / 100,
+        placement.top / 100,
+        planetWorld.z,
+        streamStart,
+        projected,
+        direction,
+      );
+      // 终点：行星表面朝向卡片的一侧
+      toPlanet.copy(streamStart).sub(planetWorld);
+      const startDistance = Math.max(0.001, toPlanet.length());
+      toPlanet.divideScalar(startDistance);
+      streamEnd.copy(planetWorld).addScaledVector(toPlanet, surfaceRadius);
+      // 控制点：中点加垂直弯曲，形成轻微弧线
+      streamPerp.set(-toPlanet.y, toPlanet.x, 0);
+      streamCurve.v0.copy(streamStart);
+      streamCurve.v2.copy(streamEnd);
+      streamCurve.v1
+        .copy(streamStart)
+        .add(streamEnd)
+        .multiplyScalar(0.5)
+        .addScaledVector(streamPerp, spec.bend * 0.24 * startDistance);
+
+      const linePositionArray = streamLinePositions[index];
+      for (let step = 0; step <= STREAM_LINE_SEGMENTS; step += 1) {
+        streamCurve.getPoint(step / STREAM_LINE_SEGMENTS, streamSample);
+        linePositionArray[step * 3] = streamSample.x;
+        linePositionArray[step * 3 + 1] = streamSample.y;
+        linePositionArray[step * 3 + 2] = streamSample.z;
+      }
+      line.geometry.setPositions(linePositionArray);
+      line.material.opacity = streamVisibility * (isActive ? 0.48 : 0.15);
+      line.material.linewidth = isActive ? 1.4 : 1;
+
+      // 粒子沿曲线向行星流动——方向即语义：证据流入市场
+      const flowSpeed = reducedMotion ? 0 : spec.speed * (isActive ? 1.7 : 1);
+      const particlePositionArray = streamParticlePositions[index];
+      const particleAlphaArray = streamParticleAlphas[index];
+      for (let particle = 0; particle < STREAM_PARTICLES; particle += 1) {
+        const phase = (time * flowSpeed + spec.phase + particle / STREAM_PARTICLES) % 1;
+        streamCurve.getPoint(phase, streamSample);
+        particlePositionArray[particle * 3] = streamSample.x;
+        particlePositionArray[particle * 3 + 1] = streamSample.y;
+        particlePositionArray[particle * 3 + 2] = streamSample.z;
+        particleAlphaArray[particle] =
+          Math.sin(phase * Math.PI) ** 0.6 * (0.3 + 0.7 * phase);
+      }
+      geometry.getAttribute("position").needsUpdate = true;
+      geometry.getAttribute("aAlpha").needsUpdate = true;
+      material.uniforms.uOpacity.value = streamVisibility * (isActive ? 0.95 : 0.28);
+      material.uniforms.uPixelRatio.value = pixelRatio;
+
+      // 命中脉冲：证据抵达市场的落点
+      const impactPulse = 0.5 + 0.5 * Math.sin(time * 3.1 + spec.phase * 7);
+      impact.position.copy(streamEnd);
+      impact.scale.setScalar((isActive ? 1 : 0.55) * (1 + impactPulse * 0.35));
+      impactMaterial.opacity =
+        streamVisibility * (isActive ? 0.42 + impactPulse * 0.26 : 0.12);
     });
-    markerRefs.current.forEach((marker, index) => {
-      const spec = orbitSpecs[index];
-      const active = index === Math.min(Math.max(activeEvidenceIndex, 0), orbitSpecs.length - 1);
-      const angle = spec.start + ((state.clock.elapsedTime * (0.08 + index * 0.018) + index * 0.21) % 1) * (spec.end - spec.start);
-      marker.position.set(Math.cos(angle) * spec.radiusX, Math.sin(angle) * spec.radiusY, 0);
-      marker.scale.setScalar(active ? 1.08 : 0.66);
-      marker.visible = active && reveal * (1 - morph) > 0.02;
-    });
+
+    if (labelsElement && centerAnchorRef.current && streamVisibility > 0.01) {
+      centerAnchorRef.current.getWorldPosition(labelWorld).project(camera);
+      labelsElement.style.setProperty(
+        "--orbit-center-x",
+        `${((labelWorld.x * 0.5 + 0.5) * state.size.width).toFixed(1)}px`,
+      );
+      labelsElement.style.setProperty(
+        "--orbit-center-y",
+        `${((-labelWorld.y * 0.5 + 0.5) * state.size.height).toFixed(1)}px`,
+      );
+    }
   });
 
   return (
+    <>
     <group ref={groupRef}>
-      <mesh>
-        <sphereGeometry args={[1, 64, 40]} />
+      <mesh renderOrder={0}>
+        <sphereGeometry args={[0.74, 64, 40]} />
         <meshStandardMaterial
           ref={coreMaterialRef}
           color="#03110e"
@@ -796,10 +887,11 @@ function PlanetInspection({
           metalness={0.14}
           transparent
           opacity={0}
+          depthWrite
         />
       </mesh>
-      <mesh>
-        <icosahedronGeometry args={[1.025, 3]} />
+      <mesh renderOrder={0}>
+        <icosahedronGeometry args={[0.77, 1]} />
         <meshBasicMaterial
           ref={shellMaterialRef}
           color={SIGNAL_COLORS.primary}
@@ -809,7 +901,7 @@ function PlanetInspection({
           depthWrite={false}
         />
       </mesh>
-      <points>
+      <points scale={0.74}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[surfacePoints, 3]} />
         </bufferGeometry>
@@ -823,7 +915,7 @@ function PlanetInspection({
           blending={THREE.AdditiveBlending}
         />
       </points>
-      <mesh scale={1.14}>
+      <mesh scale={0.86}>
         <sphereGeometry args={[1, 48, 32]} />
         <shaderMaterial
           ref={atmosphereMaterialRef}
@@ -854,37 +946,92 @@ function PlanetInspection({
           `}
         />
       </mesh>
-      {orbitSpecs.map((spec, index) => (
-        <group rotation={[...spec.rotation]} key={`${spec.color}-${index}`}>
-          <Line
-            ref={(line) => {
-              if (line) orbitLinesRef.current[index] = line;
+      <object3D ref={centerAnchorRef} position={[0, -1.28, 0]} />
+    </group>
+    {EVIDENCE_STREAMS.map((spec, index) => (
+      <group key={spec.tone}>
+        <Line
+          ref={(line) => {
+            streamLineRefs.current[index] = line;
+          }}
+          points={streamLineInitialPoints[index]}
+          color={spec.color}
+          lineWidth={1}
+          transparent
+          opacity={0}
+          depthWrite={false}
+          toneMapped={false}
+        />
+        <points frustumCulled={false}>
+          <bufferGeometry
+            ref={(geometry) => {
+              streamGeometryRefs.current[index] = geometry as THREE.BufferGeometry | null;
             }}
-            points={ellipseArcPoints(spec.radiusX, spec.radiusY, spec.start, spec.end)}
+          >
+            <bufferAttribute
+              attach="attributes-position"
+              args={[streamParticlePositions[index], 3]}
+            />
+            <bufferAttribute
+              attach="attributes-aAlpha"
+              args={[streamParticleAlphas[index], 1]}
+            />
+          </bufferGeometry>
+          <shaderMaterial
+            ref={(material) => {
+              streamMaterialRefs.current[index] = material;
+            }}
+            uniforms={streamUniforms[index]}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            vertexShader={`
+              attribute float aAlpha;
+              uniform float uPixelRatio;
+              varying float vAlpha;
+
+              void main() {
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                vAlpha = aAlpha;
+                gl_PointSize = min(9.0, (2.4 + aAlpha * 3.6) * uPixelRatio * (16.0 / max(1.0, -mvPosition.z)));
+                gl_Position = projectionMatrix * mvPosition;
+              }
+            `}
+            fragmentShader={`
+              uniform vec3 uColor;
+              uniform float uOpacity;
+              varying float vAlpha;
+
+              void main() {
+                vec2 centered = gl_PointCoord - vec2(0.5);
+                float radius = length(centered);
+                float core = smoothstep(0.5, 0.06, radius);
+                gl_FragColor = vec4(uColor, core * vAlpha * uOpacity);
+              }
+            `}
+          />
+        </points>
+        <mesh
+          ref={(mesh) => {
+            impactRefs.current[index] = mesh;
+          }}
+        >
+          <sphereGeometry args={[0.05, 12, 12]} />
+          <meshBasicMaterial
+            ref={(material) => {
+              impactMaterialRefs.current[index] = material;
+            }}
             color={spec.color}
-            lineWidth={index === 0 ? 1.05 : 0.82}
             transparent
             opacity={0}
-            depthTest={false}
+            blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}
           />
-          <mesh
-            ref={(marker) => {
-              if (marker) markerRefs.current[index] = marker;
-            }}
-          >
-            <sphereGeometry args={[index === 0 ? 0.045 : 0.034, 14, 14]} />
-            <meshBasicMaterial
-              color={spec.color}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              toneMapped={false}
-            />
-          </mesh>
-        </group>
-      ))}
-    </group>
+        </mesh>
+      </group>
+    ))}
+    </>
   );
 }
 
@@ -907,8 +1054,8 @@ function OrbitToChart({
     if (!geometry || !material) return;
 
     const value = reducedMotion ? 0.82 : progress.current;
-    const reveal = smoothstep(0.48, 0.6, value);
-    const morph = smoothstep(0.66, 0.84, value);
+    const reveal = windowStep(MARKET_SCENE.orbitPath.reveal, value);
+    const morph = windowStep(MARKET_SCENE.orbitPath.morph, value);
     const anchor = handoffAnchor.current;
     const inspectionScale = state.size.width <= 720 ? 0.52 : state.size.width <= 980 ? 0.8 : 1;
 
@@ -934,7 +1081,7 @@ function OrbitToChart({
 
     const attribute = geometry.getAttribute("position") as THREE.BufferAttribute;
     attribute.needsUpdate = true;
-    material.opacity = reveal * (1 - smoothstep(0.78, 0.87, value)) * 0.86;
+    material.opacity = reveal * (1 - windowStep(MARKET_SCENE.orbitPath.fadeOut, value)) * 0.86;
   });
 
   return (
@@ -959,14 +1106,14 @@ export function MotionLabScene({
   handoffAnchor,
   lockCopyRef,
   enablePostprocessing = true,
-  showHeroGrid = true,
-  activeEvidenceIndex = 0,
+  activeEvidenceRef,
+  orbitLabels,
 }: SceneProps & {
   handoffAnchor: HandoffAnchorRef;
   lockCopyRef?: LockCopyRef;
   enablePostprocessing?: boolean;
-  showHeroGrid?: boolean;
-  activeEvidenceIndex?: number;
+  activeEvidenceRef?: ActiveEvidenceRef;
+  orbitLabels?: OrbitLabelsRef;
 }) {
   return (
     <>
@@ -977,7 +1124,6 @@ export function MotionLabScene({
       <pointLight position={[-4, -1.6, 1]} intensity={3} color="#36c7e8" distance={12} />
 
       <SceneDirector progress={progress} reducedMotion={reducedMotion} />
-      {showHeroGrid ? <HeroGrid progress={progress} reducedMotion={reducedMotion} /> : null}
       <SignalField progress={progress} reducedMotion={reducedMotion} />
       {METEORS.map((config, index) => (
         <Meteor
@@ -992,7 +1138,8 @@ export function MotionLabScene({
         progress={progress}
         reducedMotion={reducedMotion}
         handoffAnchor={handoffAnchor}
-        activeEvidenceIndex={activeEvidenceIndex}
+        activeEvidenceRef={activeEvidenceRef}
+        orbitLabels={orbitLabels}
       />
       <OrbitToChart
         progress={progress}

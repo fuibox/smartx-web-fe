@@ -13,7 +13,11 @@ const heroCommunityLinks = [
 
 export function OriginalHero() {
   return (
-    <section className="page-shell" id="top" aria-labelledby="hero-title">
+    <section
+      className="page-shell page-shell--cosmic"
+      id="top"
+      aria-labelledby="hero-title"
+    >
       <canvas id="kinetic-grid" className="kinetic-grid" aria-hidden="true" />
       <div className="grain-layer" aria-hidden="true" />
       <div className="scan-layer" aria-hidden="true" />
