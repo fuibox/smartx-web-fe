@@ -969,6 +969,31 @@ function MemoryLoop() {
 
       <LoopPacket className={styles.loopReturnPacket} tone="enriched" />
 
+      {/* 移动端：吸收器机器图形换成四条记忆域状态行（语义直读，桌面隐藏） */}
+      <div className={styles.loopMobileSummary} aria-hidden="true">
+        {MEMORY_DOMAINS.map((domain) => {
+          const change = MEMORY_CHANGES[domain.id];
+          return (
+            <span
+              style={{ "--memory-color": domain.color } as CSSProperties}
+              data-state={change.status.toLowerCase()}
+              key={domain.id}
+            >
+              <i />
+              <strong>
+                {domain.id === "interests"
+                  ? "Interest"
+                  : domain.id === "signals"
+                    ? "Signal"
+                    : domain.shortLabel}
+              </strong>
+              <em>{change.change}</em>
+              <b>{change.status}</b>
+            </span>
+          );
+        })}
+      </div>
+
       {/* 移动端单列流的回流表意（桌面隐藏，桌面用完整回流路线） */}
       <span className={styles.loopMobileReturn} aria-hidden="true">
         <LoopPacket tone="enriched" />
@@ -1098,7 +1123,8 @@ function ClosingSection() {
           Live on Polymarket
         </p>
         <h2 id="v4-closing-title">
-          Trade with a terminal
+          {/* 显式空格：移动端隐藏 <br> 后两段仍需分词 */}
+          Trade with a terminal{" "}
           <br />
           that gets sharper with you.
         </h2>

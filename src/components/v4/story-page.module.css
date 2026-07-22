@@ -3996,21 +3996,27 @@
 
   .journeyFallback > article {
     display: grid;
-    min-height: 100svh;
+    min-height: 0;
     grid-template-columns: minmax(0, 1fr);
-    gap: 50px;
+    gap: 42px;
     align-items: center;
-    padding: 12vh 24px;
+    padding: 11vh 24px;
     border-bottom: 1px solid rgba(148, 166, 194, 0.16);
   }
 
+  /* 与全站章节宣言同一字体规格（PixelOperator 700） */
   .journeyFallback h2 {
     margin: 0;
-    color: var(--paper);
+    color: #edf8f4;
     font-family: var(--font-pixel);
-    font-size: clamp(48px, 13vw, 72px);
+    font-size: clamp(40px, 10.5vw, 58px);
+    font-weight: 700;
+    letter-spacing: 0;
     line-height: 0.92;
   }
+
+  /* 移动端不放产品截图：每屏读完核心内容 */
+  .journeyFallback .productPhone { display: none; }
 
   .journeyFallback > article > div > p:not(.kicker) {
     margin: 24px 0 0;
@@ -4103,6 +4109,20 @@
 }
 
 @media (max-width: 620px) {
+  /* 移动端字阶整体降一档：宣言 2-3 行内读完，不追求满屏大字 */
+  .indexThesis h2 { font-size: clamp(34px, 9.2vw, 40px); }
+  .journeyFallback h2 { font-size: clamp(30px, 8.6vw, 36px); }
+  .learnCopy h2,
+  .venuesHeader h2 { font-size: clamp(30px, 8.6vw, 36px); }
+  .updates h2 { font-size: 34px; }
+
+  /* 信息降噪：移动端 readout 只保留主标题与证据列表 */
+  .sourceReadout > span,
+  .sourceReadout > small,
+  .sourceMore { display: none; }
+  .executePathReadout > span,
+  .executePathReadout > small { display: none; }
+
   /* Index：由 4 个全屏格改为紧凑章节行（编号+章名+outcome | 右侧缩略舞台） */
   .indexThesis { min-height: 0; padding: 12vh 24px 7vh; }
   .indexDirectory { min-height: 0; }
@@ -4190,14 +4210,10 @@
   }
   .learn[data-visible="true"] .memoryLoop { transform: none; }
 
-  /* relative 而非 static：内部的队列包/角标仍是绝对定位，需要保留定位上下文 */
-  .loopFeed {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 112px;
-  }
-  .loopInputRail { position: static; height: 34px; }
+  /* 移动端 Learn 收敛为直读结构：Reasoner → 四条记忆域状态行 → 回流。
+     队列与吸收器机器图形在窄屏语义不清，隐藏 */
+  .loopFeed,
+  .loopInputRail { display: none; }
   .loopReasoner {
     position: relative;
     top: 0;
@@ -4219,14 +4235,44 @@
   .loopMergeRail,
   .loopMergePellets,
   .loopReturnRoute,
-  .loopReturnPacket { display: none; }
+  .loopReturnPacket,
+  .loopAbsorbers { display: none; }
 
-  .loopAbsorbers {
-    position: static;
+  /* 四条记忆域状态行：色块 + 域名 + 变化 + 状态，一屏直读 */
+  .loopMobileSummary {
+    display: grid;
     width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px 14px;
+    gap: 10px;
   }
+
+  .loopMobileSummary > span {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 14px minmax(0, 0.72fr) minmax(0, 1.28fr) auto;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid rgba(148, 166, 194, 0.16);
+    background: rgba(16, 26, 44, 0.6);
+    font-family: var(--font-jb);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .loopMobileSummary i {
+    width: 8px;
+    height: 8px;
+    background: var(--memory-color);
+  }
+
+  .loopMobileSummary span[data-state="pending"] i {
+    border: 1px solid var(--memory-color);
+    background: transparent;
+  }
+
+  .loopMobileSummary strong { color: var(--paper); font-weight: 700; }
+  .loopMobileSummary em { color: var(--muted); font-style: normal; }
+  .loopMobileSummary b { color: var(--memory-color); font-weight: 500; }
 
   .loopMobileReturn {
     display: flex;
@@ -4251,6 +4297,13 @@
     grid-template-columns: 30px minmax(105px, 0.9fr) minmax(130px, 1.1fr);
   }
   .memoryChanges button > i { display: none; }
+  /* Closing：行动组水平居中 */
+  .closingActions {
+    justify-items: center;
+    margin-inline: auto;
+  }
+  .secondaryAction { justify-content: center; }
+
   /* 场馆：一行两个，六馆三行收完 */
   .venueGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

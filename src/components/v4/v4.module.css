@@ -2058,6 +2058,6 @@
 @media (max-width: 620px) {
   .ledeDesktop { display: none; }
   .ledeMobile { display: inline; }
-  .heroTitle { font-size: clamp(40px, 11.4vw, 52px); }
+  .heroTitle { font-size: clamp(32px, 9.2vw, 40px); }
   .heroLede { font-size: 15px; }
 }
