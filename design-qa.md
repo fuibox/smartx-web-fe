@@ -78,4 +78,62 @@ Deterministic browser viewport: 1440×900 CSS px, DPR 1.
 - Replace the three article placeholders with Operations' launch content; articles can remain non-links until URLs exist.
 - Compose and sign off the dedicated mobile layout only after desktop approval.
 
+## Round-6 Learn / closed-loop rebuild
+
+Scope: only `03 / Learn`. The supplied 1280×720 concept image is the visual source of truth; the existing SmartX V4 palette, typography, and factual four-domain states remain authoritative where the generated concept is ambiguous.
+
+### Rendered evidence
+
+| Surface / state | Evidence |
+| --- | --- |
+| Source reference · 1280×720 | `output/playwright/v4-round6-learn/reference-1280x720.png` |
+| Source + implementation comparison · 1280×720 | `output/playwright/v4-round6-learn/comparison-1280x720.png` |
+| Implementation · decomposition state · 1280×720 | `output/playwright/v4-round6-learn/implementation-1280x720.png` |
+| Implementation · split-state checkpoint · 1280×720 | `output/playwright/v4-round6-learn/split-state-1280x720.png` |
+| Implementation · desktop acceptance · 1440×900 | `output/playwright/v4-round6-learn/implementation-1440x900.png` |
+
+### Findings closed
+
+- **P0 · loop topology:** Next Feed is now the actual loop origin. Rank 05 leaves the queue and enters Memory Reasoner; the rebuilt packet returns through one right-side orthogonal route, lands at rank 01, and 01–04 shift down to refill 02–05. There is no disconnected `Next Feed` label or second implied origin.
+- **P0 · decomposition clarity:** Reasoner has one shared output stem, one visible horizontal split, four semantic packets, and four aligned absorbers. The split is traceable from one packet into Interest / Signal / Style / Edge instead of appearing independently over each domain.
+- **P1 · factual state:** Interest and Signal absorb/update, Style records, and Edge remains pending. The bottom merge only reassembles written evidence; no unsupported Edge result or aggregate score is invented.
+- **P1 · craft and fidelity:** The copy baseline now aligns optically with Reasoner; queue spacing, reasoner scale, absorber spacing, merge point, and return route match the reference composition. Neutral absorber shells, semantic pixels, colored merge traces, and directional chevrons replace the previous sparse prototype lines.
+- **P1 · motion:** The complete cycle is 12 seconds. Motion is restricted to `transform` and `opacity`; movement is staged as consume → reason → split → absorb → merge → return → rerank. The title period uses the same teal result color as the returned packet.
+- **P2 · accessibility:** The diagram has a full causal `aria-label` and hidden explanatory copy. `prefers-reduced-motion` freezes the semantic final state, removes route movement, and preserves all four domain statuses.
+
+### Intentional differences from the generated image
+
+- `NEXT FEED` remains visible because it names the product consequence; the generated image leaves the queue unlabeled.
+- No blur glow, ornamental particle field, or fake scoring UI was added. Contrast comes from semantic color, line hierarchy, and directional motion.
+- The browser implementation keeps the canonical SmartX title/body type scale rather than copying minor generated-text raster artifacts.
+
+### Verification
+
+- Source and implementation were compared together at the same 1280×720 viewport and state, then the final composition was rechecked at 1440×900, DPR 1.
+- 1440×900 reports no horizontal overflow and no browser runtime errors.
+- `npm run typecheck` — passed.
+- `npx eslint src/components/v4/story-page.tsx` — passed.
+- `npx eslint . --ignore-pattern '.claude/worktrees/**'` — passed. The unfiltered `npm run lint` still traverses another agent's generated `.claude/worktrees/banner-footer/.next` output and fails outside this change scope.
+- Animation review — passed: `output/playwright/v4-round6-learn/animation-review.md` (transform/opacity-only movement, no blur glow, no layout-property animation, and an explicit reduced-motion state).
+
 final result: passed
+
+## Round-7 Learn / return-spine refinement
+
+- Moved the complete Memory loop down 42px at desktop size. At 1440×900 the diagram now occupies y=170–820, balancing the left title/copy without touching either viewport edge.
+- Tightened the right return route by 69px and changed its hierarchy from a persistent frame into a return spine: the static track is low contrast, arrow density is reduced, and only the segment currently carrying the reassembled packet illuminates.
+- Preserved the signed-off topology and timing; the change is visual hierarchy rather than a new narrative.
+- Evidence: `output/playwright/v4-round7-learn/learn-return-spine-1440x900.png`.
+- No horizontal overflow and no browser runtime errors at 1440×900. Typecheck and the scoped full-project ESLint command pass.
+- Animation review: `output/playwright/v4-round7-learn/animation-review.md` — **Approve**.
+
+## Round-8 Learn / queue continuity and semantic distribution
+
+- Rebuilt Next Feed as one clipped six-packet queue driven by one shared transform. Rank 05 can leave while the replacement and remaining four candidates move together, so no rank is temporarily empty and independent opacity windows cannot desynchronize.
+- Removed the separate green `settled` object. The returned enriched packet now overlays the persistent muted rank-01 candidate, then its semantic colors dissipate to reveal the same candidate underneath.
+- Normalized the diagram to one absolute center axis shared by the queue input, Memory Reasoner, branch origin, merge endpoint, and bottom return-route origin. Only the right-side return spine intentionally breaks symmetry.
+- Differentiated the four decomposed packet shapes and output quantities: Interest 5→2, Signal 7→4, Style 6→3, Edge 4→1. Edge remains visibly pending rather than pretending to update.
+- Closed the merge-to-return gap and aligned the merge stem endpoint exactly with the bottom route origin.
+- Sampled the complete 12-second animation cycle in the real 1440×900 browser: rank 01 remained occupied at every checkpoint while the colored return packet crossed and faded.
+- `npm run typecheck`, project ESLint excluding the other agent's generated worktree, and `git diff --check` pass.
+- Animation review: `output/playwright/v4-round8-learn/animation-review.md` — **Approve**.

@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 import {
+  IoBatteryFull,
+  IoCellular,
+  IoWifi,
+} from "react-icons/io5";
+import {
   useEffect,
   useRef,
   useState,
@@ -13,7 +18,9 @@ import { MEMORY_DOMAINS } from "@/components/memory-demo/memory-demo.fixture";
 import type { MemoryDomainId } from "@/components/memory-demo/memory-demo.types";
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
+import { ClosingFlowField } from "./closing-field";
 import { EvidenceStage, type StageState } from "./evidence-stage";
+import { FooterWordmark } from "./footer-wordmark";
 import styles from "./story-page.module.css";
 
 const CHAPTERS: Array<{
@@ -488,9 +495,9 @@ function ProductPhone({
           <time>9:42</time>
           <span className={styles.dynamicIsland}><i /></span>
           <span className={styles.phoneStatusIcons}>
-            <i data-icon="signal" />
-            <i data-icon="wifi" />
-            <i data-icon="battery" />
+            <IoCellular aria-hidden="true" />
+            <IoWifi aria-hidden="true" />
+            <IoBatteryFull aria-hidden="true" />
           </span>
         </div>
 
@@ -730,115 +737,232 @@ function TradingJourney() {
   );
 }
 
-function MemoryTrace({
-  activeDomainId,
-  onDomainChange,
+function LoopPacket({
+  className,
+  tone = "teal",
 }: {
-  activeDomainId: MemoryDomainId;
-  onDomainChange: (id: MemoryDomainId) => void;
+  className?: string;
+  tone?: "teal" | "muted" | "enriched";
 }) {
-  const activeDomain =
-    MEMORY_DOMAINS.find((domain) => domain.id === activeDomainId) ?? MEMORY_DOMAINS[0];
+  return (
+    <span
+      className={`${styles.loopPacket}${className ? ` ${className}` : ""}`}
+      data-tone={tone}
+      aria-hidden="true"
+    >
+      {Array.from({ length: 9 }).map((_, index) => (
+        <i style={{ "--packet-cell": index } as CSSProperties} key={index} />
+      ))}
+    </span>
+  );
+}
+
+function MemoryLoop() {
+  const splitOffsets = ["-213px", "-71px", "71px", "213px"];
+  const splitCellCounts = [5, 7, 6, 4];
+  const outputCellCounts = [2, 4, 3, 1];
+  const mergeOffsets = ["213px", "71px", "-71px", "-213px"];
 
   return (
-    <div className={styles.memoryTrace}>
-      <span className={styles.memoryTraceLine} aria-hidden="true">
-        <i />
-      </span>
-
-      <div className={styles.memoryInput}>
-        <span>EXECUTE / TRADE #127</span>
-        <strong>BUY YES · $1,000 AT 68.4¢</strong>
-        <small>Acted on smart money + market movement</small>
-      </div>
-
-      <div className={styles.memoryCore} aria-label="This trade updates SmartX AI Memory">
-        <span className={styles.memoryWriteCycle} aria-hidden="true">
-          <i className={styles.memoryWriteIn} />
-          <span className={styles.memoryRegister}>
-            {Array.from({ length: 16 }).map((_, index) => (
-              <i style={{ "--cell-index": index } as CSSProperties} key={index} />
+    <div
+      className={styles.memoryLoop}
+      role="img"
+      aria-label="The fifth Next Feed candidate enters Memory Reasoner while the queue immediately refills, updates Interest and Signal, records Style, keeps Edge pending, then returns over the first-ranked candidate and fades into the feed"
+    >
+      <div className={styles.loopFeed} aria-label="Next feed ranking">
+        <span className={styles.loopFeedLabel}>NEXT FEED</span>
+        <ol>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <li key={index}>
+              <span className={styles.loopRank} aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className={styles.srOnly}>Feed candidate rank {index + 1}</span>
+            </li>
+          ))}
+        </ol>
+        <span className={styles.loopFeedQueueViewport} aria-hidden="true">
+          <span className={styles.loopFeedQueue}>
+            <LoopPacket className={styles.loopFeedReplacement} tone="muted" />
+            {Array.from({ length: 5 }).map((_, index) => (
+              <LoopPacket
+                className={styles.loopFeedCandidate}
+                tone="muted"
+                key={index}
+              />
             ))}
           </span>
-          <i className={styles.memoryWriteOut} />
         </span>
-        <div>
-          <span>AI MEMORY / PROFILE v0128</span>
-          <strong>Decision written. Relevant user dimensions are re-ranked.</strong>
-        </div>
       </div>
 
-      <div className={styles.memoryChanges} aria-label="What this trade changes">
-        <span className={styles.memoryChangesLabel}>WHAT CHANGED</span>
+      <span className={styles.loopInputRail} aria-hidden="true" />
+
+      <div className={styles.loopReasoner}>
+        <span className={styles.loopReasonerGrid} aria-hidden="true">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <i style={{ "--cell-index": index } as CSSProperties} key={index} />
+          ))}
+        </span>
+        <strong>MEMORY REASONER</strong>
+      </div>
+
+      <span className={styles.loopReceipt}>FED / SMART MONEY</span>
+
+      <span className={styles.loopBranchRail} aria-hidden="true">
+        {MEMORY_DOMAINS.map((domain) => (
+          <i
+            data-state={domain.id === "edge" ? "pending" : "written"}
+            style={{ "--memory-color": domain.color } as CSSProperties}
+            key={domain.id}
+          />
+        ))}
+      </span>
+
+      <span className={styles.loopSplitPackets} aria-hidden="true">
+        {MEMORY_DOMAINS.map((domain, index) => (
+          <span
+            className={styles.loopSplitPacket}
+            data-domain={domain.id}
+            data-state={domain.id === "edge" ? "pending" : "written"}
+            style={
+              {
+                "--memory-color": domain.color,
+                "--domain-index": index,
+                "--split-x": splitOffsets[index],
+              } as CSSProperties
+            }
+            key={domain.id}
+          >
+            {Array.from({ length: splitCellCounts[index] }).map((_, cellIndex) => (
+              <i key={cellIndex} />
+            ))}
+          </span>
+        ))}
+      </span>
+
+      <div className={styles.loopAbsorbers} aria-label="Memory dimensions">
         {MEMORY_DOMAINS.map((domain, index) => {
           const change = MEMORY_CHANGES[domain.id];
+          const state =
+            domain.id === "interests" || domain.id === "signals"
+              ? "absorbed"
+              : domain.id === "trading-style"
+                ? "recorded"
+                : "pending";
 
           return (
-            <button
-              type="button"
-              data-active={domain.id === activeDomainId}
+            <div
+              className={styles.loopAbsorber}
+              data-domain={domain.id}
+              data-state={state}
               style={
                 {
                   "--memory-color": domain.color,
-                  "--memory-index": index,
+                  "--domain-index": index,
                 } as CSSProperties
               }
-              aria-pressed={domain.id === activeDomainId}
-              onFocus={() => onDomainChange(domain.id)}
-              onClick={() => onDomainChange(domain.id)}
+              aria-label={`${domain.label}: ${change.change}. ${change.status}.`}
               key={domain.id}
             >
-              <span className={styles.memoryRowGlyph} aria-hidden="true">
-                <i />
-                <i />
-                <i />
+              <span className={styles.loopAbsorberMachine} aria-hidden="true">
+                <span className={styles.loopCollector}>
+                  {Array.from({ length: 7 }).map((_, machineIndex) => (
+                    <i key={machineIndex} />
+                  ))}
+                </span>
+                <span className={styles.loopDigestor}>
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span className={styles.loopChamber}>
+                  <i />
+                </span>
               </span>
-              <strong>{domain.label}</strong>
-              <small>{change.change}</small>
-              <i>{change.status}</i>
-            </button>
+              <span className={styles.loopAbsorberOutput} aria-hidden="true">
+                {Array.from({ length: outputCellCounts[index] }).map((_, outputIndex) => (
+                  <i
+                    style={{ "--output-index": outputIndex } as CSSProperties}
+                    key={outputIndex}
+                  />
+                ))}
+              </span>
+              <span className={styles.loopDomainMeta}>
+                <strong>
+                  {domain.id === "interests"
+                    ? "Interest"
+                    : domain.id === "signals"
+                      ? "Signal"
+                      : domain.shortLabel}
+                </strong>
+                <small>{change.status}</small>
+              </span>
+            </div>
           );
         })}
       </div>
 
-      <div
-        className={styles.memoryOutput}
-        style={{ "--memory-color": activeDomain.color } as CSSProperties}
-        aria-live="polite"
-      >
-        <span>NEXT TIME</span>
-        <strong>Similar evidence moves higher in the feed.</strong>
-        <small>{activeDomain.summary}</small>
+      <span className={styles.loopMergeRail} aria-hidden="true">
+        {MEMORY_DOMAINS.map((domain) => (
+          <i
+            data-state={domain.id === "edge" ? "pending" : "written"}
+            style={{ "--memory-color": domain.color } as CSSProperties}
+            key={domain.id}
+          />
+        ))}
+      </span>
+
+      <span className={styles.loopMergePellets} aria-hidden="true">
+        {MEMORY_DOMAINS.map((domain, index) => {
+          const state = domain.id === "edge" ? "pending" : "written";
+
+          return (
+            <i
+              data-state={state}
+              style={
+                {
+                  "--memory-color": domain.color,
+                  "--domain-index": index,
+                  "--merge-x": mergeOffsets[index],
+                } as CSSProperties
+              }
+              key={domain.id}
+            />
+          );
+        })}
+      </span>
+
+      <div className={styles.loopReturnRoute} aria-hidden="true">
+        <span className={styles.loopRouteBottom}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <i style={{ "--route-index": index } as CSSProperties} key={index} />
+          ))}
+        </span>
+        <span className={styles.loopRouteSide}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <i style={{ "--route-index": index } as CSSProperties} key={index} />
+          ))}
+        </span>
+        <span className={styles.loopRouteTop}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <i style={{ "--route-index": index } as CSSProperties} key={index} />
+          ))}
+        </span>
       </div>
+
+      <LoopPacket className={styles.loopReturnPacket} tone="enriched" />
+
+      <p className={styles.srOnly}>
+        A trade informed by smart money is absorbed by Market interests and Trusted
+        signals, recorded as Trading style, held pending for User edge, and returned
+        to rank the next feed.
+      </p>
     </div>
   );
 }
 
 function LearnSection() {
-  const [activeDomainId, setActiveDomainId] = useState<MemoryDomainId>("interests");
-  const manualSelectionRef = useRef(false);
   const { ref, visible } = useReveal<HTMLElement>(0.25);
-  const activeDomain =
-    MEMORY_DOMAINS.find((domain) => domain.id === activeDomainId) ?? MEMORY_DOMAINS[0];
-
-  useEffect(() => {
-    if (!visible || manualSelectionRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setActiveDomainId("signals");
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      if (!manualSelectionRef.current) setActiveDomainId("signals");
-    }, 1120);
-
-    return () => window.clearTimeout(timer);
-  }, [visible]);
-
-  const selectDomain = (id: MemoryDomainId) => {
-    manualSelectionRef.current = true;
-    setActiveDomainId(id);
-  };
 
   return (
     <section
@@ -854,27 +978,16 @@ function LearnSection() {
           <h2 id="v4-learn-title">
             It gets sharper
             <br />
-            every trade.
+            every trade<span className={styles.learnTitleMark}>.</span>
           </h2>
           <p>
             Every decision becomes Memory. SmartX learns what you follow, which proof
             you trust, how you size a trade, and where your advantage develops—then
             changes what it brings forward next.
           </p>
-          <div
-            className={styles.memoryShift}
-            style={{ "--memory-color": activeDomain.color } as CSSProperties}
-            aria-live="polite"
-          >
-            <span>What SmartX remembers</span>
-            <strong>{activeDomain.updateLabel}</strong>
-          </div>
         </div>
 
-        <MemoryTrace
-          activeDomainId={activeDomainId}
-          onDomainChange={selectDomain}
-        />
+        <MemoryLoop />
       </div>
     </section>
   );
@@ -944,23 +1057,14 @@ function VenuesSection() {
 }
 
 function ClosingSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLAnchorElement>(null);
+
   return (
-    <section className={styles.closing} aria-labelledby="v4-closing-title">
-      {/* 方案A：分隔线内嵌像素收束——稀疏格向右收紧变密后收束，余下 hairline 指向 CTA。
-          "很多输入 → 一条更锐利的输出 → 行动"，即 gets sharper 的像素表达。 */}
-      <span className={styles.closingRail} aria-hidden="true">
-        {Array.from({ length: 22 }, (_, index) => (
-          <i
-            style={{
-              marginRight: `${Math.max(2, 17 - index * 0.72).toFixed(1)}px`,
-              opacity: (0.22 + (index / 21) * 0.7).toFixed(2),
-            }}
-            key={index}
-          />
-        ))}
-        <em />
-      </span>
-      <div>
+    <section ref={sectionRef} className={styles.closing} aria-labelledby="v4-closing-title">
+      <ClosingFlowField sectionRef={sectionRef} copyRef={copyRef} ctaRef={ctaRef} />
+      <div ref={copyRef}>
         <p className={styles.kicker}>
           <i className={styles.liveDot} aria-hidden="true" />
           Live on Polymarket
@@ -973,6 +1077,7 @@ function ClosingSection() {
       </div>
       <div className={styles.closingActions}>
         <a
+          ref={ctaRef}
           className={styles.primaryAction}
           href={createSmartXAppHref("closing_cta")}
           target="_blank"
@@ -1086,9 +1191,7 @@ function StoryFooter() {
           </a>
         </nav>
       </div>
-      <strong className={styles.footerWordmark} aria-hidden="true">
-        SMARTX
-      </strong>
+      <FooterWordmark />
       <div className={styles.footerMeta}>
         <span>© SmartX 2026</span>
       </div>

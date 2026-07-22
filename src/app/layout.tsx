@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/favicon.ico",
   },
+  verification: {
+    google: "ULRDqnBcK_2XDkvPUK6-3ioSqEiAo-wibKnuIcaQYBs",
+  },
   openGraph: {
     title: "SmartX | The AI Trading Terminal Built Around You",
     description:

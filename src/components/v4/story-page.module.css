@@ -700,7 +700,7 @@
   height: 100%;
   overflow: visible;
   border: 1px solid rgba(226, 232, 240, 0.46);
-  border-radius: 48px;
+  border-radius: 42px;
   background:
     linear-gradient(145deg, rgba(226, 232, 240, 0.3), rgba(30, 41, 59, 0.08) 24%, rgba(226, 232, 240, 0.2) 72%, rgba(15, 23, 42, 0.5)),
     #111827;
@@ -714,7 +714,7 @@
   inset: 4px;
   z-index: 8;
   border: 1px solid rgba(241, 245, 249, 0.13);
-  border-radius: 43px;
+  border-radius: 37px;
   content: "";
   pointer-events: none;
 }
@@ -723,7 +723,7 @@
   position: absolute;
   inset: 7px;
   overflow: hidden;
-  border-radius: 39px;
+  border-radius: 34px;
   background: #090f19;
 }
 
@@ -793,60 +793,17 @@
 .phoneStatusIcons {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 
-.phoneStatusIcons i { position: relative; display: block; }
-
-.phoneStatusIcons i[data-icon="signal"] {
-  width: 12px;
-  height: 8px;
-  background: linear-gradient(90deg, currentColor 0 18%, transparent 18% 27%, currentColor 27% 50%, transparent 50% 59%, currentColor 59% 82%, transparent 82% 91%, currentColor 91%);
-  clip-path: polygon(0 100%, 0 72%, 18% 72%, 18% 52%, 44% 52%, 44% 31%, 70% 31%, 70% 10%, 100% 10%, 100% 100%);
+.phoneStatusIcons svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+  color: rgba(241, 245, 249, 0.92);
 }
 
-.phoneStatusIcons i[data-icon="wifi"] {
-  width: 11px;
-  height: 8px;
-  border-top: 2px solid currentColor;
-  border-radius: 50% 50% 0 0;
-}
-
-.phoneStatusIcons i[data-icon="wifi"]::after {
-  position: absolute;
-  bottom: 0;
-  left: 4px;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-  content: "";
-}
-
-.phoneStatusIcons i[data-icon="battery"] {
-  width: 15px;
-  height: 7px;
-  border: 1px solid currentColor;
-  border-radius: 2px;
-}
-
-.phoneStatusIcons i[data-icon="battery"]::before {
-  position: absolute;
-  inset: 1px 3px 1px 1px;
-  background: currentColor;
-  content: "";
-}
-
-.phoneStatusIcons i[data-icon="battery"]::after {
-  position: absolute;
-  top: 2px;
-  right: -3px;
-  width: 2px;
-  height: 3px;
-  border-radius: 0 1px 1px 0;
-  background: currentColor;
-  content: "";
-}
+.phoneStatusIcons svg:last-child { width: 17px; }
 
 .phoneSignalView,
 .phoneExecuteView {
@@ -884,9 +841,11 @@
   user-select: none;
 }
 
-.phoneSignalView[data-source="smart-money"] .phoneCapture { top: -52px; }
-.phoneSignalView[data-source="market"] .phoneCapture { top: -54px; }
-.phoneSignalView[data-source="watchlist"] .phoneCapture { top: -66px; }
+.phoneSignalView .phoneCapture {
+  top: 0;
+  left: 3%;
+  width: 94%;
+}
 .phoneExecuteCapture { top: -8px; }
 
 .productPhone[data-execution="false"] .phoneSignalView,
@@ -1183,6 +1142,7 @@
 
 .learnCopy {
   position: relative;
+  top: -76px;
   z-index: 3;
 }
 
@@ -1191,9 +1151,11 @@
   line-height: 0.92;
 }
 
+.learnTitleMark { color: var(--teal); }
+
 .learnCopy > p:not(.kicker) {
   max-width: 500px;
-  margin: 30px 0 0;
+  margin: 48px 0 0;
   color: var(--body);
   font-size: 15px;
   line-height: 1.72;
@@ -2210,6 +2172,843 @@
 
 .memoryOutput small { max-width: 500px; }
 
+/* Learn / selected memory loop ------------------------------------------- */
+
+.memoryLoop {
+  --loop-cycle: 12000ms;
+  --loop-axis: 260px;
+  --return-axis: 536px;
+  --interest: #36c7e8;
+  --signal: var(--teal);
+  --style: #ffc45e;
+  --edge: #ff9b3e;
+  position: relative;
+  top: 0;
+  width: min(100%, 680px);
+  height: 650px;
+  justify-self: end;
+  isolation: isolate;
+  opacity: 0;
+  transform: translate3d(24px, 0, 0);
+  transition:
+    opacity 520ms var(--ease-out),
+    transform 680ms var(--ease-out);
+}
+
+.learn[data-visible="true"] .memoryLoop {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.loopPacket {
+  display: grid;
+  width: max-content;
+  grid-template-columns: repeat(3, 6px);
+  gap: 2px;
+}
+
+.loopPacket i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--teal);
+}
+
+.loopPacket[data-tone="muted"] i {
+  background: #71829e;
+  opacity: 0.64;
+}
+
+.loopPacket[data-tone="enriched"] i { background: var(--teal); }
+.loopPacket[data-tone="enriched"] i:nth-child(1),
+.loopPacket[data-tone="enriched"] i:nth-child(4) { background: var(--interest); }
+.loopPacket[data-tone="enriched"] i:nth-child(3),
+.loopPacket[data-tone="enriched"] i:nth-child(8) { background: var(--style); }
+.loopPacket[data-tone="enriched"] i:nth-child(6) {
+  border: 1px solid var(--edge);
+  background: transparent;
+}
+
+.loopFeed {
+  position: absolute;
+  z-index: 5;
+  top: -11px;
+  left: calc(var(--loop-axis) - 41px);
+  width: 112px;
+}
+
+.loopFeedLabel,
+.loopReasoner strong,
+.loopReceipt,
+.loopDomainMeta strong,
+.loopDomainMeta small {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.loopFeedLabel {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--teal);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.loopFeed ol {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loopFeed li {
+  display: grid;
+  height: 33px;
+  grid-template-columns: 30px;
+  align-items: center;
+}
+
+.loopRank {
+  display: block;
+  width: 24px;
+  height: 14px;
+  color: var(--dim);
+  font-family: var(--font-jb);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.loopFeedQueueViewport {
+  position: absolute;
+  top: 26px;
+  left: 30px;
+  z-index: 3;
+  display: block;
+  width: 22px;
+  height: 162px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.loopFeedQueue {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 197px;
+  will-change: transform;
+}
+
+.loopFeedReplacement,
+.loopFeedCandidate {
+  position: absolute;
+  left: 0;
+  will-change: transform, opacity;
+}
+
+.loopFeedReplacement { top: -35px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(2) { top: 0; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(3) { top: 35px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(4) { top: 70px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(5) { top: 105px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(6) { top: 140px; }
+
+.loopInputRail {
+  position: absolute;
+  top: 169px;
+  left: calc(var(--loop-axis) - 0.5px);
+  z-index: 0;
+  width: 1px;
+  height: 49px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(148, 166, 194, 0.34) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.loopReasoner {
+  position: absolute;
+  z-index: 3;
+  top: 218px;
+  left: calc(var(--loop-axis) - 45px);
+  display: grid;
+  width: 90px;
+  min-height: 68px;
+  place-items: center;
+  padding: 8px;
+  border: 1px solid rgba(148, 166, 194, 0.5);
+  border-top-color: rgba(8, 223, 181, 0.56);
+  border-bottom-color: rgba(8, 223, 181, 0.34);
+  background: #090f1a;
+}
+
+.loopReasoner::before,
+.loopReasoner::after {
+  position: absolute;
+  left: 50%;
+  background: var(--teal);
+  content: "";
+  transform: translate3d(-50%, 0, 0);
+}
+
+.loopReasoner::before {
+  top: -4px;
+  width: 7px;
+  height: 7px;
+}
+
+.loopReasoner::after {
+  bottom: -3px;
+  width: 14px;
+  height: 3px;
+  opacity: 0.72;
+}
+
+.loopReasonerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 6px);
+  gap: 2px;
+}
+
+.loopReasonerGrid i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--teal);
+  opacity: 0.18;
+  will-change: opacity;
+}
+
+.loopReasoner strong {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  color: var(--body);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.loopReceipt {
+  position: absolute;
+  z-index: 2;
+  top: 234px;
+  left: calc(var(--loop-axis) + 74px);
+  padding: 5px 8px;
+  border: 1px solid rgba(8, 223, 181, 0.48);
+  color: var(--teal);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.loopReceipt::before {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 24px;
+  border-top: 1px dashed rgba(8, 223, 181, 0.58);
+  content: "";
+}
+
+.loopBranchRail,
+.loopMergeRail {
+  position: absolute;
+  z-index: 0;
+  left: -18px;
+  display: grid;
+  width: 556px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(148, 166, 194, 0.38) 0 4px,
+      transparent 4px 8px
+    ) center top / 76.6% 1px no-repeat;
+}
+
+.loopBranchRail { top: 329px; }
+.loopMergeRail { top: 511px; }
+
+.loopBranchRail::before {
+  position: absolute;
+  top: -43px;
+  left: 50%;
+  height: 43px;
+  border-left: 1px dashed rgba(148, 166, 194, 0.28);
+  content: "";
+}
+
+.loopBranchRail::after {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 76.6%;
+  border-top: 1px solid rgba(8, 223, 181, 0.5);
+  content: "";
+  opacity: 0;
+  transform: translate3d(-50%, 0, 0) scaleX(0);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.loopBranchRail i,
+.loopMergeRail i {
+  width: 1px;
+  height: 26px;
+  justify-self: center;
+  border-left: 1px dashed var(--memory-color);
+  opacity: 0.42;
+}
+
+.loopBranchRail i[data-state="pending"] {
+  border-left-style: dotted;
+  opacity: 0.1;
+}
+
+.loopMergeRail i {
+  position: relative;
+  height: 42px;
+  border-left-color: var(--memory-color);
+  opacity: 0.5;
+  transform: translate3d(0, -42px, 0);
+}
+
+.loopMergeRail { background: none; }
+
+.loopMergeRail i::after {
+  position: absolute;
+  top: 42px;
+  border-top: 1px dashed var(--memory-color);
+  content: "";
+}
+
+.loopMergeRail i:nth-child(1)::after { left: 0; width: 213px; }
+.loopMergeRail i:nth-child(2)::after { left: 0; width: 71px; }
+.loopMergeRail i:nth-child(3)::after { right: 0; width: 71px; }
+.loopMergeRail i:nth-child(4)::after { right: 0; width: 213px; }
+
+.loopMergeRail i[data-state="pending"] {
+  border-left-style: dotted;
+  opacity: 0.22;
+}
+
+.loopMergeRail::before {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  border: 1px solid rgba(8, 223, 181, 0.38);
+  background: #090f1a;
+  content: "";
+  transform: translate3d(-50%, 0, 0);
+}
+
+.loopMergeRail::after {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 57px;
+  border-left: 1px solid rgba(148, 166, 194, 0.34);
+  content: "";
+}
+
+.loopSplitPackets {
+  position: absolute;
+  top: 286px;
+  left: calc(var(--loop-axis) - 12px);
+  z-index: 4;
+  display: block;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.loopSplitPacket {
+  --memory-color: var(--teal);
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.loopSplitPacket i {
+  position: absolute;
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: var(--memory-color);
+}
+
+.loopSplitPacket i:nth-child(2),
+.loopSplitPacket i:nth-child(6) { opacity: 0.52; }
+
+.loopSplitPacket[data-domain="interests"] i:nth-child(1) { top: 0; left: 9px; }
+.loopSplitPacket[data-domain="interests"] i:nth-child(2) { top: 7px; left: 3px; }
+.loopSplitPacket[data-domain="interests"] i:nth-child(3) { top: 7px; left: 9px; }
+.loopSplitPacket[data-domain="interests"] i:nth-child(4) { top: 7px; left: 15px; }
+.loopSplitPacket[data-domain="interests"] i:nth-child(5) { top: 14px; left: 9px; }
+
+.loopSplitPacket[data-domain="signals"] i:nth-child(1) { top: 0; left: 9px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(2) { top: 7px; left: 3px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(3) { top: 7px; left: 9px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(4) { top: 7px; left: 15px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(5) { top: 14px; left: 3px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(6) { top: 14px; left: 9px; }
+.loopSplitPacket[data-domain="signals"] i:nth-child(7) { top: 14px; left: 15px; }
+
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(1) { top: 0; left: 1px; }
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(2) { top: 0; left: 7px; }
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(3) { top: 7px; left: 7px; }
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(4) { top: 7px; left: 13px; }
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(5) { top: 14px; left: 13px; }
+.loopSplitPacket[data-domain="trading-style"] i:nth-child(6) { top: 14px; left: 19px; }
+
+.loopSplitPacket[data-domain="edge"] i:nth-child(1) { top: 0; left: 2px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(2) { top: 4px; left: 16px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(3) { top: 12px; left: 8px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(4) { top: 16px; left: 19px; }
+
+.loopSplitPacket[data-state="pending"] i {
+  border: 1px solid var(--memory-color);
+  background: transparent;
+  opacity: 0.4;
+}
+
+.loopAbsorbers {
+  position: absolute;
+  z-index: 2;
+  top: 352px;
+  left: -18px;
+  display: grid;
+  width: 556px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loopAbsorber {
+  --memory-color: var(--teal);
+  position: relative;
+  display: grid;
+  height: 153px;
+  grid-template-rows: 84px 18px 36px;
+  justify-items: center;
+  align-items: center;
+  padding: 0;
+  color: var(--memory-color);
+}
+
+.loopAbsorberMachine {
+  position: relative;
+  display: block;
+  width: 70px;
+  height: 72px;
+  color: var(--memory-color);
+  opacity: 0.76;
+  will-change: opacity;
+}
+
+.loopAbsorberMachine::before,
+.loopAbsorberMachine::after {
+  position: absolute;
+  top: 18px;
+  width: 31px;
+  height: 1px;
+  background: rgba(148, 166, 194, 0.72);
+  content: "";
+  opacity: 0.66;
+}
+
+.loopAbsorberMachine::before {
+  left: 3px;
+  transform: rotate(38deg);
+  transform-origin: left center;
+}
+
+.loopAbsorberMachine::after {
+  right: 3px;
+  transform: rotate(-38deg);
+  transform-origin: right center;
+}
+
+.loopCollector {
+  position: absolute;
+  inset: 0 0 auto;
+  display: block;
+  height: 34px;
+}
+
+.loopCollector i {
+  position: absolute;
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--memory-color);
+  opacity: 0.88;
+}
+
+.loopCollector i:nth-child(1) { top: 0; left: 0; }
+.loopCollector i:nth-child(2) { top: 8px; left: 8px; }
+.loopCollector i:nth-child(3) { top: 16px; left: 16px; }
+.loopCollector i:nth-child(4) { top: 24px; left: 32px; }
+.loopCollector i:nth-child(5) { top: 16px; right: 16px; }
+.loopCollector i:nth-child(6) { top: 8px; right: 8px; }
+.loopCollector i:nth-child(7) { top: 0; right: 0; }
+
+.loopDigestor {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  display: grid;
+  gap: 3px;
+}
+
+.loopDigestor i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--memory-color);
+  opacity: 0.42;
+}
+
+.loopChamber {
+  position: absolute;
+  bottom: 0;
+  left: 23px;
+  display: grid;
+  width: 26px;
+  height: 23px;
+  place-items: center;
+  border: 1px solid rgba(148, 166, 194, 0.68);
+  background: #090f1a;
+}
+
+.loopChamber i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--memory-color);
+  opacity: 0.78;
+}
+
+.loopAbsorberOutput {
+  display: flex;
+  height: 17px;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.loopAbsorberOutput i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--memory-color);
+  opacity: 0.68;
+  will-change: transform, opacity;
+}
+
+.loopAbsorber[data-state="absorbed"] .loopAbsorberOutput i {
+  background: var(--memory-color);
+}
+
+.loopAbsorber[data-state="recorded"] .loopAbsorberOutput i {
+  height: 4px;
+  border: 0;
+  background: var(--memory-color);
+}
+
+.loopAbsorber[data-state="recorded"] .loopAbsorberOutput i:nth-child(2) { height: 9px; }
+.loopAbsorber[data-state="recorded"] .loopAbsorberOutput i:nth-child(3) { height: 14px; }
+
+.loopAbsorber[data-state="pending"] .loopCollector,
+.loopAbsorber[data-state="pending"] .loopDigestor { opacity: 0.42; }
+
+.loopAbsorber[data-state="pending"] .loopChamber i {
+  border: 1px solid var(--memory-color);
+  background: transparent;
+  opacity: 0.56;
+}
+
+.loopDomainMeta {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+
+.loopDomainMeta strong {
+  color: var(--body);
+  font-weight: 650;
+}
+
+.loopDomainMeta small {
+  color: var(--memory-color);
+  font-weight: 650;
+  opacity: 0.72;
+}
+
+.loopAbsorber[data-state="pending"] .loopDomainMeta small { opacity: 0.42; }
+
+.loopMergePellets {
+  position: absolute;
+  top: 472px;
+  left: -18px;
+  z-index: 4;
+  display: grid;
+  width: 556px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  pointer-events: none;
+}
+
+.loopMergePellets > i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  justify-self: center;
+  background: var(--memory-color);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.loopMergePellets > i[data-state="pending"] {
+  border: 1px solid var(--memory-color);
+  background: #090f1a;
+}
+
+.loopReturnRoute {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  color: var(--teal);
+  pointer-events: none;
+}
+
+.loopRouteBottom,
+.loopRouteSide,
+.loopRouteTop {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-color: rgba(8, 223, 181, 0.24);
+  color: rgba(8, 223, 181, 0.58);
+}
+
+.loopRouteBottom {
+  top: 568px;
+  left: var(--loop-axis);
+  width: calc(var(--return-axis) - var(--loop-axis));
+  height: 22px;
+  border-top: 1px solid;
+}
+
+.loopRouteSide {
+  top: 26px;
+  left: calc(var(--return-axis) - 11px);
+  width: 11px;
+  height: 542px;
+  flex-direction: column-reverse;
+  border-right: 1px solid;
+}
+
+.loopRouteTop {
+  top: 4px;
+  left: var(--loop-axis);
+  width: calc(var(--return-axis) - var(--loop-axis));
+  height: 22px;
+  flex-direction: row-reverse;
+  border-bottom: 1px solid;
+}
+
+.loopRouteBottom::after,
+.loopRouteSide::after,
+.loopRouteTop::after {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  content: "";
+  opacity: 0.32;
+}
+
+.loopRouteBottom::after { top: -3px; left: -3px; }
+.loopRouteSide::after { right: -3px; bottom: -3px; }
+.loopRouteTop::after { right: -3px; bottom: -3px; }
+
+.loopRouteBottom::before,
+.loopRouteSide::before,
+.loopRouteTop::before {
+  position: absolute;
+  z-index: 2;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.loopRouteBottom::before {
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.loopRouteSide::before {
+  right: -1px;
+  bottom: 0;
+  width: 1px;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: center bottom;
+}
+
+.loopRouteTop::before {
+  right: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: right center;
+}
+
+.loopRouteBottom i,
+.loopRouteSide i,
+.loopRouteTop i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border: solid currentColor;
+  border-width: 0 1px 1px 0;
+  opacity: 0.24;
+  will-change: opacity;
+}
+
+.loopRouteBottom i { transform: rotate(-45deg); }
+.loopRouteSide i { transform: rotate(-135deg); }
+.loopRouteTop i { transform: rotate(135deg); }
+
+.loopReturnPacket {
+  position: absolute;
+  z-index: 6;
+  top: 550px;
+  left: calc(var(--loop-axis) - 11px);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.loopReturnPacket i {
+  opacity: 0;
+  will-change: opacity;
+}
+
+.learn[data-visible="true"] .loopReasonerGrid i {
+  animation: loopReasonerCell var(--loop-cycle) linear
+    calc(400ms + var(--cell-index) * 35ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopBranchRail::after {
+  animation: loopBranchPulse var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopReceipt {
+  animation: loopReceiptIn var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopSplitPacket {
+  animation: loopSplitPacket var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 70ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopAbsorberMachine {
+  animation: loopAbsorberRead var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 90ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopAbsorberOutput i {
+  animation: loopAbsorberWrite var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 90ms + var(--output-index) * 35ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i {
+  animation: loopDigestCell var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 90ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i:nth-child(2) {
+  animation-delay: calc(460ms + var(--domain-index) * 90ms);
+}
+
+.learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i:nth-child(3) {
+  animation-delay: calc(520ms + var(--domain-index) * 90ms);
+}
+
+.learn[data-visible="true"] .loopMergePellets > i[data-state="written"] {
+  animation: loopMergePellet var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 60ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopMergePellets > i[data-state="pending"] {
+  animation: loopMergePending var(--loop-cycle) linear 580ms infinite both;
+}
+
+.learn[data-visible="true"] .loopReturnPacket {
+  animation: loopPacketReturn var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopReturnPacket i {
+  animation: loopPacketAssemble var(--loop-cycle) linear
+    calc(400ms + var(--packet-cell) * 45ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopFeedQueue {
+  animation: loopFeedQueueShift var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:last-child {
+  animation: loopFeedConsume var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteBottom i {
+  animation: loopRouteArrow var(--loop-cycle) linear
+    calc(7800ms + var(--route-index) * 45ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteSide i {
+  animation: loopRouteArrow var(--loop-cycle) linear
+    calc(9000ms + var(--route-index) * 45ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteTop i {
+  animation: loopRouteArrow var(--loop-cycle) linear
+    calc(10000ms + var(--route-index) * 42ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteBottom::before {
+  animation: loopRouteBottomTrace var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteSide::before {
+  animation: loopRouteSideTrace var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteTop::before {
+  animation: loopRouteTopTrace var(--loop-cycle) linear 400ms infinite both;
+}
+
 /* All-in-one -------------------------------------------------------------- */
 
 .venues {
@@ -2230,7 +3029,7 @@
   display: grid;
   max-width: 1100px;
   justify-items: center;
-  margin: 0 auto clamp(24px, 3.2vh, 32px);
+  margin: 0 auto clamp(36px, 4.5vh, 46px);
   text-align: center;
 }
 
@@ -2256,8 +3055,8 @@
 .venueSystem {
   display: grid;
   justify-items: center;
-  gap: 8px;
-  margin: 0 auto 12px;
+  gap: 12px;
+  margin: 0 auto clamp(22px, 3vh, 30px);
   text-align: center;
 }
 
@@ -2278,7 +3077,7 @@
   display: block;
   width: min(100%, 980px);
   max-width: 980px;
-  margin: 0 auto 20px;
+  margin: 0 auto clamp(30px, 4vh, 40px);
 }
 
 .venueSpine i {
@@ -2418,46 +3217,25 @@
   overflow: hidden;
   padding: clamp(80px, 11vh, 120px) max(clamp(42px, 6vw, 96px), calc((100vw - 1248px) / 2));
   border-bottom: 1px solid rgba(148, 166, 194, 0.16);
-  background:
-    linear-gradient(90deg, rgba(8, 223, 181, 0.08) 1px, transparent 1px),
-    #0a111e;
-  background-size: 14px 100%, auto;
+  background: #0a111e;
 }
 
 .closing::before {
   position: absolute;
   inset: 0 0 0 auto;
   width: 34%;
-  background: rgba(8, 223, 181, 0.045);
+  background: rgba(8, 223, 181, 0.03);
   content: "";
   pointer-events: none;
 }
 
 .closing > div { position: relative; z-index: 2; }
 
-.closingRail {
+.closingCanvas {
   position: absolute;
-  right: 7%;
-  bottom: 19%;
-  left: 7%;
+  inset: 0;
   z-index: 1;
-  display: flex;
-  align-items: center;
   pointer-events: none;
-}
-
-.closingRail i {
-  width: 6px;
-  height: 6px;
-  flex: none;
-  background: var(--teal);
-}
-
-.closingRail em {
-  height: 1px;
-  flex: 1;
-  margin-left: 16px;
-  background: rgba(8, 223, 181, 0.14);
 }
 
 .liveDot {
@@ -2482,6 +3260,7 @@
   display: grid;
   min-width: 250px;
   gap: 16px;
+  transform: translate3d(0, 30px, 0);
 }
 
 .primaryAction {
@@ -2805,9 +3584,23 @@
   outline-offset: 4px;
 }
 
+.footerWordmarkWrap {
+  position: relative;
+  margin-top: 54px;
+}
+
+.footerWordmarkWrap[data-assembling="true"] .footerWordmark {
+  visibility: hidden;
+}
+
+.wordmarkCanvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .footerWordmark {
   display: block;
-  margin-top: 54px;
   color: rgba(148, 166, 194, 0.18);
   font-family: var(--font-pixel);
   font-size: clamp(110px, 20vw, 310px);
@@ -2981,6 +3774,135 @@
   100% { opacity: 0; transform: translate3d(0, 480px, 0); }
 }
 
+@keyframes loopFeedConsume {
+  0%, 3% { opacity: 1; transform: translate3d(0, 0, 0); }
+  5% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  11% { opacity: 1; transform: translate3d(0, 71px, 0); }
+  13%, 97% { opacity: 0; transform: translate3d(0, 71px, 0); }
+  99% { opacity: 0; transform: translate3d(0, 0, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes loopReasonerCell {
+  0%, 9%, 31%, 100% { opacity: 0.18; }
+  13% { opacity: 0.62; }
+  18% { opacity: 1; }
+  24% { opacity: 0.54; }
+}
+
+@keyframes loopReceiptIn {
+  0%, 10% { opacity: 0; transform: translate3d(-6px, 0, 0); }
+  13% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-out); }
+  22% { opacity: 1; transform: translate3d(0, 0, 0); }
+  26%, 100% { opacity: 0; transform: translate3d(6px, 0, 0); }
+}
+
+@keyframes loopSplitPacket {
+  0%, 17% { opacity: 0; transform: translate3d(0, 0, 0); }
+  19% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  24% { opacity: 1; transform: translate3d(0, 43px, 0); animation-timing-function: var(--ease-in-out); }
+  33% { opacity: 1; transform: translate3d(var(--split-x), 43px, 0); animation-timing-function: var(--ease-in-out); }
+  41% { opacity: 1; transform: translate3d(var(--split-x), 66px, 0); }
+  44%, 100% { opacity: 0; transform: translate3d(var(--split-x), 66px, 0); }
+}
+
+@keyframes loopBranchPulse {
+  0%, 18% { opacity: 0; transform: translate3d(-50%, 0, 0) scaleX(0); }
+  23% { opacity: 0.7; transform: translate3d(-50%, 0, 0) scaleX(0.08); }
+  33% { opacity: 0.5; transform: translate3d(-50%, 0, 0) scaleX(1); }
+  39% { opacity: 0; transform: translate3d(-50%, 0, 0) scaleX(1); }
+  40%, 100% { opacity: 0; transform: translate3d(-50%, 0, 0) scaleX(0); }
+}
+
+@keyframes loopAbsorberRead {
+  0%, 31%, 92%, 100% { opacity: 0.76; }
+  39% { opacity: 1; }
+  48%, 72% { opacity: 0.82; }
+}
+
+@keyframes loopAbsorberWrite {
+  0%, 39%, 100% { opacity: 0.42; transform: translate3d(0, 0, 0); }
+  44% { opacity: 1; transform: translate3d(0, -2px, 0); animation-timing-function: var(--ease-out); }
+  52%, 82% { opacity: 0.9; transform: translate3d(0, 0, 0); }
+  94% { opacity: 0.48; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes loopDigestCell {
+  0%, 34%, 54%, 100% { opacity: 0.42; transform: translate3d(0, 0, 0); }
+  39% { opacity: 1; transform: translate3d(0, 0, 0); }
+  45% { opacity: 1; transform: translate3d(0, 6px, 0); }
+  50% { opacity: 0; transform: translate3d(0, 12px, 0); }
+}
+
+@keyframes loopMergePellet {
+  0%, 49% { opacity: 0; transform: translate3d(0, 0, 0); }
+  51% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  55% { opacity: 1; transform: translate3d(0, 39px, 0); animation-timing-function: var(--ease-in-out); }
+  60% { opacity: 1; transform: translate3d(var(--merge-x), 39px, 0); animation-timing-function: var(--ease-in-out); }
+  64% { opacity: 1; transform: translate3d(var(--merge-x), 78px, 0); }
+  66%, 100% { opacity: 0; transform: translate3d(var(--merge-x), 78px, 0); }
+}
+
+@keyframes loopMergePending {
+  0%, 47% { opacity: 0; transform: translate3d(0, 0, 0); }
+  50%, 56% { opacity: 0.42; transform: translate3d(0, 10px, 0); }
+  60%, 100% { opacity: 0; transform: translate3d(0, 10px, 0); }
+}
+
+@keyframes loopPacketReturn {
+  0%, 62% { opacity: 0; transform: translate3d(0, 0, 0); }
+  64% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  68% { opacity: 1; transform: translate3d(0, 7px, 0); animation-timing-function: var(--ease-in-out); }
+  75% { opacity: 1; transform: translate3d(276px, 7px, 0); animation-timing-function: var(--ease-in-out); }
+  84% { opacity: 1; transform: translate3d(276px, -535px, 0); animation-timing-function: var(--ease-in-out); }
+  91%, 97% { opacity: 1; transform: translate3d(0, -535px, 0); }
+  99%, 100% { opacity: 0; transform: translate3d(0, -535px, 0); }
+}
+
+@keyframes loopPacketAssemble {
+  0%, 61% { opacity: 0; }
+  64%, 92% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+@keyframes loopFeedQueueShift {
+  0%, 10% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  16%, 99.8% { transform: translate3d(0, 35px, 0); }
+  99.9% {
+    transform: translate3d(0, 35px, 0);
+    animation-timing-function: steps(1, end);
+  }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes loopRouteArrow {
+  0%, 1% { opacity: 0.24; }
+  4% { opacity: 0.78; }
+  8%, 100% { opacity: 0.24; }
+}
+
+@keyframes loopRouteBottomTrace {
+  0%, 67% { opacity: 0; transform: scaleX(0); }
+  68% { opacity: 0.82; transform: scaleX(0); }
+  75% { opacity: 0.82; transform: scaleX(1); }
+  79%, 100% { opacity: 0; transform: scaleX(1); }
+}
+
+@keyframes loopRouteSideTrace {
+  0%, 74% { opacity: 0; transform: scaleY(0); }
+  75% { opacity: 0.82; transform: scaleY(0); }
+  84% { opacity: 0.82; transform: scaleY(1); }
+  88%, 100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes loopRouteTopTrace {
+  0%, 83% { opacity: 0; transform: scaleX(0); }
+  84% { opacity: 0.82; transform: scaleX(0); }
+  91% { opacity: 0.82; transform: scaleX(1); }
+  95%, 100% { opacity: 0; transform: scaleX(1); }
+}
+
 @keyframes venueIn {
   from { opacity: 0; transform: translate3d(0, 16px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -3007,6 +3929,11 @@
   .chapterArrow { right: 34px; bottom: 34px; }
   .journeyPhone { width: min(330px, 39vh); }
   .learn .sectionInner { grid-template-columns: minmax(420px, 0.88fr) minmax(540px, 1.12fr); }
+  .memoryLoop {
+    transform: translate3d(24px, 0, 0) scale(0.88);
+    transform-origin: right center;
+  }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.88); }
   .updates { margin-inline: 42px; }
 }
 
@@ -3027,6 +3954,8 @@
   }
 
   .learn[data-visible="true"] .memorySorter { transform: scale(0.84); }
+  .memoryLoop { transform: translate3d(24px, 0, 0) scale(0.78); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.78); }
 }
 
 @media (max-width: 979px) {
@@ -3100,10 +4029,14 @@
     padding: 13vh 24px 10vh;
   }
 
+  .learnCopy,
+  .memoryLoop { top: 0; }
+
   .learnCopy h2,
   .venuesHeader h2 { font-size: clamp(48px, 12vw, 68px); }
   .memorySorter { width: 680px; justify-self: center; }
   .memoryTrace { width: min(100%, 680px); justify-self: center; }
+  .memoryLoop { width: 680px; justify-self: center; transform-origin: center top; }
 
   .venues .sectionInner { min-height: 0; padding: 13vh 24px 10vh; }
   .venuesHeader { grid-template-columns: minmax(0, 1fr); }
@@ -3119,7 +4052,8 @@
 
   .closing::before { width: 26%; }
   .closing h2 { font-size: clamp(48px, 12vw, 68px); }
-  .closingActions { width: min(100%, 330px); }
+  .closingActions { width: min(100%, 330px); transform: none; }
+  .closingCanvas { display: none; }
 
   .updates { margin-inline: 24px; padding-block: 12vh; }
   .updates > header { grid-template-columns: minmax(0, 1fr); gap: 20px; }
@@ -3143,6 +4077,8 @@
     transform-origin: left top;
   }
   .learn[data-visible="true"] .memorySorter { transform: scale(0.72); }
+  .memoryLoop { transform: translate3d(18px, 0, 0) scale(0.72); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.72); }
   .memoryTrace { min-height: 0; padding-left: 54px; transform-origin: center top; }
   .memoryTraceLine { left: 22px; }
   .memoryChanges button {
@@ -3163,6 +4099,26 @@
   .venueItem,
   .memoryChanges button,
   .memoryTrace,
+  .memoryLoop,
+  .loopReasonerGrid i,
+  .loopBranchRail::after,
+  .loopReceipt,
+  .loopSplitPacket,
+  .loopAbsorberMachine,
+  .loopDigestor i,
+  .loopAbsorberOutput i,
+  .loopMergePellets > i,
+  .loopReturnPacket,
+  .loopReturnPacket i,
+  .loopRouteBottom i,
+  .loopRouteSide i,
+  .loopRouteTop i,
+  .loopRouteBottom::before,
+  .loopRouteSide::before,
+  .loopRouteTop::before,
+  .loopFeedQueue,
+  .loopFeedCandidate,
+  .loopFeedReplacement,
   .memoryRegister i,
   .memoryWriteIn,
   .memoryWriteOut,
@@ -3195,6 +4151,25 @@
   .updateRows h3,
   .secondaryAction,
   .secondaryAction i { animation: none !important; transition: none !important; }
+  .memoryLoop { opacity: 1; transform: none; }
+  .loopReceipt,
+  .loopMergePellets > i,
+  .loopReturnPacket { opacity: 0; }
+  .loopSplitPacket[data-state="written"] {
+    opacity: 0.74;
+    transform: translate3d(var(--split-x), 66px, 0);
+  }
+  .loopSplitPacket[data-state="pending"] {
+    opacity: 0.28;
+    transform: translate3d(var(--split-x), 66px, 0);
+  }
+  .loopBranchRail::after { opacity: 0.28; transform: translate3d(-50%, 0, 0) scaleX(1); }
+  .loopReasonerGrid i { opacity: 0.68; }
+  .loopAbsorber:not([data-state="pending"]) .loopAbsorberMachine { opacity: 0.72; }
+  .loopAbsorber:not([data-state="pending"]) .loopAbsorberOutput i { opacity: 0.9; transform: none; }
+  .loopFeedCandidate { opacity: 1; transform: none; }
+  .loopFeedQueue { opacity: 1; transform: none; }
+  .loopFeedReplacement { opacity: 0; transform: none; }
   .memoryRegister i { opacity: 0.72; }
   .sorterCore > span i { opacity: 0.58; }
   .sorterDomain[data-state="updated"] .sorterDomainGlyph i,

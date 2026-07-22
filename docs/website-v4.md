@@ -84,26 +84,27 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 - 标题：**“It gets sharper every trade.”**；内容偏营销，解释四个维度的意义与用户价值，不展开算法机制。
 - 沿用 `vc-demo` 的语义拓扑：中央 Memory core + 四个非对称 domain cluster：
   **Market interests / Trusted signals / Trading style / User edge**。
-- 官网版保留核心与四个 domain，但先解释因果、再解释结构：右侧按 `成交回执 → 写入 AI Memory profile → 四类变化 → 下一次排序改变` 自上而下展开。Memory core 使用可循环的输入、寄存器写入和输出动画，不再使用无语义随机像素团；四个 domain 以开放式记录行和微型变化图形呈现。
+- 官网版保留核心与四个 domain，但先解释因果、再解释结构：右侧把 `Next Feed 队列 → Memory Reasoner → 四类变化 → 下一次排序改变` 画成一条闭合因果链。Reasoner 使用可循环的输入、拆解和输出动画，不再使用无语义随机像素团；四个 domain 以横向吸收器和微型状态图形呈现。
 - Execute 的成交回执进入 Memory core，只触发本次真实相关的维度；不展示没有真实依据的综合分数。
 
-#### Learn 候选动效：Memory nutrient loop（待确认、尚未实施）
+#### Learn 动效：Memory nutrient loop（已确认、桌面版已实施）
 
-目标不是画一条装饰性流水线，而是让同一个成交回执解释「为什么 SmartX 下一次会更懂用户」。共享实体始终是一颗有明确来源的像素 packet，循环分五段：
+目标不是画一条装饰性流水线，而是让同一个决策 packet 解释「为什么 SmartX 下一次会更懂用户」。共享实体始终有明确来源与去向，循环分五段：
 
-1. **进入**：Execute 完成后，成交回执压缩为单颗 packet，从顶部进入中央管道。
-2. **消化**：packet 通过 AI Memory analysis gate，被拆解为带有四种产品语义的“养料”：Market interests / Trusted signals / Trading style / User edge；颜色只能复用各 domain 的既有语义色。
+1. **进入**：Next Feed 保持五项队列；第 05 位 packet 沿垂直管道进入 Memory Reasoner，原 01–04 立即下移补齐 02–05，并由一个低对比候选项补入 01，队列不能在处理期间留下空洞。
+2. **消化**：Reasoner 点亮并把 packet 拆解为四路带有产品语义的“养料”：Market interests / Trusted signals / Trading style / User edge；分解先走共同主干，再沿四条可追踪支路进入对应吸收器，颜色只能复用各 domain 的既有语义色。
 3. **消费**：养料沿分支进入四个维度。本次有真实依据的维度吸收并更新；无依据的维度只保持可见，不伪造变化。
-4. **汇合**：已写入的信息在底部重新汇成一颗更精确的 packet，同时形成可读的 `Next time` 输出。
-5. **回流**：packet 由短促的弹簧/浮力机制送回顶部，落到“下一次 feed ranking”起点，闭合 `trade → memory → next decision` 因果环。
+4. **汇合**：已写入的信息在四个横向吸收器下方立即重新汇成一颗更精确的 packet；不增加底部压缩仓、第二处理阶段或额外仪表盘。
+5. **回流**：packet 经右侧单向正交管道返回顶部，覆盖 Next Feed 第 01 位的低对比候选项；语义颜色逐格消散并落回普通 Feed 状态，不再用第二个对象替换，闭合 `feed → memory → rerank → next feed` 因果环。
 
 实现合同：
 
-- packet 必须跨五段保持同一身份；不允许中途替换为随机粒子雨或纯装饰像素。
+- packet 必须跨五段保持同一身份；第 05 位的离队、Reasoner 内的拆解、底部重组与第 01 位的回填必须在几何上连续。第 01 位补位块作为静态底层持续存在，回流 packet 只在其上完成一次语义着色与消散，不允许中途替换为随机粒子雨或额外 settled 对象。
 - 阅读窗口以静止为主：首次进入完整播放一次，之后只允许低频慢循环；hover 只用于查看四个维度，不接管主循环。
 - 运动只用 `transform / opacity`，路径使用像素网格与正交管线；不增加自由角度轨迹、发光圆晕或无终点漂浮。
 - `prefers-reduced-motion` 下保留静态方向、四维写入状态和 `Next time` 结果，不播放回流。
-- 若完整回流的工艺在收口阶段仍不稳定，降级为「packet 在底部汇合 → Next time 输出点亮」；语义完整性优先于强行动效。
+- 四个维度固定从左到右平铺：Interest / Signal 吸收并增加语义像素，Style 记录行为轨迹，Edge 保持 pending；不得为了画面热闹伪造四项同时更新。
+- 若完整回流的工艺在收口阶段仍不稳定，降级为「packet 在底部汇合 → Next feed 第 01 位点亮」；语义完整性优先于强行动效。
 
 ### 04 All-in-one
 
@@ -145,7 +146,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **Index** | 🟡 精修待签字 | 默认态取消假激活与无效 evidence；hover/focus 后显示证据摘要并强化对应像素状态，其他章节同步降噪 |
 | **01 Signals** | 🟡 精修待签字 | 手机缩小并只保留系统 chrome，产品导航来自真实截图；三列来源轨道等宽居中；不公开标签数量 |
 | **02 Execute** | 🟠 待专项讨论 | 已盘点召回交易与策略跟单两类内容，但当前构图不冻结，下一轮先讨论场景编排再实施 |
-| **03 Learn** | 🟠 动效方案待确认 | 当前 profile register 可用；已记录 Memory nutrient loop 五段合同，确认后再替换现有循环表现 |
+| **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
 | **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 加日期、统一圆角与非点击型 hover；Footer 法务入口保留 |
 
