@@ -1175,9 +1175,9 @@
 .learn .sectionInner {
   display: grid;
   min-height: 110vh;
-  grid-template-columns: minmax(400px, 0.78fr) minmax(620px, 1.22fr);
+  grid-template-columns: minmax(460px, 0.9fr) minmax(600px, 1.1fr);
   align-items: center;
-  gap: clamp(16px, 2.4vw, 40px);
+  gap: clamp(18px, 3vw, 54px);
   padding: 10vh clamp(42px, 6vw, 96px);
 }
 
@@ -1895,6 +1895,320 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+
+.memoryShift {
+  --memory-color: var(--teal);
+  position: relative;
+  display: grid;
+  max-width: 430px;
+  gap: 7px;
+  margin-top: 48px;
+  padding-left: 54px;
+}
+
+.memoryShift::before {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 34px;
+  height: 4px;
+  background: var(--memory-color);
+  content: "";
+  opacity: 0.8;
+}
+
+.memoryShift span {
+  color: var(--dim);
+  font-family: var(--font-jb);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.memoryShift strong {
+  color: var(--body);
+  font-size: 13px;
+  font-weight: 580;
+  line-height: 1.45;
+}
+
+.memoryTrace {
+  position: relative;
+  display: grid;
+  width: min(100%, 680px);
+  min-height: 650px;
+  align-content: center;
+  justify-self: end;
+  padding: 46px 0 42px 78px;
+  opacity: 0;
+  transform: translate3d(22px, 0, 0);
+  transition:
+    opacity 560ms var(--ease-out),
+    transform 720ms var(--ease-out);
+}
+
+.learn[data-visible="true"] .memoryTrace {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.memoryTraceLine {
+  position: absolute;
+  top: 68px;
+  bottom: 70px;
+  left: 31px;
+  width: 1px;
+  background: rgba(148, 166, 194, 0.2);
+}
+
+.memoryTraceLine::before,
+.memoryTraceLine::after {
+  position: absolute;
+  left: -3px;
+  width: 7px;
+  height: 7px;
+  background: var(--teal);
+  content: "";
+}
+
+.memoryTraceLine::before { top: 0; }
+.memoryTraceLine::after { bottom: 0; opacity: 0.38; }
+
+.memoryTraceLine i {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 7px;
+  height: 7px;
+  background: var(--teal);
+  opacity: 0;
+}
+
+.learn[data-visible="true"] .memoryTraceLine i {
+  animation: memoryPacket 1180ms var(--ease-in-out) 280ms both;
+}
+
+.memoryInput,
+.memoryOutput {
+  position: relative;
+  display: grid;
+  gap: 7px;
+}
+
+.memoryInput {
+  padding: 0 0 25px;
+  border-bottom: 1px solid rgba(148, 166, 194, 0.2);
+}
+
+.memoryInput > span,
+.memoryOutput > span,
+.memoryChangesLabel,
+.memoryCore div > span {
+  color: var(--teal);
+  font-family: var(--font-jb);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.memoryInput strong {
+  color: var(--paper);
+  font-family: var(--font-jb);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.memoryInput small,
+.memoryOutput small {
+  color: var(--dim);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.memoryCore {
+  display: grid;
+  grid-template-columns: 126px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 27px 0;
+  border-bottom: 1px solid rgba(148, 166, 194, 0.2);
+}
+
+.memoryWriteCycle {
+  position: relative;
+  display: grid;
+  width: 126px;
+  height: 70px;
+  place-items: center;
+}
+
+.memoryRegister {
+  display: grid;
+  grid-template-columns: repeat(4, 8px);
+  gap: 5px;
+  padding: 10px;
+  border-top: 1px solid rgba(8, 223, 181, 0.36);
+  border-bottom: 1px solid rgba(8, 223, 181, 0.36);
+}
+
+.memoryRegister i {
+  width: 8px;
+  height: 8px;
+  background: var(--teal);
+  opacity: 0.14;
+}
+
+.memoryWriteIn,
+.memoryWriteOut {
+  position: absolute;
+  top: 33px;
+  width: 28px;
+  height: 4px;
+  background: var(--teal);
+  opacity: 0;
+}
+
+.memoryWriteIn { left: 0; }
+.memoryWriteOut { right: 0; }
+
+.memoryCore > div {
+  display: grid;
+  gap: 8px;
+}
+
+.memoryCore div > strong {
+  max-width: 360px;
+  color: var(--body);
+  font-size: 14px;
+  font-weight: 580;
+  line-height: 1.45;
+}
+
+.learn[data-visible="true"] .memoryRegister i {
+  animation: memoryCellWrite 2400ms linear infinite;
+  animation-delay: calc(var(--cell-index) * 45ms);
+}
+
+.learn[data-visible="true"] .memoryWriteIn {
+  animation: memoryWriteIn 2400ms var(--ease-in-out) infinite;
+}
+
+.learn[data-visible="true"] .memoryWriteOut {
+  animation: memoryWriteOut 2400ms var(--ease-in-out) infinite;
+}
+
+.memoryChanges {
+  display: grid;
+  padding-top: 22px;
+}
+
+.memoryChangesLabel { margin-bottom: 7px; color: var(--dim); }
+
+.memoryChanges button {
+  --memory-color: var(--teal);
+  display: grid;
+  min-height: 55px;
+  grid-template-columns: 54px minmax(126px, 0.9fr) minmax(158px, 1.25fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 166, 194, 0.14);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  text-align: left;
+  transform: translate3d(0, 8px, 0);
+}
+
+.learn[data-visible="true"] .memoryChanges button {
+  animation: memoryRowIn 280ms var(--ease-out) both;
+  animation-delay: calc(480ms + var(--memory-index) * 60ms);
+}
+
+.memoryChanges button > span,
+.memoryChanges button > i {
+  font-family: var(--font-jb);
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.memoryChanges button > span { color: var(--memory-color); opacity: 0.55; }
+.memoryRowGlyph {
+  display: flex;
+  width: 42px;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.memoryRowGlyph i {
+  display: block;
+  width: 10px;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.34;
+}
+
+.memoryRowGlyph i:nth-child(2) { height: 9px; }
+.memoryRowGlyph i:nth-child(3) { height: 14px; }
+.memoryChanges button > strong { color: var(--paper); font-size: 13px; font-weight: 600; }
+.memoryChanges button > small { color: var(--muted); font-size: 12px; }
+.memoryChanges button > i { color: var(--dim); }
+
+.memoryChanges button[data-active="true"] > span,
+.memoryChanges button[data-active="true"] > i { color: var(--memory-color); opacity: 1; }
+
+.memoryChanges button[data-active="true"] .memoryRowGlyph i { opacity: 1; }
+
+.memoryChanges button[data-active="true"] > strong { color: var(--memory-color); }
+
+.memoryChanges button:focus-visible {
+  outline: 1px solid var(--memory-color);
+  outline-offset: 4px;
+  transition: none;
+}
+
+.memoryChanges button:focus-visible > span,
+.memoryChanges button:focus-visible > strong,
+.memoryChanges button:focus-visible > i { transition: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .memoryChanges button {
+    transition: border-color 150ms var(--ease-out);
+  }
+
+  .memoryChanges button > span,
+  .memoryChanges button > strong,
+  .memoryChanges button > i {
+    transition:
+      color 140ms var(--ease-out),
+      opacity 140ms var(--ease-out);
+  }
+
+  .memoryChanges button:hover { border-color: rgba(148, 166, 194, 0.3); }
+  .memoryChanges button:hover .memoryRowGlyph { opacity: 0.9; }
+}
+
+.memoryOutput {
+  --memory-color: var(--teal);
+  margin-top: 26px;
+  padding-left: 18px;
+  border-left: 3px solid var(--memory-color);
+}
+
+.memoryOutput > span { color: var(--memory-color); }
+
+.memoryOutput strong {
+  color: var(--paper);
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.4;
+}
+
+.memoryOutput small { max-width: 500px; }
 
 /* All-in-one -------------------------------------------------------------- */
 
@@ -2643,8 +2957,37 @@
   100% { opacity: 0; transform: translate3d(0, -6px, 0); }
 }
 
+@keyframes memoryCellWrite {
+  0%, 18%, 82%, 100% { opacity: 0.14; }
+  34%, 62% { opacity: 0.92; }
+}
+
+@keyframes memoryWriteIn {
+  0% { opacity: 0; transform: translate3d(-18px, 0, 0); }
+  12%, 26% { opacity: 1; }
+  38%, 100% { opacity: 0; transform: translate3d(18px, 0, 0); }
+}
+
+@keyframes memoryWriteOut {
+  0%, 54% { opacity: 0; transform: translate3d(-18px, 0, 0); }
+  66%, 82% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(18px, 0, 0); }
+}
+
+@keyframes memoryPacket {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  12% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(0, 480px, 0); }
+}
+
 @keyframes venueIn {
   from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes memoryRowIn {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
@@ -2663,10 +3006,7 @@
   .chapterEvidence { top: 30px; right: 34px; }
   .chapterArrow { right: 34px; bottom: 34px; }
   .journeyPhone { width: min(330px, 39vh); }
-  .learn .sectionInner {
-    grid-template-columns: minmax(360px, 0.72fr) minmax(560px, 1.28fr);
-    gap: 8px;
-  }
+  .learn .sectionInner { grid-template-columns: minmax(420px, 0.88fr) minmax(540px, 1.12fr); }
   .updates { margin-inline: 42px; }
 }
 
@@ -2677,6 +3017,7 @@
   }
 
   .feedCandidateList button::before { transition: none; }
+  .memoryChanges button * { transition: none; }
 }
 
 @media (min-width: 980px) and (max-width: 1080px) {
@@ -2762,6 +3103,7 @@
   .learnCopy h2,
   .venuesHeader h2 { font-size: clamp(48px, 12vw, 68px); }
   .memorySorter { width: 680px; justify-self: center; }
+  .memoryTrace { width: min(100%, 680px); justify-self: center; }
 
   .venues .sectionInner { min-height: 0; padding: 13vh 24px 10vh; }
   .venuesHeader { grid-template-columns: minmax(0, 1fr); }
@@ -2801,6 +3143,12 @@
     transform-origin: left top;
   }
   .learn[data-visible="true"] .memorySorter { transform: scale(0.72); }
+  .memoryTrace { min-height: 0; padding-left: 54px; transform-origin: center top; }
+  .memoryTraceLine { left: 22px; }
+  .memoryChanges button {
+    grid-template-columns: 30px minmax(105px, 0.9fr) minmax(130px, 1.1fr);
+  }
+  .memoryChanges button > i { display: none; }
   .venueGrid { grid-template-columns: minmax(0, 1fr); }
   .updateImage { min-height: 240px; }
   .footerTop { align-items: flex-start; }
@@ -2813,6 +3161,12 @@
   .chapterStage,
   .venueSpine i,
   .venueItem,
+  .memoryChanges button,
+  .memoryTrace,
+  .memoryRegister i,
+  .memoryWriteIn,
+  .memoryWriteOut,
+  .memoryTraceLine i,
   .memorySorter,
   .sorterInputPacket,
   .sorterCore > span i,
@@ -2841,6 +3195,7 @@
   .updateRows h3,
   .secondaryAction,
   .secondaryAction i { animation: none !important; transition: none !important; }
+  .memoryRegister i { opacity: 0.72; }
   .sorterCore > span i { opacity: 0.58; }
   .sorterDomain[data-state="updated"] .sorterDomainGlyph i,
   .sorterDomain[data-state="updated"] > b,
@@ -2862,6 +3217,8 @@
   .primaryAction:hover > i,
   .secondaryAction:hover i { transform: none; }
   .venueItem,
+  .memoryChanges button,
+  .memoryTrace,
   .memorySorter { opacity: 1; transform: none; }
   .venueSpine i { transform: scaleX(1); }
   .closingFlow i { opacity: 0; }
