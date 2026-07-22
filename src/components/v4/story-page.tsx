@@ -74,8 +74,8 @@ const SIGNAL_SOURCES = [
     captureHeight: 1688,
     captureAlt: "SmartX Smart Money list with trader labels and performance history",
     eyebrow: "Trader intelligence",
-    headline: "Know why a wallet matters—not only what it earned.",
-    detail: "Representative labels reveal the dimensions SmartX reads across every wallet.",
+    headline: "See why a wallet matters beyond PnL.",
+    detail: "",
     points: [
       {
         label: "Expertise",
@@ -102,9 +102,9 @@ const SIGNAL_SOURCES = [
     captureWidth: 780,
     captureHeight: 1688,
     captureAlt: "SmartX market list with live market signal labels",
-    eyebrow: "Market event taxonomy",
-    headline: "See what changed before the price alone can explain it.",
-    detail: "Representative event labels explain what changed—not only that price moved.",
+    eyebrow: "Market intelligence",
+    headline: "See the signals behind the move.",
+    detail: "",
     points: [
       { label: "Momentum", value: "Fast Move · Volume Surge", tone: "trading" },
       { label: "Flow", value: "Big Orders · Smart Money", tone: "behavior" },
@@ -119,9 +119,9 @@ const SIGNAL_SOURCES = [
     captureWidth: 390,
     captureHeight: 844,
     captureAlt: "SmartX Watchlist create alert panel with configurable triggers",
-    eyebrow: "Your rules, always watching",
-    headline: "Define the exact condition that should bring you back.",
-    detail: "Set rules on a market, a metric, or a tracked wallet—then let SmartX monitor it.",
+    eyebrow: "Custom alerts",
+    headline: "Set the conditions. SmartX keeps watch.",
+    detail: "",
     points: [
       { label: "Metric move", value: "OI or Volume · 1h / 6h threshold", tone: "expert" },
       { label: "Price", value: "YES / NO moves above or below your price", tone: "status" },
@@ -134,11 +134,19 @@ const SIGNAL_SOURCES = [
 
 type SignalSource = (typeof SIGNAL_SOURCES)[number];
 
-const EXECUTE_CAPTURE = {
-  src: "/assets/h5/execute@2x.png",
-  width: 780,
-  height: 1688,
-  alt: "SmartX mobile market trade ticket with outcome, amount, and order controls",
+const EXECUTE_CAPTURES = {
+  recall: {
+    src: "/assets/h5/execute@2x.png",
+    width: 780,
+    height: 1688,
+    alt: "SmartX mobile market trade ticket with outcome, amount, and order controls",
+  },
+  follow: {
+    src: "/assets/h5/strategy-follow@2x.png",
+    width: 780,
+    height: 1688,
+    alt: "SmartX Watchlist with active price, signal, market metric, and wallet rules",
+  },
 } as const;
 
 const EXECUTION_PATHS = [
@@ -146,27 +154,25 @@ const EXECUTION_PATHS = [
     id: "recall",
     label: "Recall & trade",
     eyebrow: "SIGNALS · ALERTS · TELEGRAM",
-    headline: "The right moment brings you back.",
-    detail:
-      "Open the exact market and evidence from a SmartX signal, an alert you configured, or—in a future release—Telegram.",
+    headline: "Return with the evidence intact.",
     items: [
-      { label: "SmartX signal", detail: "Evidence opens with the market" },
-      { label: "Your alert", detail: "Price, OI, volume, or wallet rule" },
-      { label: "Telegram", detail: "Trade from the notification · Coming" },
+      { label: "SmartX signal", detail: "Opens the exact market" },
+      { label: "Your alert", detail: "Returns to the matched condition" },
+      { label: "Telegram", detail: "Trade from notification · Coming" },
     ],
+    capture: EXECUTE_CAPTURES.recall,
   },
   {
     id: "follow",
     label: "Strategy follow",
-    eyebrow: "MARKET · SMART MONEY · WATCHLIST",
+    eyebrow: "WATCHLIST RULES · AUTO-EXECUTION COMING",
     headline: "Turn a trusted signal into a rule.",
-    detail:
-      "Keep a follow strategy in Watchlist and let a market event or tracked wallet become the trigger for the next trade.",
     items: [
-      { label: "Market signals", detail: "Follow a selected event taxonomy" },
-      { label: "Smart Money", detail: "Follow wallets and evidence you trust" },
-      { label: "Watchlist strategy", detail: "Keep the trigger visible and editable" },
+      { label: "Market signals", detail: "Choose the event trigger" },
+      { label: "Smart Money", detail: "Choose wallets to follow" },
+      { label: "Watchlist rule", detail: "Review, pause, or edit" },
     ],
+    capture: EXECUTE_CAPTURES.follow,
   },
 ] as const;
 
@@ -432,7 +438,7 @@ function SignalReadout({ source }: { source: SignalSource }) {
     <div className={styles.sourceReadout} aria-live="polite">
       <span>{source.eyebrow}</span>
       <strong>{source.headline}</strong>
-      <small>{source.detail}</small>
+      {source.detail ? <small>{source.detail}</small> : null}
       <ul>
         {source.points.map((point) => (
           <li data-tone={point.tone} key={point.label}>
@@ -471,7 +477,6 @@ function ExecutionReadout({
       <div className={styles.executePathReadout} aria-live="polite">
         <span>{path.eyebrow}</span>
         <strong>{path.headline}</strong>
-        <small>{path.detail}</small>
         <ul>
           {path.items.map((item) => (
             <li key={item.label}>
@@ -542,24 +547,16 @@ function ProductPhone({
           aria-hidden={!executionActive}
         >
           <Image
+            key={executionPath.capture.src}
             className={`${styles.phoneCapture} ${styles.phoneExecuteCapture}`}
-            src={EXECUTE_CAPTURE.src}
-            alt={EXECUTE_CAPTURE.alt}
-            width={EXECUTE_CAPTURE.width}
-            height={EXECUTE_CAPTURE.height}
+            src={executionPath.capture.src}
+            alt={executionPath.capture.alt}
+            width={executionPath.capture.width}
+            height={executionPath.capture.height}
             sizes="(max-width: 979px) 350px, 26vw"
             draggable={false}
             unoptimized
           />
-        </div>
-
-        <div className={styles.phoneSceneLabel} data-visible={executionActive} aria-hidden="true">
-          <span>
-            {executionPath.id === "recall"
-              ? "ENTRY / SIGNAL ALERT"
-              : "FOLLOW / WATCHLIST RULE"}
-          </span>
-          <i />
         </div>
 
         <i className={styles.phoneHomeIndicator} aria-hidden="true" />
@@ -606,13 +603,12 @@ function JourneyCopy({
     <div ref={elementRef} className={`${styles.journeyCopy} ${styles.executeCopy}`}>
       <p className={styles.kicker}>02 / Execute</p>
       <h2 id="v4-execute-title">
-        From signal to action,{" "}
+        From signal
         <br />
-        your way.
+        to trade.
       </h2>
       <p>
-        Return through a signal or alert, trade with its evidence still attached, or
-        let a watchlisted strategy follow the market or wallets you trust.
+        Trade from a signal now—or let a strategy follow the next one.
       </p>
       <ExecutionReadout path={executionPath} onChange={onExecutionPathChange} />
     </div>
@@ -747,15 +743,13 @@ function TradingJourney() {
           <ProductPhone source={source} executionActive executionPath={executionPath} />
           <div>
             <p className={styles.kicker}>02 / Execute</p>
-            <h2 id="v4-execute-title-static">From signal to action, your way.</h2>
+            <h2 id="v4-execute-title-static">From signal to trade.</h2>
             <p>
               <span className={styles.ledeDesktop}>
-                Return through a signal or alert, trade with its evidence attached, or
-                let a watchlisted strategy follow the trigger.
+                Trade from a signal now—or let a strategy follow the next one.
               </span>
               <span className={styles.ledeMobile}>
-                Trade from a signal with its evidence attached, or let a strategy
-                follow it.
+                Trade now, or let a strategy follow the next signal.
               </span>
             </p>
             <ExecutionReadout path={executionPath} onChange={setExecutionPath} />

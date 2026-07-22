@@ -76,8 +76,8 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 - 切换来源时必须改变信号、证据字段与产品状态，不做自动轮播和装饰性 carousel dots。
 - Smart Money 的首要证据是交易者标签的**覆盖维度**，按领域专长、交易风格、历史战绩与行为特征组织；每类只展示代表性例子，不公开强调标签总数。Market 同样以 Momentum / Flow / Positioning 三个维度展示 Fast Move / Big Orders / Smart Money / OI Build Up / Volume Surge / Illiquid 等代表性事件，不让用户误以为 taxonomy 只有当前几项。Watchlist 的首要证据是可配置规则，包括价格阈值、1h/6h OI 或 Volume 变化、Radar signal 与跟踪钱包买入金额。
 - Signals 与 Execute 共用同一台手机、同一个示例市场和同一组数值。滚动交接时手机从右侧移动到左侧，信号展开为图表、订单与成交；文案交叉衔接，不出现空窗，也不额外展示 01→02 的装饰性进度条。
-- Execute 的内容范围至少包含两条路径：**Recall & trade**（SmartX Signal / 用户 Alerts / 未来 Telegram 召回）和 **Strategy follow**（市场信号跟单 / Smart Money 跟单 / Watchlist 策略）。两条路径共用真实交易终点，但这一屏的最终构图与场景编排仍待专项讨论；当前实现只作为信息盘点，不冻结为最终方案。
-- 产品录屏素材到位前，Signals 使用真实 2× H5 静态图：Smart Money 标签列表、Markets 事件标签列表、Watchlist Create Alert；Execute 使用真实 H5 market trade ticket。手机外壳只模拟 iPhone 系统层的状态栏、Dynamic Island、硬件按键与 Home Indicator；产品级顶部/底部导航必须来自真实 H5 截图，禁止在截图外再画一套近似图标。三张 Signals 截图与 Execute 截图在同一屏幕 viewport 内裁切。首版以截图切换和轻量状态层代替 MP4，素材到位后只替换手机屏幕内部，不改变外部布局与 shared-element 交接。
+- Execute 收敛为两条路径：**Recall & trade**（从 SmartX Signal / 用户 Alert 回到对应市场；Telegram 召回标 Coming）和 **Strategy follow**（用市场事件或 Smart Money 配置 Watchlist Rule；自动执行标 Coming）。两条路径共享同一台手机，但必须显示不同的真实产品状态，不能只替换说明文字。
+- 产品录屏素材到位前，Signals 使用真实 2× H5 静态图：Smart Money 标签列表、Markets 事件标签列表、Watchlist Create Alert；Execute 的 Recall 使用真实 H5 market trade ticket，Strategy follow 使用真实 Watchlist Rules（价格、Radar signal、指标与钱包规则）。手机外壳只模拟 iPhone 系统层的状态栏、Dynamic Island、硬件按键与 Home Indicator；产品级顶部/底部导航必须来自真实 H5 截图，禁止在截图外再画一套近似图标或场景标签。所有截图使用同一屏幕 viewport，并完整显示底部导航或主 CTA。首版以双状态静态帧和轻量切换代替 MP4，素材到位后只替换手机屏幕内部，不改变外部布局与 shared-element 交接。
 
 ### 03 Learn / AI Memory
 
@@ -145,7 +145,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **Hero / Prologue** | ✅ 视觉冻结 | 保留当前版 |
 | **Index** | 🟡 精修待签字 | 默认态取消假激活与无效 evidence；hover/focus 后显示证据摘要并强化对应像素状态，其他章节同步降噪 |
 | **01 Signals** | 🟡 精修待签字 | 手机缩小并只保留系统 chrome，产品导航来自真实截图；三列来源轨道等宽居中；不公开标签数量 |
-| **02 Execute** | 🟠 待专项讨论 | 已盘点召回交易与策略跟单两类内容，但当前构图不冻结，下一轮先讨论场景编排再实施 |
+| **02 Execute** | 🟡 精修待签字 | 文案已收敛为两条路径；Recall 使用真实交易票据，Strategy follow 使用真实 Watchlist Rules，自动执行能力明确标 Coming |
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
 | **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接官方 Medium 最新三篇与 `See all` 外链；Footer 法务入口保留 |

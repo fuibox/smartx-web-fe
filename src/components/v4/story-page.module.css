@@ -14,6 +14,7 @@
 /* 移动端短文案切换：≤620 显示 short 版，其余显示完整版 */
 .ledeMobile { display: none; }
 
+.loopMobileSummary,
 .loopMobileReturn { display: none; }
 
 .kicker {
@@ -569,8 +570,8 @@
 .executePaths {
   display: grid;
   max-width: 470px;
-  gap: 17px;
-  margin-top: 28px;
+  gap: 15px;
+  margin-top: 24px;
 }
 
 .executePathTabs {
@@ -642,13 +643,6 @@
   color: var(--paper);
   font-size: 15px;
   font-weight: 620;
-}
-
-.executePathReadout > small {
-  max-width: 450px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.48;
 }
 
 .executePathReadout ul {
@@ -851,7 +845,24 @@
   left: 3%;
   width: 94%;
 }
-.phoneExecuteCapture { top: -8px; }
+.phoneExecuteCapture {
+  top: 0;
+  left: 3%;
+  width: 94%;
+  animation: executeCaptureIn 180ms var(--ease-out) both;
+}
+
+@keyframes executeCaptureIn {
+  from {
+    opacity: 0;
+    transform: translate3d(8px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
 
 .productPhone[data-execution="false"] .phoneSignalView,
 .productPhone[data-execution="true"] .phoneExecuteView {
@@ -859,32 +870,6 @@
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
-
-.phoneSceneLabel {
-  position: absolute;
-  top: 43px;
-  left: 13px;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 9px;
-  background: rgba(4, 10, 18, 0.88);
-  color: var(--teal);
-  font-family: var(--font-jb);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  opacity: 0;
-  transform: translate3d(-8px, 0, 0);
-}
-
-.phoneSceneLabel i {
-  width: 5px;
-  height: 5px;
-  background: var(--teal);
-}
-
-.phoneSceneLabel[data-visible="true"] { opacity: 1; transform: translate3d(0, 0, 0); }
 
 .phoneHomeIndicator {
   position: absolute;
@@ -896,14 +881,6 @@
   border-radius: 2px;
   background: rgba(241, 245, 249, 0.76);
   transform: translateX(-50%);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .phoneSceneLabel {
-    transition:
-      opacity 150ms var(--ease-out),
-      transform 220ms var(--ease-out);
-  }
 }
 
 .phoneViewHead {
@@ -4149,9 +4126,6 @@
   .primaryAction span { flex: 1; }
   .secondaryAction { justify-content: flex-start; }
 
-  /* 场景标签：状态栏已隐藏，贴到卡片顶部 */
-  .phoneSceneLabel { top: 10px; left: 12px; }
-
   .updates { margin-inline: 24px; padding-block: 12vh; }
   .updates > header { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .updatesHeaderAside { justify-items: start; }
@@ -4454,7 +4428,6 @@
   .feedQueueState i,
   .closingFlow i,
   .phoneCapture,
-  .phoneSceneLabel,
   .phoneSignalView,
   .phoneExecuteView,
   .primaryAction,
