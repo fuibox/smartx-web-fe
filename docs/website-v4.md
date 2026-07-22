@@ -51,8 +51,9 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 - 当前居中构图、标题、lede、CTA 与 navy/teal 气质保留。
 - Hero 是独立序章，正常纵向离场，不缩小、不向左让位。
-- idle 只允许边缘抖动密度发生极慢变化；标题与 CTA 的阅读状态保持稳定。
-- `Launch App` hover 使用箭头端的 teal 像素染色由右向左覆盖文字区；文案不替换，不增加第二套 CTA 状态。
+- idle 只允许边缘抖动密度发生极慢变化；标题与 CTA 的阅读状态保持稳定。首屏状态统一为 **Live alpha**。
+- 主 CTA 统一使用 `Launch Alpha`；hover 使用箭头端的 teal 像素染色由右向左覆盖文字区，文案不替换，不增加第二套 CTA 状态。
+- `Scroll` 提示的文字与箭头位置均保持静止；箭头仅在首次进入时做两轮低频明暗呼吸，随后停在稳定状态，避免无限循环与复位跳变；reduced-motion 下完全静态。
 
 ### Index / The system
 
@@ -115,7 +116,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 ### Closing CTA / Updates / Footer
 
-- Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch SmartX`，次入口 `Read the docs`。
+- Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch Alpha`，次入口 `Read the docs`。
 - Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；数据接口固定为 `category / date / title / excerpt / cover / url`。当前展示 SmartX 官方 Medium 最新三篇，文章分别跳转对应详情，`See all` 跳转 `https://medium.com/@smartxofficial`；后续官网 Blog 列表页与详情页上线后，只替换数据来源和链接，不改变版式。
 - Footer 保持常规导航、社交入口、Terms of Service 与 Privacy Policy，并以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
 - Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
@@ -130,7 +131,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | Signals → Execute | 同一台手机 + 同一市场 | 信号详情展开为图表、订单与成交 |
 | Execute → Learn | 成交回执 | 回执进入 Memory core，相关 domain 响应 |
 | Learn → All-in-one | Memory core | 核心退为 intelligence layer，六个 venue 状态出现 |
-| All-in-one → Closing | Polymarket Live 状态 | Live 路径收束为 Launch SmartX 行动 |
+| All-in-one → Closing | Polymarket Live 状态 | Live 路径收束为 Launch Alpha 行动 |
 
 ### 桌面优先、移动端后置
 

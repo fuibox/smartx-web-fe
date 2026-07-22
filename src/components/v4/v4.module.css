@@ -273,9 +273,30 @@
   position: absolute;
   bottom: 5vh;
   left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   color: var(--dim);
   font-size: 13px;
   transform: translateX(-50%);
+}
+
+.heroHint i {
+  display: inline-block;
+  color: var(--teal);
+  font-style: normal;
+  opacity: 0.55;
+  animation: scrollCue 2200ms var(--ease-in-out) 900ms 2 both;
+}
+
+@keyframes scrollCue {
+  0%, 100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 0.88;
+  }
 }
 
 /* ---- 00 / Thesis → chapter index ---- */
@@ -771,6 +792,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .heroHint i {
+    opacity: 0.55;
+    animation: none;
+  }
+
   .ctaLabel::before,
   .ctaLabel::after,
   .ctaLabel b,

@@ -78,7 +78,7 @@ export function V4Hero() {
       </header>
 
       <section ref={heroRef} className={styles.hero} aria-labelledby="v4-title">
-        <p className={styles.heroKicker}>AI trading terminal · Live beta</p>
+        <p className={styles.heroKicker}>AI trading terminal · Live alpha</p>
         <h1 id="v4-title" className={styles.heroTitle}>
           The AI Trading Terminal{" "}
           <br />
@@ -102,13 +102,16 @@ export function V4Hero() {
             rel="noopener noreferrer"
           >
             <span className={styles.ctaLabel}>
-              <b>Launch App</b>
-              <b aria-hidden="true">Launch App</b>
+              <b>Launch Alpha</b>
+              <b aria-hidden="true">Launch Alpha</b>
             </span>
             <i aria-hidden="true">↗</i>
           </a>
         </div>
-        <span className={styles.heroHint}>Scroll ↓</span>
+        <span className={styles.heroHint}>
+          <span>Scroll</span>
+          <i aria-hidden="true">↓</i>
+        </span>
       </section>
     </div>
   );

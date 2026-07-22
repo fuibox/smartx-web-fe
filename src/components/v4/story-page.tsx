@@ -1144,8 +1144,8 @@ function ClosingSection() {
           rel="noopener noreferrer"
         >
           <span>
-            <b>Launch SmartX</b>
-            <b aria-hidden="true">Launch SmartX</b>
+            <b>Launch Alpha</b>
+            <b aria-hidden="true">Launch Alpha</b>
           </span>
           <i aria-hidden="true">↗</i>
         </a>
