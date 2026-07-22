@@ -785,6 +785,8 @@ function MemoryLoop() {
   const splitCellCounts = [5, 7, 6, 4];
   const outputCellCounts = [2, 4, 3, 1];
   const mergeOffsets = ["213px", "71px", "-71px", "-213px"];
+  const domainArrivalDelays = ["0ms", "70ms", "140ms", "210ms"];
+  const domainWriteDelays = ["0ms", "70ms", "140ms", "300ms"];
 
   return (
     <div
@@ -806,7 +808,6 @@ function MemoryLoop() {
         </ol>
         <span className={styles.loopFeedQueueViewport} aria-hidden="true">
           <span className={styles.loopFeedQueue}>
-            <LoopPacket className={styles.loopFeedReplacement} tone="muted" />
             {Array.from({ length: 5 }).map((_, index) => (
               <LoopPacket
                 className={styles.loopFeedCandidate}
@@ -832,10 +833,15 @@ function MemoryLoop() {
       <span className={styles.loopReceipt}>FED / SMART MONEY</span>
 
       <span className={styles.loopBranchRail} aria-hidden="true">
-        {MEMORY_DOMAINS.map((domain) => (
+        {MEMORY_DOMAINS.map((domain, index) => (
           <i
             data-state={"written"}
-            style={{ "--memory-color": domain.color } as CSSProperties}
+            style={
+              {
+                "--memory-color": domain.color,
+                "--domain-arrival-delay": domainArrivalDelays[index],
+              } as CSSProperties
+            }
             key={domain.id}
           />
         ))}
@@ -852,6 +858,7 @@ function MemoryLoop() {
                 "--memory-color": domain.color,
                 "--domain-index": index,
                 "--split-x": splitOffsets[index],
+                "--domain-arrival-delay": domainArrivalDelays[index],
               } as CSSProperties
             }
             key={domain.id}
@@ -880,6 +887,7 @@ function MemoryLoop() {
                 {
                   "--memory-color": domain.color,
                   "--domain-index": index,
+                  "--domain-write-delay": domainWriteDelays[index],
                 } as CSSProperties
               }
               aria-label={`${domain.label}: ${change.change}. ${change.status}.`}
@@ -924,10 +932,15 @@ function MemoryLoop() {
       </div>
 
       <span className={styles.loopMergeRail} aria-hidden="true">
-        {MEMORY_DOMAINS.map((domain) => (
+        {MEMORY_DOMAINS.map((domain, index) => (
           <i
             data-state={"written"}
-            style={{ "--memory-color": domain.color } as CSSProperties}
+            style={
+              {
+                "--memory-color": domain.color,
+                "--domain-write-delay": domainWriteDelays[index],
+              } as CSSProperties
+            }
             key={domain.id}
           />
         ))}
@@ -945,6 +958,7 @@ function MemoryLoop() {
                   "--memory-color": domain.color,
                   "--domain-index": index,
                   "--merge-x": mergeOffsets[index],
+                  "--domain-write-delay": domainWriteDelays[index],
                 } as CSSProperties
               }
               key={domain.id}

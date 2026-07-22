@@ -2324,20 +2324,17 @@
   will-change: transform;
 }
 
-.loopFeedReplacement,
 .loopFeedCandidate {
   position: absolute;
   left: 0;
   will-change: transform, opacity;
 }
 
-/* 补位包改为从底部入列（rerank 时 05 空位由新候选补入） */
-.loopFeedReplacement { top: 140px; opacity: 0; }
-.loopFeedQueue > .loopFeedCandidate:nth-child(2) { top: 0; }
-.loopFeedQueue > .loopFeedCandidate:nth-child(3) { top: 35px; }
-.loopFeedQueue > .loopFeedCandidate:nth-child(4) { top: 70px; }
-.loopFeedQueue > .loopFeedCandidate:nth-child(5) { top: 105px; }
-.loopFeedQueue > .loopFeedCandidate:nth-child(6) { top: 140px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(1) { top: 0; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(2) { top: 35px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(3) { top: 70px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(4) { top: 105px; }
+.loopFeedQueue > .loopFeedCandidate:nth-child(5) { top: 140px; }
 
 .loopInputRail {
   position: absolute;
@@ -2966,36 +2963,30 @@
 }
 
 .learn[data-visible="true"] .loopBranchRail i {
-  animation: loopDropGlow var(--loop-cycle) linear 400ms infinite both;
+  animation: loopDropGlow var(--loop-cycle) linear
+    calc(400ms + var(--domain-arrival-delay)) infinite both;
 }
-
-.learn[data-visible="true"] .loopBranchRail i:nth-child(2) { animation-delay: 470ms; }
-.learn[data-visible="true"] .loopBranchRail i:nth-child(3) { animation-delay: 540ms; }
-.learn[data-visible="true"] .loopBranchRail i:nth-child(4) { animation-delay: 610ms; }
 
 /* merge 竖降与横行段共享同一 i 的透明度，一次点亮全程管道 */
 .learn[data-visible="true"] .loopMergeRail i {
-  animation: loopMergeGlow var(--loop-cycle) linear 400ms infinite both;
+  animation: loopMergeGlow var(--loop-cycle) linear
+    calc(400ms + var(--domain-write-delay)) infinite both;
 }
 
-.learn[data-visible="true"] .loopMergeRail i:nth-child(2) { animation-delay: 460ms; }
-.learn[data-visible="true"] .loopMergeRail i:nth-child(3) { animation-delay: 520ms; }
-.learn[data-visible="true"] .loopMergeRail i:nth-child(4) { animation-delay: 580ms; }
-
 .learn[data-visible="true"] .loopMergeRail::before {
-  animation: loopJunctionPulse var(--loop-cycle) linear 400ms infinite both;
+  animation: loopJunctionPulse var(--loop-cycle) linear 700ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteBottom::after {
-  animation: loopCornerFlash var(--loop-cycle) linear 8080ms infinite both;
+  animation: loopCornerFlash var(--loop-cycle) linear 8380ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteSide::after {
-  animation: loopCornerFlash var(--loop-cycle) linear 9280ms infinite both;
+  animation: loopCornerFlash var(--loop-cycle) linear 9580ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteTop::after {
-  animation: loopCornerFlash var(--loop-cycle) linear 10240ms infinite both;
+  animation: loopCornerFlash var(--loop-cycle) linear 10540ms infinite both;
 }
 
 .learn[data-visible="true"] .loopBranchRail::after {
@@ -3008,62 +2999,41 @@
 
 .learn[data-visible="true"] .loopSplitPacket {
   animation: loopSplitPacket var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 70ms) infinite both;
+    calc(400ms + var(--domain-arrival-delay)) infinite both;
 }
 
 .learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopAbsorberMachine {
   animation: loopAbsorberRead var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 90ms) infinite both;
+    calc(400ms + var(--domain-write-delay)) infinite both;
 }
 
 .learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopAbsorberOutput i {
   animation: loopAbsorberWrite var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 90ms + var(--output-index) * 35ms) infinite both;
+    calc(400ms + var(--domain-write-delay) + var(--output-index) * 35ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i {
   animation: loopDigestCell var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 90ms) infinite both;
+    calc(400ms + var(--domain-write-delay)) infinite both;
 }
 
 .learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i:nth-child(2) {
-  animation-delay: calc(460ms + var(--domain-index) * 90ms);
+  animation-delay: calc(460ms + var(--domain-write-delay));
 }
 
 .learn[data-visible="true"] .loopAbsorber:not([data-state="pending"]) .loopDigestor i:nth-child(3) {
-  animation-delay: calc(520ms + var(--domain-index) * 90ms);
+  animation-delay: calc(520ms + var(--domain-write-delay));
 }
 
 .learn[data-visible="true"] .loopMergePellets > i[data-state="written"] {
   animation: loopMergePellet var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 60ms) infinite both;
+    calc(400ms + var(--domain-write-delay)) infinite both;
 }
 
-/* Edge 的消化与输出整体压后 340ms：四域中最后落笔，与其他域拉开节拍 */
-.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i {
-  animation-delay: 1010ms;
-}
-
-.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i:nth-child(2) {
-  animation-delay: 1070ms;
-}
-
-.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i:nth-child(3) {
-  animation-delay: 1130ms;
-}
-
-.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopAbsorberOutput i {
-  animation-delay: calc(1010ms + var(--output-index) * 35ms);
-}
-
-/* 状态字与写入联动：写入前暗沉，写入完成点亮，循环末端回落 */
+/* 状态字与写入共用 domain clock：养料抵达并完成消化后才一起点亮。 */
 .learn[data-visible="true"] .loopDomainMeta small {
   animation: loopStatusWake var(--loop-cycle) linear
-    calc(400ms + var(--domain-index) * 90ms) infinite both;
-}
-
-.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDomainMeta small {
-  animation-delay: 1010ms;
+    calc(400ms + var(--domain-write-delay)) infinite both;
 }
 
 .learn[data-visible="true"] .loopMergePellets > i[data-state="pending"] {
@@ -3071,29 +3041,25 @@
 }
 
 .learn[data-visible="true"] .loopReturnPacket {
-  animation: loopPacketReturn var(--loop-cycle) linear 400ms infinite both;
+  animation: loopPacketReturn var(--loop-cycle) linear 700ms infinite both;
 }
 
 .learn[data-visible="true"] .loopReturnPacket i {
   animation: loopPacketAssemble var(--loop-cycle) linear
-    calc(400ms + var(--packet-cell) * 45ms) infinite both;
+    calc(700ms + var(--packet-cell) * 35ms) infinite both;
 }
 
-.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(2),
-.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(3) {
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(1),
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(2) {
   animation: loopRerankDown var(--loop-cycle) linear 400ms infinite both;
 }
 
-.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(4) {
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(3) {
   animation: loopRerankUp var(--loop-cycle) linear 400ms infinite both;
 }
 
-.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(4) i {
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(3) i {
   animation: loopPromoteGlow var(--loop-cycle) linear 400ms infinite both;
-}
-
-.learn[data-visible="true"] .loopFeedReplacement {
-  animation: loopRefill var(--loop-cycle) linear 400ms infinite both;
 }
 
 .learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:last-child {
@@ -3102,29 +3068,29 @@
 
 .learn[data-visible="true"] .loopRouteBottom i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(8040ms + var(--route-index) * 45ms) infinite both;
+    calc(8340ms + var(--route-index) * 45ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteSide i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(8880ms + var(--route-index) * 45ms) infinite both;
+    calc(9180ms + var(--route-index) * 45ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteTop i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(9840ms + var(--route-index) * 42ms) infinite both;
+    calc(10140ms + var(--route-index) * 42ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteBottom::before {
-  animation: loopRouteBottomTrace var(--loop-cycle) linear 400ms infinite both;
+  animation: loopRouteBottomTrace var(--loop-cycle) linear 700ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteSide::before {
-  animation: loopRouteSideTrace var(--loop-cycle) linear 400ms infinite both;
+  animation: loopRouteSideTrace var(--loop-cycle) linear 700ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteTop::before {
-  animation: loopRouteTopTrace var(--loop-cycle) linear 400ms infinite both;
+  animation: loopRouteTopTrace var(--loop-cycle) linear 700ms infinite both;
 }
 
 /* 已进入过视口的 Learn 保留当前状态，离屏时暂停循环以避免后台持续合成。 */
@@ -3950,9 +3916,10 @@
   0%, 3% { opacity: 1; transform: translate3d(0, 0, 0); }
   5% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
   11% { opacity: 1; transform: translate3d(0, 71px, 0); }
-  13%, 97% { opacity: 0; transform: translate3d(0, 71px, 0); }
-  99% { opacity: 0; transform: translate3d(0, 0, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  13%, 92% { opacity: 0; transform: translate3d(0, 71px, 0); }
+  92.1% { opacity: 0; transform: translate3d(0, 8px, 0); }
+  96% { opacity: 0; transform: translate3d(0, 8px, 0); animation-timing-function: var(--ease-out); }
+  98%, 100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* 思考闪烁：每格在思考窗内三次脉冲，配合乱序 stagger 形成计算微光 */
@@ -4003,11 +3970,11 @@
   8%, 100% { opacity: 0.32; }
 }
 
-/* 状态字：写入完成后从暗沉点亮，保持到循环尾声 */
+/* 状态字与 absorber 输出在同一帧醒来，不能先于养料抵达。 */
 @keyframes loopStatusWake {
-  0%, 42% { opacity: 0.4; }
-  46%, 92% { opacity: 1; }
-  97%, 100% { opacity: 0.4; }
+  0%, 48% { opacity: 0.28; }
+  50%, 92% { opacity: 1; }
+  97%, 100% { opacity: 0.28; }
 }
 
 @keyframes loopReceiptIn {
@@ -4035,22 +4002,23 @@
 }
 
 @keyframes loopAbsorberRead {
-  0%, 31%, 92%, 100% { opacity: 0.76; }
-  39% { opacity: 1; }
-  48%, 72% { opacity: 0.82; }
+  0%, 40% { opacity: 0.34; }
+  42% { opacity: 1; }
+  48%, 92% { opacity: 0.82; }
+  97%, 100% { opacity: 0.34; }
 }
 
 @keyframes loopAbsorberWrite {
-  0%, 39%, 100% { opacity: 0.42; transform: translate3d(0, 0, 0); }
-  44% { opacity: 1; transform: translate3d(0, -2px, 0); animation-timing-function: var(--ease-out); }
-  52%, 82% { opacity: 0.9; transform: translate3d(0, 0, 0); }
-  94% { opacity: 0.48; transform: translate3d(0, 0, 0); }
+  0%, 48% { opacity: 0.08; transform: translate3d(0, 0, 0); }
+  50% { opacity: 1; transform: translate3d(0, -2px, 0); animation-timing-function: var(--ease-out); }
+  53%, 92% { opacity: 0.9; transform: translate3d(0, 0, 0); }
+  97%, 100% { opacity: 0.08; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes loopDigestCell {
-  0%, 34%, 54%, 100% { opacity: 0.42; transform: translate3d(0, 0, 0); }
-  39% { opacity: 1; transform: translate3d(0, 0, 0); }
-  45% { opacity: 1; transform: translate3d(0, 6px, 0); }
+  0%, 41%, 54%, 100% { opacity: 0.12; transform: translate3d(0, 0, 0); }
+  43% { opacity: 1; transform: translate3d(0, 0, 0); }
+  47% { opacity: 1; transform: translate3d(0, 6px, 0); }
   50% { opacity: 0; transform: translate3d(0, 12px, 0); }
 }
 
@@ -4069,29 +4037,29 @@
   60%, 100% { opacity: 0; transform: translate3d(0, 10px, 0); }
 }
 
-/* 回程压缩到 62-88%，88-96% 停靠在队首交接（配合补位包点亮） */
+/* 回流先在 01 停靠，再触发队列重排；两者不能同时抢跑。 */
 @keyframes loopPacketReturn {
   0%, 62% { opacity: 0; transform: translate3d(0, 0, 0); }
   64% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
   67% { opacity: 1; transform: translate3d(0, 7px, 0); animation-timing-function: var(--ease-in-out); }
   74% { opacity: 1; transform: translate3d(276px, 7px, 0); animation-timing-function: var(--ease-in-out); }
   82% { opacity: 1; transform: translate3d(276px, -535px, 0); animation-timing-function: var(--ease-in-out); }
-  88%, 96% { opacity: 1; transform: translate3d(0, -535px, 0); }
-  99%, 100% { opacity: 0; transform: translate3d(0, -535px, 0); }
+  88%, 96.2% { opacity: 1; transform: translate3d(0, -535px, 0); }
+  97.2%, 100% { opacity: 0; transform: translate3d(0, -535px, 0); }
 }
 
 @keyframes loopPacketAssemble {
   0%, 61% { opacity: 0; }
-  64%, 94% { opacity: 1; }
-  97%, 100% { opacity: 0; }
+  64%, 95.8% { opacity: 1; }
+  96.8%, 100% { opacity: 0; }
 }
 
-/* 明显 rerank：Memory 回流停靠后，03 号候选被抬升到 01（升 2 格），
-   01/02 各让 1 格，底部空位由新候选补入——feed 被重新排序而非被 memory 顶替 */
+/* Memory 在 88% 抵达 01，留出明确停靠后才重排：03 抬升到 01，
+   01/02 各让 1 格；05 槽位最后补入且跨循环持续，不再替换对象。 */
 @keyframes loopRerankDown {
-  0%, 90% { transform: translate3d(0, 0, 0); }
-  91% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
-  94%, 99.8% { transform: translate3d(0, 35px, 0); }
+  0%, 92% { transform: translate3d(0, 0, 0); }
+  93% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  96%, 99.8% { transform: translate3d(0, 35px, 0); }
   99.9% {
     transform: translate3d(0, 35px, 0);
     animation-timing-function: steps(1, end);
@@ -4100,9 +4068,9 @@
 }
 
 @keyframes loopRerankUp {
-  0%, 90% { transform: translate3d(0, 0, 0); }
-  91% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
-  94%, 99.8% { transform: translate3d(0, -70px, 0); }
+  0%, 92% { transform: translate3d(0, 0, 0); }
+  93% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  96%, 99.8% { transform: translate3d(0, -70px, 0); }
   99.9% {
     transform: translate3d(0, -70px, 0);
     animation-timing-function: steps(1, end);
@@ -4112,16 +4080,9 @@
 
 /* 被 memory 提升的候选：跃升时点亮到满亮度 */
 @keyframes loopPromoteGlow {
-  0%, 91% { opacity: 0.64; }
-  94%, 98% { opacity: 1; }
+  0%, 93% { opacity: 0.64; }
+  96%, 98.5% { opacity: 1; }
   100% { opacity: 0.64; }
-}
-
-/* 新候选补入底部空位 */
-@keyframes loopRefill {
-  0%, 92% { opacity: 0; }
-  95%, 98.5% { opacity: 1; }
-  100% { opacity: 0; }
 }
 
 @keyframes loopRouteArrow {
@@ -4613,7 +4574,6 @@
   .loopRouteSide::after,
   .loopRouteTop::after,
   .loopReceipt,
-  .loopFeedReplacement,
   .loopDomainMeta small,
   .loopSplitPacket,
   .loopAbsorberMachine,
@@ -4630,7 +4590,7 @@
   .loopRouteTop::before,
   .loopFeedQueue,
   .loopFeedCandidate,
-  .loopFeedReplacement,
+  .loopFeedCandidate i,
   .memoryRegister i,
   .memoryWriteIn,
   .memoryWriteOut,
@@ -4697,7 +4657,6 @@
   .loopAbsorber:not([data-state="pending"]) .loopAbsorberOutput i { opacity: 0.9; transform: none; }
   .loopFeedCandidate { opacity: 1; transform: none; }
   .loopFeedQueue { opacity: 1; transform: none; }
-  .loopFeedReplacement { opacity: 0; transform: none; }
   .memoryRegister i { opacity: 0.72; }
   .sorterCore > span i { opacity: 0.58; }
   .sorterDomain[data-state="updated"] .sorterDomainGlyph i,
