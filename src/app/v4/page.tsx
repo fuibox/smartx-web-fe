@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 
-import { DiscoverRail } from "@/components/v4/discover-rail";
 import { V4Hero } from "@/components/v4/hero";
-import {
-  EpilogueSection,
-  ExecuteSection,
-  LearnSection,
-  VenuesSection,
-} from "@/components/v4/sections";
+import { V4StoryPage } from "@/components/v4/story-page";
 import styles from "@/components/v4/v4.module.css";
 
 export const metadata: Metadata = {
@@ -21,12 +15,7 @@ export default function V4Page() {
   return (
     <main className={styles.page}>
       <V4Hero />
-
-      <DiscoverRail />
-      <ExecuteSection />
-      <LearnSection />
-      <VenuesSection />
-      <EpilogueSection />
+      <V4StoryPage />
     </main>
   );
 }

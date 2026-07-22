@@ -1,7 +1,7 @@
 # SmartX 官网 V4 方案（当前主线）
 
 > 状态：开发中，路由 `/v4`，本文件是 V4 的唯一权威文档
-> 更新日期：2026-07-21
+> 更新日期：2026-07-22
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
 > **与旧方案的关系**：V2 太空叙事（`website-v2-space-narrative-design-intent.md`、`website-v2-frontend-architecture.md`、`visual-motion-spec.md`）为已废弃方向，保留于 `/` 路由作对照，其文档不再更新；V3 编辑化原型（`src/components/v3/`）为已废弃探索。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
@@ -12,7 +12,7 @@
 - 官网唯一任务：**融资/可信度背书**，访客以投资人为主
 - 证据策略：deck 无 traction 数字 → **产品真实度就是证据**（真实字段、真实 UI 结构、真实标签体系）
 - 叙事骨架 = deck 的 AI Flywheel：Signals（信号快）→ Execute → Learn（Memory = compounding gap）→ All-in-one
-- **内容红线**：不出现任何投资机构/导师名（YZi Labs 保密）；不强调 BNB；集成现状只有 Polymarket（Live），Predict.fun / Hyperliquid / Aster / bStocks 标 Coming
+- **内容红线**：不出现任何投资机构/导师名（YZi Labs 保密）；不强调 BNB；集成现状只有 Polymarket（Live），Predict.fun / Hyperliquid / Aster / bStocks / Ondo GM 标 Coming；News 信号产品未上线，官网不出现
 
 ## 2. 设计系统
 
@@ -29,74 +29,127 @@
 
 **动效规范**：见 CLAUDE.md（emilkowalski skills 标准：强 ease-out `cubic-bezier(0.23,1,0.32,1)`、永不 ease-in、UI <300ms、入场永不 scale(0)、只动 transform/opacity、stagger 30-80ms、reduced-motion 必备）。
 
-## 3. 桌面端逐屏 Storyboard（当前签字结构）
+## 2.5 抽象图形与转场的硬验收条件（两轮评审合并，2026-07-21）
 
-整体顺序：
+1. **语义映射强制**：每个抽象图形必须映射到真实字段、事件或产品状态；hash/随机生成的纯装饰形态禁止。评审时必须能回答"这个像素/线/带对应产品里的什么"。
+2. **转场实体强制**：每个转场必须说明同一个实体从哪里来、变成什么（shared element 原则）；只有空间连续没有信息连续的缩放/位移不合格。
+3. **激活质变强制**：交互激活态必须发生内容质变（展开真实产品证据/状态演化），不允许只有 3% 背景色 + 6px 位移级别的装饰性 hover。
+4. **焦点即时**：`:focus-visible` 立即呈现，不复用 pointer hover 的 transition。
+5. 每屏 authored line primitives ≤ 3；触屏下产品证据必须默认可见或有明确展开方式。
+
+## 3. 桌面端逐屏 Storyboard（2026-07-21 用户线框签字版）
+
+> 本节取代此前所有 `00 / Decision Trace`、`active stage + chapter rail`、
+> `DiscoverRail` 与 Memory band 方案。Hero 后不再有独立 `00`；Thesis 直接并入 Index。
 
 ```text
-Hero / Prologue
-→ 00 / Thesis
-→ Index / Chapter Directory
-→ 01 Signals
-→ 02 Execute
-→ 03 Learn
-→ 04 All-in-one
-→ Closing CTA
+Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
+→ 04 All-in-one → Closing CTA → Updates → Footer
 ```
 
 ### Hero / Prologue（视觉冻结）
 
-- Hero 是独立的序章，不属于 `00`，当前首屏构图、标题、lede、CTA 与 idle 气质保持不变。
-- Hero 离场时不缩小、不向左让位；它按正常纵向滚动离开 viewport。
-- 只允许使用底部抖动带作为 Hero 与第二屏之间的接缝，不提前露出 Index，不为衔接重做 Hero。
+- 当前居中构图、标题、lede、CTA 与 navy/teal 气质保留。
+- Hero 是独立序章，正常纵向离场，不缩小、不向左让位。
+- idle 只允许边缘抖动密度发生极慢变化；标题与 CTA 的阅读状态保持稳定。
+- `Launch App` hover 使用箭头端的 teal 像素染色由右向左覆盖文字区；文案不替换，不增加第二套 CTA 状态。
 
-### 00 / Thesis — Decision Field（方向已签，文案待定稿）
+### Index / The system
 
-- `00` 是全新的第二屏，可以且应当与 Hero 使用不同构图；只继承 navy/teal、PixelOperator 和像素抖动语法。
-- 工作文案：**"BUILT AROUND HOW YOU TRADE."** 最终 copy 在实现前单独确认。
-- 这一屏解释 Hero 的 "understands you" 如何成为系统：Signals、Execute 与 Memory 不是三个孤立功能，而是一套持续适应用户的决策系统。
-- 视觉主角是非对称的像素密度带 / 决策指纹，不放产品卡片，不复刻 Particle 的圆环。
-- 初始状态完整占据一屏并留出稳定阅读窗口；只有进入本屏后半段才开始缩小与左移。
+- 左侧总论标题：**“Built around how you trade.”**；一句话解释 Signals、Execute 与 Memory 是同一条持续适应用户的链路。
+- 右侧为有明确阅读顺序的 `2 × 2` 章节网格：
 
-### 00 → Index（Particle 式核心 sticky 场景）
+  ```text
+  01 Signals     02 Execute
+  03 Learn       04 All-in-one
+  ```
 
-- 桌面容器目标长度 `260–300vh`，内部 `100vh sticky`；Hero 不参与这段 transform。
-- `0–30%`：Decision Field 与 thesis 完整停留，画面基本静止。
-- `30–70%`：Decision Field 作为一个整体缩小并移动到左侧，像素轴向延展，建立 Index 的空间原点。
-- `55–100%`：Index 从右侧进入；运动只使用 transform/opacity，并与滚动直接绑定。
-- Index 使用无圆角卡片背景的 **1+3 建筑式网格**：Signals 占左侧半屏；Execute / Learn / All-in-one 在右侧纵向三等分。
-- 默认状态只出现超大章节名和一句 outcome；hover/focus 才显示真实产品切片。分割依靠 1px 线、比例和留白，不做等权卡片墙。
-- 离开 Index 时，Signals 区域扩展为全屏并成为 `01 Signals` 的起点。
+- Signals 与 Learn 可获得更强视觉权重，但不得用位置打乱叙事顺序。
+- Index 总命题和四个章节名使用低于 Hero 一级的展示字号；Hero 是全站唯一最大标题。
+- 四格共用一套 EvidenceStage 语义像素层：默认态只保留低对比语义轮廓，不显示顶部 evidence 文案；hover/focus 后才显示真实证据摘要，并触发一次有终点的汇入、管线、记忆或 venue 路径。激活态必须与默认态形成明显质变，click 进入章节。
+- Index 初次进入使用一次像素幕布揭示；文字不参与“粒子化”。
 
-### 后续章节
+### 01 Signals → 02 Execute（同一个手机实体）
 
-| 章节 | 本屏唯一判断 | 桌面端运动语法 | 与下一屏交接 |
-| --- | --- | --- | --- |
-| **01 Signals** | SmartX 持续发现值得关注的变化 | 横向 pinned 轨道；每个 viewport 只讲一种信号，真实产品切片主导，营销文字退居次要 | 最后一张信号实体转化为 Execute 的市场详情入口 |
-| **02 Execute** | 从信号到下单不丢失上下文 | `220–260vh` 缩放推进：信号附着到图表，进入真实市场页，交易 sheet 上推并完成下单 | 成交结果转化为一条 Memory event |
-| **03 Learn** | 每次交易都会改善下一次推荐 | 分层/视差累积：交易记录逐步组成四维 Memory profile；不使用旋转飞轮或轨道 | Memory 外框扩展为 Venue 状态墙 |
-| **04 All-in-one** | 同一套理解能力扩展到更多市场 | 动效刻意停止，以大排版和集成状态墙形成节奏反差 | 状态墙像素化并收束到 Closing CTA |
-| **Closing CTA** | 现在进入 SmartX | 像素场重新聚拢为品牌字标或 CTA 容器；一个主 CTA、一个次级入口 | 极简 Footer；没有真实文章 permalink 时不展示 Journal |
+- 取消横向 Rail 与重复章节开场。Signals 使用稳定的一屏构图：左侧标题/开放式来源轨道，右侧真实 H5 产品切片；来源控件采用三列等宽的开放轨道，序号与文字在各自列内居中，选中线宽度稳定，不跟随文案长度跳变。
+- 首版来源只有 **Smart money / Market / Watchlist**；News 产品未上线，不展示。
+- 切换来源时必须改变信号、证据字段与产品状态，不做自动轮播和装饰性 carousel dots。
+- Smart Money 的首要证据是交易者标签的**覆盖维度**，按领域专长、交易风格、历史战绩与行为特征组织；每类只展示代表性例子，不公开强调标签总数。Market 同样以 Momentum / Flow / Positioning 三个维度展示 Fast Move / Big Orders / Smart Money / OI Build Up / Volume Surge / Illiquid 等代表性事件，不让用户误以为 taxonomy 只有当前几项。Watchlist 的首要证据是可配置规则，包括价格阈值、1h/6h OI 或 Volume 变化、Radar signal 与跟踪钱包买入金额。
+- Signals 与 Execute 共用同一台手机、同一个示例市场和同一组数值。滚动交接时手机从右侧移动到左侧，信号展开为图表、订单与成交；文案交叉衔接，不出现空窗，也不额外展示 01→02 的装饰性进度条。
+- Execute 的内容范围至少包含两条路径：**Recall & trade**（SmartX Signal / 用户 Alerts / 未来 Telegram 召回）和 **Strategy follow**（市场信号跟单 / Smart Money 跟单 / Watchlist 策略）。两条路径共用真实交易终点，但这一屏的最终构图与场景编排仍待专项讨论；当前实现只作为信息盘点，不冻结为最终方案。
+- 产品录屏素材到位前，Signals 使用真实 2× H5 静态图：Smart Money 标签列表、Markets 事件标签列表、Watchlist Create Alert；Execute 使用真实 H5 market trade ticket。手机外壳只模拟 iPhone 系统层的状态栏、Dynamic Island、硬件按键与 Home Indicator；产品级顶部/底部导航必须来自真实 H5 截图，禁止在截图外再画一套近似图标。三张 Signals 截图与 Execute 截图在同一屏幕 viewport 内裁切。首版以截图切换和轻量状态层代替 MP4，素材到位后只替换手机屏幕内部，不改变外部布局与 shared-element 交接。
+
+### 03 Learn / AI Memory
+
+- 标题：**“It gets sharper every trade.”**；内容偏营销，解释四个维度的意义与用户价值，不展开算法机制。
+- 沿用 `vc-demo` 的语义拓扑：中央 Memory core + 四个非对称 domain cluster：
+  **Market interests / Trusted signals / Trading style / User edge**。
+- 官网版保留核心与四个 domain，但先解释因果、再解释结构：右侧按 `成交回执 → 写入 AI Memory profile → 四类变化 → 下一次排序改变` 自上而下展开。Memory core 使用可循环的输入、寄存器写入和输出动画，不再使用无语义随机像素团；四个 domain 以开放式记录行和微型变化图形呈现。
+- Execute 的成交回执进入 Memory core，只触发本次真实相关的维度；不展示没有真实依据的综合分数。
+
+#### Learn 候选动效：Memory nutrient loop（待确认、尚未实施）
+
+目标不是画一条装饰性流水线，而是让同一个成交回执解释「为什么 SmartX 下一次会更懂用户」。共享实体始终是一颗有明确来源的像素 packet，循环分五段：
+
+1. **进入**：Execute 完成后，成交回执压缩为单颗 packet，从顶部进入中央管道。
+2. **消化**：packet 通过 AI Memory analysis gate，被拆解为带有四种产品语义的“养料”：Market interests / Trusted signals / Trading style / User edge；颜色只能复用各 domain 的既有语义色。
+3. **消费**：养料沿分支进入四个维度。本次有真实依据的维度吸收并更新；无依据的维度只保持可见，不伪造变化。
+4. **汇合**：已写入的信息在底部重新汇成一颗更精确的 packet，同时形成可读的 `Next time` 输出。
+5. **回流**：packet 由短促的弹簧/浮力机制送回顶部，落到“下一次 feed ranking”起点，闭合 `trade → memory → next decision` 因果环。
+
+实现合同：
+
+- packet 必须跨五段保持同一身份；不允许中途替换为随机粒子雨或纯装饰像素。
+- 阅读窗口以静止为主：首次进入完整播放一次，之后只允许低频慢循环；hover 只用于查看四个维度，不接管主循环。
+- 运动只用 `transform / opacity`，路径使用像素网格与正交管线；不增加自由角度轨迹、发光圆晕或无终点漂浮。
+- `prefers-reduced-motion` 下保留静态方向、四维写入状态和 `Next time` 结果，不播放回流。
+- 若完整回流的工艺在收口阶段仍不稳定，降级为「packet 在底部汇合 → Next time 输出点亮」；语义完整性优先于强行动效。
+
+### 04 All-in-one
+
+- 固定 `3 × 2` 六项布局：Polymarket（Live）+ Predict.fun / Hyperliquid / Aster / bStocks / Ondo GM（Coming）。
+- 六项置于开放品牌场域，不使用六张等权卡片；标题使用单行 **“Every venue. One terminal.”**，删除重复解释型副标题。整个品牌场在一屏内垂直居中；SmartX intelligence layer 与六个 venue 全部采用严格居中轴，平台节点统一为「图标在上、名称/品类/状态在下」，由一条无标签的横向 spine 建立共同关系。
+- 每项以复用自 SmartX 产品原型的真实平台图标、名称、品类和状态为主；不再绘制近似 logo，也不堆长描述。
+- Polymarket 的 Live 状态必须比 Coming 更完整、更明确，但六项仍保持同一结构体系。
+
+### Closing CTA / Updates / Footer
+
+- Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch SmartX`，次入口 `Read the docs`。
+- Updates 先实现三篇文章版式：第一篇带封面、后两篇为编辑式文本行；数据接口固定为 `category / date / title / cover / url`。运营提供真实三篇内容前，V4 只使用明确的布局草稿数据，不生成虚假 permalink。
+- Footer 保持常规导航、社交入口、Terms of Service 与 Privacy Policy，并以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
+- Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
+- Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期。运营内容到位前仍不生成虚假链接，hover 只做封面轻微收紧、标题与分类短线响应，不出现箭头或手型等虚假点击暗示。
+
+### 图形交接合同
+
+| 交接 | 必须持续存在的实体 | 状态变化 |
+| --- | --- | --- |
+| Hero → Index | 无 | Hero 正常离场，Index 像素幕布揭示 |
+| Index → Signals | Signals 的命中事件 | Index 预览成为 H5 中第一条信号 |
+| Signals → Execute | 同一台手机 + 同一市场 | 信号详情展开为图表、订单与成交 |
+| Execute → Learn | 成交回执 | 回执进入 Memory core，相关 domain 响应 |
+| Learn → All-in-one | Memory core | 核心退为 intelligence layer，六个 venue 状态出现 |
+| All-in-one → Closing | Polymarket Live 状态 | Live 路径收束为 Launch SmartX 行动 |
 
 ### 桌面优先、移动端后置
 
-- 当前轮次只实现并验收桌面端；桌面整站成立后再启动移动端专项。
-- 移动端最终采用独立编排：Hero 保留、00 静态展示、Index 改 accordion、pinned 章节改为纵向状态序列。
-- 桌面实现仍需保持内容结构与动效层解耦，避免未来只能机械缩放桌面版本。
-- reduced-motion 在桌面阶段同步实现，不属于移动端延期范围。
+- 当前只实现并验收桌面端；移动端在桌面整站成立后单独编排。
+- 手机内容本身可响应，但桌面章节动效不直接机械缩放为移动版。
+- reduced-motion 在桌面阶段同步实现。
 
 ## 4. 当前实现状态
 
 | 章节 | 状态 | 说明 |
 | --- | --- | --- |
-| **Hero / Prologue** | ✅ 视觉冻结 | 当前首屏保留；仅补充正常离场与第二屏边界接缝 |
-| **00 / Thesis** | ⬜ 待实现 | Decision Field 桌面原型 |
-| **Index** | ⬜ 待实现 | `1+3` 目录与 Signals 扩展交接 |
-| **01 Signals** | ⚠️ 有素材 | 当前 pinned 轨道作为内容素材保留，视觉与节奏待逐屏精修 |
-| **02 Execute** | ⚠️ 有素材 | 产品 UI 与文案待真实性校对和 pinned 编排 |
-| **03 Learn** | ⚠️ 有素材 | Flywheel/Memory 素材保留，最终构图与累积语法待定 |
-| **04 All-in-one** | ⚠️ 有素材 | 状态与内容正确，视觉精修待定 |
-| **Closing / Footer** | ⚠️ 有素材 | CTA 与 Footer 待重组；Journal 仅在真实 permalink 齐备时启用 |
+| **Hero / Prologue** | ✅ 视觉冻结 | 保留当前版 |
+| **Index** | 🟡 精修待签字 | 默认态取消假激活与无效 evidence；hover/focus 后显示证据摘要并强化对应像素状态，其他章节同步降噪 |
+| **01 Signals** | 🟡 精修待签字 | 手机缩小并只保留系统 chrome，产品导航来自真实截图；三列来源轨道等宽居中；不公开标签数量 |
+| **02 Execute** | 🟠 待专项讨论 | 已盘点召回交易与策略跟单两类内容，但当前构图不冻结，下一轮先讨论场景编排再实施 |
+| **03 Learn** | 🟠 动效方案待确认 | 当前 profile register 可用；已记录 Memory nutrient loop 五段合同，确认后再替换现有循环表现 |
+| **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
+| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 加日期、统一圆角与非点击型 hover；Footer 法务入口保留 |
+
+桌面首版已在 `1440 × 900` 浏览器逐屏验收，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
 ## 5. 已废弃的实验（勿重做）
 
@@ -115,19 +168,22 @@ src/app/v4/page.tsx              页面组装
 src/components/v4/
   hero.tsx                       Hero（滚动进度 + CTA）
   dither-field.tsx               签名抖动场（Canvas 2D）
-  discover-rail.tsx              01 横向轨道（GSAP pinned）
-  sections.tsx                   02/03/04 + Journal/Footer
+  story-page.tsx                 Index 之后的桌面叙事与交互状态
+  story-page.module.css          新原型独立样式；不继续堆叠旧场景 CSS
+  evidence-stage.tsx             Index 四章的语义像素预览
+  thesis-index.tsx               旧 00/Index 实验，页面不再挂载
+  discover-rail.tsx              旧横向 Rail，页面不再挂载
+  sections.tsx                   旧后续章节，页面不再挂载
   signal-card.tsx                SignalProCard 复刻（当前未挂载，留作素材）
-  v4.module.css                  全部样式（tokens 在 .page 上）
-共享：v3/memory-radar.tsx（雷达）、product-demo fixture、smartx-links
+  v4.module.css                  Hero 与共享 tokens
+共享：memory-demo fixture、product-demo fixture、smartx-links
 ```
 
 ## 7. TODO（用户已定方向）
 
-1. **仅做桌面原型：Hero → 00 → Index**。Hero 不改构图，先验证独立第二屏、sticky 缩放左移和 `1+3` Index 的整体关系。
-2. 00/Index 签字后，按 01 Signals → 02 Execute → 03 Learn → 04 All-in-one → Closing 顺序逐屏实施与验收。
-3. 使用已安装的 improve-animations / review-animations skill 做每屏动效审计；阅读窗口必须稳定。
-4. 桌面整站验收后再做移动端专项；随后完成大屏（>1600px）与无障碍完整 pass。
+1. 按 Index → Signals/Execute → Learn → All-in-one → Closing/Updates 的顺序逐屏评审并冻结桌面构图。
+2. 用真实产品录屏、最终官方 venue SVG 与运营文章替换现有素材槽；替换不得改变已签字结构。
+3. 桌面整站签字后再做移动端专项；随后完成大屏（>1600px）与无障碍完整 pass。
 
 ## 8. 事实依据（三份蒸馏报告要点存档）
 
