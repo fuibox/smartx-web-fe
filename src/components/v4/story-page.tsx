@@ -318,8 +318,13 @@ function StoryIndex() {
             how you trade.
           </h2>
           <p>
-            SmartX connects what you notice, how you act, and what it learns—so the
-            terminal becomes more personal with every decision.
+            <span className={styles.ledeDesktop}>
+              SmartX connects what you notice, how you act, and what it learns—so the
+              terminal becomes more personal with every decision.
+            </span>
+            <span className={styles.ledeMobile}>
+              SmartX connects what you notice, how you act, and what it learns.
+            </span>
           </p>
         </div>
 
@@ -708,8 +713,14 @@ function TradingJourney() {
             <p className={styles.kicker}>01 / Signals</p>
             <h2 id="v4-signals-title-static">Signals, before the crowd.</h2>
             <p>
-              SmartX brings market movement, proven wallet activity, and the markets
-              you follow into one evidence-backed signal.
+              <span className={styles.ledeDesktop}>
+                SmartX brings market movement, proven wallet activity, and the markets
+                you follow into one evidence-backed signal.
+              </span>
+              <span className={styles.ledeMobile}>
+                Market moves, proven wallets, and your watchlist—one evidence-backed
+                signal.
+              </span>
             </p>
             <SignalTabs activeSource={source} onChange={setSource} />
             <SignalReadout source={source} />
@@ -726,8 +737,14 @@ function TradingJourney() {
             <p className={styles.kicker}>02 / Execute</p>
             <h2 id="v4-execute-title-static">From signal to action, your way.</h2>
             <p>
-              Return through a signal or alert, trade with its evidence attached, or
-              let a watchlisted strategy follow the trigger.
+              <span className={styles.ledeDesktop}>
+                Return through a signal or alert, trade with its evidence attached, or
+                let a watchlisted strategy follow the trigger.
+              </span>
+              <span className={styles.ledeMobile}>
+                Trade from a signal with its evidence attached, or let a strategy
+                follow it.
+              </span>
             </p>
             <ExecutionReadout path={executionPath} onChange={setExecutionPath} />
           </div>
@@ -952,6 +969,12 @@ function MemoryLoop() {
 
       <LoopPacket className={styles.loopReturnPacket} tone="enriched" />
 
+      {/* 移动端单列流的回流表意（桌面隐藏，桌面用完整回流路线） */}
+      <span className={styles.loopMobileReturn} aria-hidden="true">
+        <LoopPacket tone="enriched" />
+        <b>RANKS THE NEXT FEED ↺</b>
+      </span>
+
       <p className={styles.srOnly}>
         A trade informed by smart money is absorbed by Market interests and Trusted
         signals, recorded as Trading style, held pending for User edge, and returned
@@ -981,9 +1004,14 @@ function LearnSection() {
             every trade<span className={styles.learnTitleMark}>.</span>
           </h2>
           <p>
-            Every decision becomes Memory. SmartX learns what you follow, which proof
-            you trust, how you size a trade, and where your advantage develops—then
-            changes what it brings forward next.
+            <span className={styles.ledeDesktop}>
+              Every decision becomes Memory. SmartX learns what you follow, which proof
+              you trust, how you size a trade, and where your advantage develops—then
+              changes what it brings forward next.
+            </span>
+            <span className={styles.ledeMobile}>
+              Every decision becomes Memory—and changes what SmartX brings you next.
+            </span>
           </p>
         </div>
 

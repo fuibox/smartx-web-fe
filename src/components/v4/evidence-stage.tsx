@@ -416,21 +416,24 @@ export function EvidenceStage({
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const render = (progress: number, withMotion: boolean) => {
-      const rect = host.getBoundingClientRect();
+      /* 用布局盒而非视觉盒量测：宿主被 transform 缩放（移动端缩略图）时
+         仍按完整网格作画，再由 CSS 缩小 */
+      const hostWidth = host.offsetWidth;
+      const hostHeight = host.offsetHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.round(rect.width * dpr);
-      const height = Math.round(rect.height * dpr);
+      const width = Math.round(hostWidth * dpr);
+      const height = Math.round(hostHeight * dpr);
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
       }
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
+      canvas.style.width = `${hostWidth}px`;
+      canvas.style.height = `${hostHeight}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      context.clearRect(0, 0, rect.width, rect.height);
+      context.clearRect(0, 0, hostWidth, hostHeight);
 
-      const columns = Math.floor(rect.width / CELL);
-      const rows = Math.floor(rect.height / CELL);
+      const columns = Math.floor(hostWidth / CELL);
+      const rows = Math.floor(hostHeight / CELL);
       for (const cell of DRAWERS[state](columns, rows)) {
         if (cell.c < 0 || cell.r < 0 || cell.c >= columns || cell.r >= rows) continue;
         const order = revealOrder(state, cell, columns, rows);

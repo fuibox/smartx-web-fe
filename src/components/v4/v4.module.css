@@ -2051,3 +2051,13 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+/* 移动端短文案切换 + Hero 字阶（≤620 收一档，标题控制在 4 行内） */
+.ledeMobile { display: none; }
+
+@media (max-width: 620px) {
+  .ledeDesktop { display: none; }
+  .ledeMobile { display: inline; }
+  .heroTitle { font-size: clamp(40px, 11.4vw, 52px); }
+  .heroLede { font-size: 15px; }
+}

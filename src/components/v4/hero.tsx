@@ -85,8 +85,14 @@ export function V4Hero() {
           That Understands You
         </h1>
         <p className={styles.heroLede}>
-          The first terminal that watches every market, learns how you trade, and puts
-          the next opportunity in front of you — before the crowd sees it.
+          <span className={styles.ledeDesktop}>
+            The first terminal that watches every market, learns how you trade, and
+            puts the next opportunity in front of you — before the crowd sees it.
+          </span>
+          <span className={styles.ledeMobile}>
+            Watches every market, learns how you trade, and surfaces the next move
+            first.
+          </span>
         </p>
         <div className={styles.heroActions}>
           <a

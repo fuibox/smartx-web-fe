@@ -150,10 +150,11 @@ export function FooterWordmark() {
       const sampled = sampleWordmark("SMARTX");
       if (!sampled) return;
 
-      /* 以 DOM 字标的实际字号换算 cell 尺寸，保证观感与原文本一致 */
+      /* 以 DOM 字标的实际字号换算 cell 尺寸，保证观感与原文本一致；
+         网格总宽超出容器（窄屏）时整体缩到正好放下 */
       const fontPx = parseFloat(window.getComputedStyle(strong).fontSize) || 240;
-      const cell = fontPx / 16;
       const rect = strong.getBoundingClientRect();
+      const cell = Math.min(fontPx / 16, rect.width / sampled.cols);
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);

@@ -11,6 +11,11 @@
   color: var(--paper);
 }
 
+/* 移动端短文案切换：≤620 显示 short 版，其余显示完整版 */
+.ledeMobile { display: none; }
+
+.loopMobileReturn { display: none; }
+
 .kicker {
   display: flex;
   align-items: center;
@@ -4014,11 +4019,38 @@
     line-height: 1.7;
   }
 
+  /* 移动端：去掉设备边框，产品截图以平面截图卡呈现（手机里再套手机很怪） */
   .journeyFallback .productPhone {
     width: min(100%, 350px);
     height: auto;
-    aspect-ratio: 390 / 844;
+    max-height: 60svh;
+    aspect-ratio: 39 / 66;
     justify-self: center;
+    overflow: hidden;
+    border: 1px solid rgba(148, 166, 194, 0.3);
+    border-radius: 4px;
+    background: #0d1524;
+    box-shadow: none;
+  }
+
+  .journeyFallback .productPhone::before,
+  .journeyFallback .phoneVolumeButton,
+  .journeyFallback .phonePowerButton,
+  .journeyFallback .phoneStatusBar,
+  .journeyFallback .phoneHomeIndicator { display: none; }
+
+  .journeyFallback .phoneScreen {
+    inset: 0;
+    border-radius: 0;
+  }
+
+  .journeyFallback .phoneSignalView,
+  .journeyFallback .phoneExecuteView { inset: 0; }
+
+  .journeyFallback .phoneSignalView .phoneCapture {
+    top: 0;
+    left: 0;
+    width: 100%;
   }
 
   .learn,
@@ -4051,9 +4083,14 @@
   }
 
   .closing::before { width: 26%; }
-  .closing h2 { font-size: clamp(48px, 12vw, 68px); }
+  .closing h2 { font-size: clamp(30px, 8.8vw, 40px); line-height: 1.02; }
+  .closing h2 br { display: none; }
   .closingActions { width: min(100%, 330px); transform: none; }
-  .closingCanvas { display: none; }
+  .primaryAction span { flex: 1; }
+  .secondaryAction { justify-content: flex-start; }
+
+  /* 场景标签：状态栏已隐藏，贴到卡片顶部 */
+  .phoneSceneLabel { top: 10px; left: 12px; }
 
   .updates { margin-inline: 24px; padding-block: 12vh; }
   .updates > header { grid-template-columns: minmax(0, 1fr); gap: 20px; }
@@ -4066,26 +4103,172 @@
 }
 
 @media (max-width: 620px) {
-  .chapterGrid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
-  .chapterCell { border-right: 0; }
-  .chapterCell:nth-child(n + 3) { border-bottom: 1px solid rgba(148, 166, 194, 0.18); }
+  /* Index：由 4 个全屏格改为紧凑章节行（编号+章名+outcome | 右侧缩略舞台） */
+  .indexThesis { min-height: 0; padding: 12vh 24px 7vh; }
+  .indexDirectory { min-height: 0; }
+  .chapterGrid {
+    position: relative;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .chapterCell,
+  .chapterCell[data-active="true"] {
+    display: grid;
+    min-height: 0;
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) 108px;
+    grid-template-rows: auto auto;
+    column-gap: 16px;
+    padding: 20px 20px 20px 24px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 166, 194, 0.18);
+    background: #0a111e;
+  }
+
   .chapterCell:last-child { border-bottom: 0; }
-  .chapterEvidence { max-width: 45%; }
+  .chapterCell::before { display: none; }
+
+  .chapterNumber {
+    position: static;
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 10px;
+  }
+
+  .chapterCopy {
+    grid-column: 1;
+    grid-row: 2;
+    gap: 8px;
+  }
+
+  .chapterCopy strong { font-size: 24px; }
+
+  .chapterCopy small {
+    max-width: none;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  .chapterStage,
+  .chapterCell[data-active="true"] .chapterStage {
+    position: relative;
+    inset: auto;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 108px;
+    height: 84px;
+    align-self: center;
+    overflow: hidden;
+    opacity: 0.8;
+    transform: none;
+  }
+
+  /* 舞台按完整网格作画后整体缩小，语义图形保持完整 */
+  .chapterStage .chapterStageCanvas {
+    width: 260px;
+    height: 200px;
+    transform: scale(0.42);
+    transform-origin: top left;
+  }
+
+  .chapterEvidence,
+  .chapterArrow { display: none; }
+  .ledeDesktop { display: none; }
+  .ledeMobile { display: inline; }
+
+  /* Learn：桌面的绝对定位编排改为单列纵向流（队列→推理器→2×2 吸收器→回流） */
+  .memoryLoop {
+    display: grid;
+    width: 100%;
+    height: auto;
+    justify-self: stretch;
+    justify-items: center;
+    gap: 16px;
+    transform: translate3d(0, 14px, 0);
+  }
+  .learn[data-visible="true"] .memoryLoop { transform: none; }
+
+  /* relative 而非 static：内部的队列包/角标仍是绝对定位，需要保留定位上下文 */
+  .loopFeed {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 112px;
+  }
+  .loopInputRail { position: static; height: 34px; }
+  .loopReasoner {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 26px;
+  }
+
+  .loopReceipt,
+  .learn[data-visible="true"] .loopReceipt {
+    position: static;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .loopReceipt::before { display: none; }
+
+  .loopBranchRail,
+  .loopSplitPackets,
+  .loopMergeRail,
+  .loopMergePellets,
+  .loopReturnRoute,
+  .loopReturnPacket { display: none; }
+
+  .loopAbsorbers {
+    position: static;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 14px;
+  }
+
+  .loopMobileReturn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    color: var(--teal);
+    font-family: var(--font-jb);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+  }
+
   .memorySorter {
     height: 455px;
     transform: translate3d(18px, 0, 0) scale(0.72);
     transform-origin: left top;
   }
   .learn[data-visible="true"] .memorySorter { transform: scale(0.72); }
-  .memoryLoop { transform: translate3d(18px, 0, 0) scale(0.72); }
-  .learn[data-visible="true"] .memoryLoop { transform: scale(0.72); }
   .memoryTrace { min-height: 0; padding-left: 54px; transform-origin: center top; }
   .memoryTraceLine { left: 22px; }
   .memoryChanges button {
     grid-template-columns: 30px minmax(105px, 0.9fr) minmax(130px, 1.1fr);
   }
   .memoryChanges button > i { display: none; }
-  .venueGrid { grid-template-columns: minmax(0, 1fr); }
+  /* 场馆：一行两个，六馆三行收完 */
+  .venueGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 18px;
+  }
+  .venueItem { min-height: 92px; gap: 7px; }
+  .venueLogoFrame { width: 64px; height: 42px; }
+  .venueLogoFrame img,
+  .venueItem[data-venue] .venueLogoFrame img { max-width: 40px; max-height: 36px; }
+  /* Aster 是裁切式宽字标，保持原裁切逻辑只按比例缩小 */
+  .venueItem[data-venue="aster"] .venueLogoFrame { width: 28px; }
+  .venueItem[data-venue="aster"] .venueLogoFrame img {
+    width: 106px;
+    max-width: none;
+    height: 28px;
+    max-height: none;
+  }
+  .venueIdentity strong { font-size: 14px; }
   .updateImage { min-height: 240px; }
   .footerTop { align-items: flex-start; }
   .footerTop nav { display: grid; grid-template-columns: repeat(2, auto); }

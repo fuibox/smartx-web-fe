@@ -76,17 +76,19 @@ type Column = { c: number; base: number; cap: number; phase: number };
 function buildProfile(zone: Zone): Column[] {
   const { cols, rows, keepOut, targetCol, targetR1 } = zone;
   const columns: Column[] = [];
+  /* 窄屏（列布局）：内容纵向堆叠，柱阵只保留一条低矮底带 */
+  const mobile = cols < 78;
   /* CTA 及 docs 链接下方的硬上限：柱顶至少低于按钮底 7 格 */
   const rightCap = Math.max(4, rows - (targetR1 + 7));
   for (let c = 0; c < cols; c += PITCH) {
     const x = c / (cols - 1);
-    const ramp = 3 + 13 * Math.pow(x, 1.7);
+    const ramp = mobile ? 2 + 3.4 * Math.pow(x, 1.4) : 3 + 13 * Math.pow(x, 1.7);
     const noise = Math.floor(hash(c + 7) * 3) - 1;
-    let cap = rows - 2;
-    if (keepOut && c >= keepOut.c0 - 1 && c <= keepOut.c1 + 1) {
+    let cap = mobile ? 6 : rows - 2;
+    if (!mobile && keepOut && c >= keepOut.c0 - 1 && c <= keepOut.c1 + 1) {
       cap = Math.max(3, rows - (keepOut.r1 + 2));
     }
-    if (c >= targetCol - 26) cap = Math.min(cap, rightCap);
+    if (!mobile && c >= targetCol - 26) cap = Math.min(cap, rightCap);
     columns.push({
       c,
       base: Math.max(2, Math.round(ramp + noise)),
@@ -172,8 +174,8 @@ export function ClosingFlowField({
         }
       }
 
-      /* 涌浪抵达按钮：左边框列亮起再熄灭 */
-      if (now !== null) {
+      /* 涌浪抵达按钮：左边框列亮起再熄灭（窄屏按钮在场外，不做） */
+      if (now !== null && cols >= 78) {
         const arrive = Math.exp(-Math.pow((wave - targetCol) / 3, 2));
         if (arrive > 0.05) {
           for (let row = targetR0; row <= targetR1; row += 1) {
