@@ -2899,7 +2899,7 @@
 
 .learn[data-visible="true"] .loopReasonerGrid i {
   animation: loopReasonerCell var(--loop-cycle) linear
-    calc(400ms + var(--cell-index) * 35ms) infinite both;
+    calc(400ms + var(--cell-index) * 85ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopBranchRail::after {
@@ -2960,23 +2960,27 @@
   animation: loopFeedQueueShift var(--loop-cycle) linear 400ms infinite both;
 }
 
+.learn[data-visible="true"] .loopFeedReplacement i {
+  animation: loopReplacementWake var(--loop-cycle) linear 400ms infinite both;
+}
+
 .learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:last-child {
   animation: loopFeedConsume var(--loop-cycle) linear 400ms infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteBottom i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(7800ms + var(--route-index) * 45ms) infinite both;
+    calc(8040ms + var(--route-index) * 45ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteSide i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(9000ms + var(--route-index) * 45ms) infinite both;
+    calc(8880ms + var(--route-index) * 45ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteTop i {
   animation: loopRouteArrow var(--loop-cycle) linear
-    calc(10000ms + var(--route-index) * 42ms) infinite both;
+    calc(9840ms + var(--route-index) * 42ms) infinite both;
 }
 
 .learn[data-visible="true"] .loopRouteBottom::before {
@@ -3819,11 +3823,12 @@
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+/* 思考扫描：短脉冲 + 大 stagger（85ms/格）让亮点按格序扫过 3×3 */
 @keyframes loopReasonerCell {
-  0%, 9%, 31%, 100% { opacity: 0.18; }
-  13% { opacity: 0.62; }
-  18% { opacity: 1; }
-  24% { opacity: 0.54; }
+  0%, 10%, 26%, 100% { opacity: 0.18; }
+  13% { opacity: 0.45; }
+  16% { opacity: 1; }
+  20% { opacity: 0.35; }
 }
 
 @keyframes loopReceiptIn {
@@ -3885,31 +3890,41 @@
   60%, 100% { opacity: 0; transform: translate3d(0, 10px, 0); }
 }
 
+/* 回程压缩到 62-88%，88-96% 停靠在队首交接（配合补位包点亮） */
 @keyframes loopPacketReturn {
   0%, 62% { opacity: 0; transform: translate3d(0, 0, 0); }
   64% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
-  68% { opacity: 1; transform: translate3d(0, 7px, 0); animation-timing-function: var(--ease-in-out); }
-  75% { opacity: 1; transform: translate3d(276px, 7px, 0); animation-timing-function: var(--ease-in-out); }
-  84% { opacity: 1; transform: translate3d(276px, -535px, 0); animation-timing-function: var(--ease-in-out); }
-  91%, 97% { opacity: 1; transform: translate3d(0, -535px, 0); }
+  67% { opacity: 1; transform: translate3d(0, 7px, 0); animation-timing-function: var(--ease-in-out); }
+  74% { opacity: 1; transform: translate3d(276px, 7px, 0); animation-timing-function: var(--ease-in-out); }
+  82% { opacity: 1; transform: translate3d(276px, -535px, 0); animation-timing-function: var(--ease-in-out); }
+  88%, 96% { opacity: 1; transform: translate3d(0, -535px, 0); }
   99%, 100% { opacity: 0; transform: translate3d(0, -535px, 0); }
 }
 
 @keyframes loopPacketAssemble {
   0%, 61% { opacity: 0; }
-  64%, 92% { opacity: 1; }
-  96%, 100% { opacity: 0; }
+  64%, 94% { opacity: 1; }
+  97%, 100% { opacity: 0; }
 }
 
+/* 补位挪到回流到站时刻：91% 前队列底部一直留着"处理中"的空位，
+   回流包停靠队首后队列才下移换排名——因果与画面一致 */
 @keyframes loopFeedQueueShift {
-  0%, 10% { transform: translate3d(0, 0, 0); }
-  12% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
-  16%, 99.8% { transform: translate3d(0, 35px, 0); }
+  0%, 88% { transform: translate3d(0, 0, 0); }
+  90% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  94%, 99.8% { transform: translate3d(0, 35px, 0); }
   99.9% {
     transform: translate3d(0, 35px, 0);
     animation-timing-function: steps(1, end);
   }
   100% { transform: translate3d(0, 0, 0); }
+}
+
+/* 到站交接：灰色补位包在回流包停靠时点亮成为新 #1 */
+@keyframes loopReplacementWake {
+  0%, 88% { opacity: 0.64; }
+  92%, 96% { opacity: 1; }
+  100% { opacity: 0.64; }
 }
 
 @keyframes loopRouteArrow {
@@ -3919,24 +3934,24 @@
 }
 
 @keyframes loopRouteBottomTrace {
-  0%, 67% { opacity: 0; transform: scaleX(0); }
-  68% { opacity: 0.82; transform: scaleX(0); }
-  75% { opacity: 0.82; transform: scaleX(1); }
-  79%, 100% { opacity: 0; transform: scaleX(1); }
+  0%, 66% { opacity: 0; transform: scaleX(0); }
+  67% { opacity: 0.82; transform: scaleX(0); }
+  74% { opacity: 0.82; transform: scaleX(1); }
+  78%, 100% { opacity: 0; transform: scaleX(1); }
 }
 
 @keyframes loopRouteSideTrace {
-  0%, 74% { opacity: 0; transform: scaleY(0); }
-  75% { opacity: 0.82; transform: scaleY(0); }
-  84% { opacity: 0.82; transform: scaleY(1); }
-  88%, 100% { opacity: 0; transform: scaleY(1); }
+  0%, 73% { opacity: 0; transform: scaleY(0); }
+  74% { opacity: 0.82; transform: scaleY(0); }
+  82% { opacity: 0.82; transform: scaleY(1); }
+  86%, 100% { opacity: 0; transform: scaleY(1); }
 }
 
 @keyframes loopRouteTopTrace {
-  0%, 83% { opacity: 0; transform: scaleX(0); }
-  84% { opacity: 0.82; transform: scaleX(0); }
-  91% { opacity: 0.82; transform: scaleX(1); }
-  95%, 100% { opacity: 0; transform: scaleX(1); }
+  0%, 81% { opacity: 0; transform: scaleX(0); }
+  82% { opacity: 0.82; transform: scaleX(0); }
+  88% { opacity: 0.82; transform: scaleX(1); }
+  92%, 100% { opacity: 0; transform: scaleX(1); }
 }
 
 @keyframes venueIn {
