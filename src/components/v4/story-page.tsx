@@ -241,27 +241,38 @@ const MEMORY_CHANGES: Record<
 
 const UPDATE_STORIES = [
   {
+    category: "Campaign",
+    date: "Jul 17, 2026",
+    dateTime: "2026-07-17",
+    title: "SmartX Boost: Trade Alongside the Smart Money",
+    excerpt:
+      "SmartX’s first trading leaderboard rewards the earliest traders who fund, trade, and connect their X account.",
+    cover: "/assets/updates/smartx-boost.webp",
+    coverAlt: "SmartX Boost trading leaderboard campaign",
+    url: "https://medium.com/@smartxofficial/smartx-boost-trade-alongside-the-smart-money-c59f856c97a5",
+  },
+  {
     category: "Product",
-    date: "Jul 22, 2026",
-    dateTime: "2026-07-22",
-    title: "Building the AI trading terminal around you",
-    excerpt: "Why signals, execution, and Memory belong in one continuous system.",
+    date: "Jul 16, 2026",
+    dateTime: "2026-07-16",
+    title: "Introducing Smart Points: Get Rewarded for Being Early",
+    excerpt:
+      "Every trade, deposit, and funded invite now earns points automatically across daily, weekly, and milestone tracks.",
+    url: "https://medium.com/@smartxofficial/introducing-smart-points-get-rewarded-for-being-early-fdef0388fc74",
   },
   {
     category: "Intelligence",
-    date: "Jul 15, 2026",
-    dateTime: "2026-07-15",
-    title: "From signal discovery to trade action",
-    excerpt: "How SmartX carries the original evidence from discovery into the order.",
-  },
-  {
-    category: "Company",
-    date: "Jul 08, 2026",
-    dateTime: "2026-07-08",
-    title: "What we are building next",
-    excerpt: "The markets and intelligence layers that extend the SmartX terminal.",
+    date: "Jul 13, 2026",
+    dateTime: "2026-07-13",
+    title:
+      "SmartX: Smart Money Decoded — What the Top 1% of Prediction-Market Traders Actually Read",
+    excerpt:
+      "Why PnL alone hides how top prediction-market traders actually win—and what their trading behavior reveals.",
+    url: "https://medium.com/@smartxofficial/smart-money-decoded-what-the-top-1-of-prediction-market-traders-actually-read-10258f52e46d",
   },
 ] as const;
+
+const MEDIUM_PROFILE_URL = "https://medium.com/@smartxofficial";
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -275,15 +286,16 @@ function smoothstep(start: number, end: number, value: number) {
 function useReveal<T extends HTMLElement>(threshold = 0.2) {
   const ref = useRef<T>(null);
   const [visible, setVisible] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
+        setActive(entry.isIntersecting);
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.disconnect();
         }
       },
       { threshold },
@@ -292,7 +304,7 @@ function useReveal<T extends HTMLElement>(threshold = 0.2) {
     return () => observer.disconnect();
   }, [threshold]);
 
-  return { ref, visible };
+  return { ref, visible, active };
 }
 
 function StoryIndex() {
@@ -313,7 +325,7 @@ function StoryIndex() {
         <div className={styles.indexThesis}>
           <p className={styles.kicker}>The system / 00</p>
           <h2 id="v4-index-title">
-            Built around
+            Built around{" "}
             <br />
             how you trade.
           </h2>
@@ -576,7 +588,7 @@ function JourneyCopy({
       <div ref={elementRef} className={`${styles.journeyCopy} ${styles.signalsCopy}`}>
         <p className={styles.kicker}>01 / Signals</p>
         <h2 id="v4-signals-title">
-          Signals, before
+          Signals, before{" "}
           <br />
           the crowd.
         </h2>
@@ -594,7 +606,7 @@ function JourneyCopy({
     <div ref={elementRef} className={`${styles.journeyCopy} ${styles.executeCopy}`}>
       <p className={styles.kicker}>02 / Execute</p>
       <h2 id="v4-execute-title">
-        From signal to action,
+        From signal to action,{" "}
         <br />
         your way.
       </h2>
@@ -1010,7 +1022,7 @@ function MemoryLoop() {
 }
 
 function LearnSection() {
-  const { ref, visible } = useReveal<HTMLElement>(0.25);
+  const { ref, visible, active } = useReveal<HTMLElement>(0.25);
 
   return (
     <section
@@ -1018,13 +1030,14 @@ function LearnSection() {
       id="v4-learn"
       className={styles.learn}
       data-visible={visible}
+      data-active={active}
       aria-labelledby="v4-learn-title"
     >
       <div className={styles.sectionInner}>
         <div className={styles.learnCopy}>
           <p className={styles.kicker}>03 / Learn</p>
           <h2 id="v4-learn-title">
-            It gets sharper
+            It gets sharper{" "}
             <br />
             every trade<span className={styles.learnTitleMark}>.</span>
           </h2>
@@ -1064,7 +1077,6 @@ function VenuesSection() {
         </header>
 
         <div className={styles.venueSystem}>
-          <span>ONE INTELLIGENCE LAYER</span>
           <Image
             src="/assets/smartx-logo.svg"
             alt=""
@@ -1158,41 +1170,70 @@ function ClosingSection() {
 }
 
 function UpdatesSection() {
+  const featuredUpdate = UPDATE_STORIES[0];
+
   return (
-    <section className={styles.updates} aria-labelledby="v4-updates-title">
+    <section id="v4-updates" className={styles.updates} aria-labelledby="v4-updates-title">
       <header>
         <p className={styles.kicker}>From SmartX</p>
         <h2 id="v4-updates-title">Updates</h2>
+        <div className={styles.updatesHeaderAside}>
           <span>Product thinking, market intelligence, and what comes next.</span>
+          <a
+            className={styles.updatesSeeAll}
+            href={MEDIUM_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>See all</span>
+            <i aria-hidden="true">↗</i>
+          </a>
+        </div>
       </header>
 
       <div className={styles.updateList}>
         <article className={styles.featuredUpdate}>
-          <div className={styles.updateImage}>
-            <Image
-              src="/assets/updates/decision-loop.png"
-              alt="Abstract SmartX decision loop illustration"
-              fill
-              sizes="(min-width: 980px) 42vw, 100vw"
-            />
-          </div>
-          <div className={styles.updateMeta}>
-            <span>{UPDATE_STORIES[0].category}</span>
-            <time dateTime={UPDATE_STORIES[0].dateTime}>{UPDATE_STORIES[0].date}</time>
-          </div>
-          <h3>{UPDATE_STORIES[0].title}</h3>
-          <p>{UPDATE_STORIES[0].excerpt}</p>
+          <a
+            className={styles.updateStoryLink}
+            href={featuredUpdate.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${featuredUpdate.title} — read on Medium`}
+          >
+            <div className={styles.updateImage}>
+              <Image
+                src={featuredUpdate.cover}
+                alt={featuredUpdate.coverAlt}
+                fill
+                sizes="(min-width: 980px) 42vw, 100vw"
+              />
+            </div>
+            <div className={styles.updateMeta}>
+              <span>{featuredUpdate.category}</span>
+              <time dateTime={featuredUpdate.dateTime}>{featuredUpdate.date}</time>
+            </div>
+            <h3>{featuredUpdate.title}</h3>
+            <p>{featuredUpdate.excerpt}</p>
+          </a>
         </article>
 
         <div className={styles.updateRows}>
           {UPDATE_STORIES.slice(1).map((update) => (
             <article key={update.title}>
-              <div className={styles.updateMeta}>
-                <span>{update.category}</span>
-                <time dateTime={update.dateTime}>{update.date}</time>
-              </div>
-              <h3>{update.title}</h3>
-              <p>{update.excerpt}</p>
+              <a
+                className={styles.updateStoryLink}
+                href={update.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${update.title} — read on Medium`}
+              >
+                <div className={styles.updateMeta}>
+                  <span>{update.category}</span>
+                  <time dateTime={update.dateTime}>{update.date}</time>
+                </div>
+                <h3>{update.title}</h3>
+                <p>{update.excerpt}</p>
+              </a>
             </article>
           ))}
         </div>

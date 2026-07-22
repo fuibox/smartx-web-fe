@@ -1,9 +1,9 @@
 # SmartX 官网 V4 方案（当前主线）
 
-> 状态：开发中，公开首页 `/`；`/v4` 仅作旧链接兼容跳转。本文件是 V4 的唯一权威文档
+> 状态：上线收口中，公开首页 `/`；`/v4` 仅作旧链接兼容跳转。本文件是 V4 的唯一权威文档
 > 更新日期：2026-07-22
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
-> **与旧方案的关系**：V2 太空叙事（`website-v2-space-narrative-design-intent.md`、`website-v2-frontend-architecture.md`、`visual-motion-spec.md`）为已废弃方向，仅保留历史代码，其文档不再更新；V3 编辑化原型（`src/components/v3/`）为已废弃探索。
+> **与旧方案的关系**：V2 太空叙事与 V3 编辑化原型均为已废弃探索，只保留在 Git 历史与历史文档中，不进入生产源码和构建产物。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
 
 ## 1. 定位与叙事（已签字）
@@ -116,10 +116,10 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ### Closing CTA / Updates / Footer
 
 - Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch SmartX`，次入口 `Read the docs`。
-- Updates 先实现三篇文章版式：第一篇带封面、后两篇为编辑式文本行；数据接口固定为 `category / date / title / cover / url`。运营提供真实三篇内容前，V4 只使用明确的布局草稿数据，不生成虚假 permalink。
+- Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；数据接口固定为 `category / date / title / excerpt / cover / url`。当前展示 SmartX 官方 Medium 最新三篇，文章分别跳转对应详情，`See all` 跳转 `https://medium.com/@smartxofficial`；后续官网 Blog 列表页与详情页上线后，只替换数据来源和链接，不改变版式。
 - Footer 保持常规导航、社交入口、Terms of Service 与 Privacy Policy，并以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
 - Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
-- Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期。运营内容到位前仍不生成虚假链接，hover 只做封面轻微收紧、标题与分类短线响应，不出现箭头或手型等虚假点击暗示。
+- Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期并使用真实文章链接，hover 只做封面轻微收紧、标题与分类短线响应，不额外增加卡片箭头。
 
 ### 图形交接合同
 
@@ -148,9 +148,18 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **02 Execute** | 🟠 待专项讨论 | 已盘点召回交易与策略跟单两类内容，但当前构图不冻结，下一轮先讨论场景编排再实施 |
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
-| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 加日期、统一圆角与非点击型 hover；Footer 法务入口保留 |
+| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接官方 Medium 最新三篇与 `See all` 外链；Footer 法务入口保留 |
 
 桌面首版已在 `1440 × 900` 浏览器逐屏验收，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
+
+### 正式发布合同
+
+- 唯一可索引页面为 `/`；`/v4/` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
+- 构建产物是 `.next-build/` 静态站点：`npm run build` 生成，`npm start` 只用于本地预览。生产环境直接发布该目录，不运行 `next dev`。
+- Google Search Console verification meta 必须长期保留；`robots.txt`、`sitemap.xml`、Open Graph 图片和自定义 404 随构建生成。
+- CDN/静态托管层上线时必须验证安全响应头：CSP、`X-Content-Type-Options: nosniff`、点击劫持防护、`Referrer-Policy` 与适用的 `Permissions-Policy`。这些响应头不由静态页面本身代替。
+- 托管层若支持重定向，优先把 `/v4/*` 配置为指向 `/` 的 308；仓库中的客户端跳转仅作为跨平台兜底。
+- 当前移动端只保证内容不丢失、不横向裁切和 reduced-motion 可用；桌面签字后再做独立的移动端构图，不把安全降级视为移动端定稿。
 
 ## 5. 已废弃的实验（勿重做）
 
@@ -171,14 +180,12 @@ src/components/v4/
   hero.tsx                       Hero（滚动进度 + CTA）
   dither-field.tsx               签名抖动场（Canvas 2D）
   story-page.tsx                 Index 之后的桌面叙事与交互状态
-  story-page.module.css          新原型独立样式；不继续堆叠旧场景 CSS
+  story-page.module.css          V4 叙事与交互样式
   evidence-stage.tsx             Index 四章的语义像素预览
-  thesis-index.tsx               旧 00/Index 实验，页面不再挂载
-  discover-rail.tsx              旧横向 Rail，页面不再挂载
-  sections.tsx                   旧后续章节，页面不再挂载
-  signal-card.tsx                SignalProCard 复刻（当前未挂载，留作素材）
+  closing-field.tsx              Closing 的离屏暂停像素流场
+  footer-wordmark.tsx            Footer 字标聚合动效
   v4.module.css                  Hero 与共享 tokens
-共享：memory-demo fixture、product-demo fixture、smartx-links
+共享：memory-demo fixture/types、smartx-links
 ```
 
 ## 7. TODO（用户已定方向）
