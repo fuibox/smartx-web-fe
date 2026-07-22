@@ -2360,9 +2360,20 @@
   width: 6px;
   height: 6px;
   background: var(--teal);
-  opacity: 0.18;
+  opacity: 0.14;
   will-change: opacity;
 }
+
+/* 乱序扫描序（Bayer 式散布）：相邻格不相继点亮，读作"计算"而非进度条 */
+.loopReasonerGrid i:nth-child(1) { --scan-order: 0; }
+.loopReasonerGrid i:nth-child(2) { --scan-order: 5; }
+.loopReasonerGrid i:nth-child(3) { --scan-order: 2; }
+.loopReasonerGrid i:nth-child(4) { --scan-order: 7; }
+.loopReasonerGrid i:nth-child(5) { --scan-order: 4; }
+.loopReasonerGrid i:nth-child(6) { --scan-order: 1; }
+.loopReasonerGrid i:nth-child(7) { --scan-order: 6; }
+.loopReasonerGrid i:nth-child(8) { --scan-order: 3; }
+.loopReasonerGrid i:nth-child(9) { --scan-order: 8; }
 
 .loopReasoner strong {
   position: absolute;
@@ -2899,7 +2910,16 @@
 
 .learn[data-visible="true"] .loopReasonerGrid i {
   animation: loopReasonerCell var(--loop-cycle) linear
-    calc(400ms + var(--cell-index) * 85ms) infinite both;
+    calc(400ms + var(--scan-order, 0) * 95ms) infinite both;
+}
+
+/* 顶部端口：包到达时收光；底部发射口：分裂发出时亮起 */
+.learn[data-visible="true"] .loopReasoner::before {
+  animation: loopPortIn var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopReasoner::after {
+  animation: loopPortOut var(--loop-cycle) linear 400ms infinite both;
 }
 
 .learn[data-visible="true"] .loopBranchRail::after {
@@ -3823,12 +3843,25 @@
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* 思考扫描：短脉冲 + 大 stagger（85ms/格）让亮点按格序扫过 3×3 */
+/* 思考闪烁：每格在思考窗内三次脉冲，配合乱序 stagger 形成计算微光 */
 @keyframes loopReasonerCell {
-  0%, 10%, 26%, 100% { opacity: 0.18; }
-  13% { opacity: 0.45; }
-  16% { opacity: 1; }
-  20% { opacity: 0.35; }
+  0%, 9%, 29%, 100% { opacity: 0.14; }
+  11.5% { opacity: 1; }
+  13.5% { opacity: 0.26; }
+  16% { opacity: 0.85; }
+  18.5% { opacity: 0.3; }
+  21% { opacity: 1; }
+  24.5% { opacity: 0.4; }
+}
+
+@keyframes loopPortIn {
+  0%, 8%, 16%, 100% { opacity: 0.5; }
+  11%, 13% { opacity: 1; }
+}
+
+@keyframes loopPortOut {
+  0%, 17%, 26%, 100% { opacity: 0.72; }
+  19%, 23% { opacity: 1; }
 }
 
 @keyframes loopReceiptIn {
@@ -4406,8 +4439,11 @@
   .memoryTrace,
   .memoryLoop,
   .loopReasonerGrid i,
+  .loopReasoner::before,
+  .loopReasoner::after,
   .loopBranchRail::after,
   .loopReceipt,
+  .loopFeedReplacement i,
   .loopSplitPacket,
   .loopAbsorberMachine,
   .loopDigestor i,
