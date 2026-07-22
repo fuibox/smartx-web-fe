@@ -3009,6 +3009,16 @@
   animation: loopRouteTopTrace var(--loop-cycle) linear 400ms infinite both;
 }
 
+/* 已进入过视口的 Learn 保留当前状态，离屏时暂停循环以避免后台持续合成。 */
+.learn[data-active="false"] .memoryLoop,
+.learn[data-active="false"] .memoryLoop *,
+.learn[data-active="false"] .memoryLoop::before,
+.learn[data-active="false"] .memoryLoop::after,
+.learn[data-active="false"] .memoryLoop *::before,
+.learn[data-active="false"] .memoryLoop *::after {
+  animation-play-state: paused !important;
+}
+
 /* All-in-one -------------------------------------------------------------- */
 
 .venues {
@@ -3029,7 +3039,7 @@
   display: grid;
   max-width: 1100px;
   justify-items: center;
-  margin: 0 auto clamp(36px, 4.5vh, 46px);
+  margin: 0 auto clamp(36px, 4.2vh, 40px);
   text-align: center;
 }
 
@@ -3055,22 +3065,14 @@
 .venueSystem {
   display: grid;
   justify-items: center;
-  gap: 12px;
-  margin: 0 auto clamp(22px, 3vh, 30px);
+  margin: 0 auto clamp(44px, 5.1vh, 48px);
   text-align: center;
 }
 
-.venueSystem > span {
-  color: var(--teal);
-  font-family: var(--font-jb);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-}
-
 .venueSystem img {
-  width: 138px;
+  width: 178px;
   height: auto;
-  opacity: 0.92;
+  opacity: 1;
 }
 
 .venueSpine {
@@ -3083,7 +3085,7 @@
 .venueSpine i {
   display: block;
   height: 1px;
-  background: rgba(148, 166, 194, 0.22);
+  background: rgba(148, 166, 194, 0.16);
   transform: scaleX(0);
 }
 
@@ -3386,14 +3388,45 @@
   line-height: 0.9;
 }
 
-.updates > header > span {
+.updatesHeaderAside {
+  display: grid;
+  justify-items: end;
+  gap: 15px;
+}
+
+.updatesHeaderAside > span {
   max-width: 270px;
   color: var(--dim);
-  font-family: var(--font-jb);
-  font-size: 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
   line-height: 1.5;
   text-align: right;
+}
+
+.updatesSeeAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--body);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
   text-transform: uppercase;
+}
+
+.updatesSeeAll::before {
+  width: 18px;
+  height: 2px;
+  background: var(--teal);
+  content: "";
+  transform-origin: right center;
+}
+
+.updatesSeeAll i {
+  color: var(--teal);
+  font-style: normal;
 }
 
 .updateList {
@@ -3413,6 +3446,24 @@
   min-height: 480px;
   flex-direction: column;
   padding: 0;
+}
+
+.updateStoryLink {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.updateRows .updateStoryLink { justify-content: center; }
+
+.updateStoryLink:focus-visible,
+.updatesSeeAll:focus-visible {
+  outline: 1px solid var(--teal);
+  outline-offset: 8px;
+  transition: none;
 }
 
 .updateImage {
@@ -3474,8 +3525,8 @@
   line-height: 1.35;
 }
 
-.featuredUpdate > p,
-.updateRows article > p {
+.featuredUpdate .updateStoryLink > p,
+.updateRows .updateStoryLink > p {
   max-width: 520px;
   margin: 12px 44px 0 0;
   color: var(--muted);
@@ -3508,18 +3559,21 @@
 @media (hover: hover) and (pointer: fine) {
   .updateImage img,
   .updateMeta span::before,
-  .featuredUpdate h3,
-  .updateRows h3 {
+  .updateStoryLink h3,
+  .updatesSeeAll,
+  .updatesSeeAll::before,
+  .updatesSeeAll i {
     transition:
       color 160ms var(--ease-out),
       transform 240ms var(--ease-out);
   }
 
-  .featuredUpdate:hover .updateImage img { transform: scale(1.012); }
-  .featuredUpdate:hover .updateMeta span::before,
-  .updateRows article:hover .updateMeta span::before { transform: scaleX(1.65); }
-  .featuredUpdate:hover h3,
-  .updateRows article:hover h3 { color: var(--teal); }
+  .updateStoryLink:hover .updateImage img { transform: scale(1.012); }
+  .updateStoryLink:hover .updateMeta span::before { transform: scaleX(1.65); }
+  .updateStoryLink:hover h3,
+  .updatesSeeAll:hover { color: var(--paper); }
+  .updateStoryLink:hover h3 { color: var(--teal); }
+  .updatesSeeAll:hover::before { transform: scaleX(1.45); }
 }
 
 /* Footer ------------------------------------------------------------------ */
@@ -4057,7 +4111,8 @@
 
   .updates { margin-inline: 24px; padding-block: 12vh; }
   .updates > header { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .updates > header > span { text-align: left; }
+  .updatesHeaderAside { justify-items: start; }
+  .updatesHeaderAside > span { text-align: left; }
   .updateList { grid-template-columns: minmax(0, 1fr); }
   .featuredUpdate { min-height: 0; }
 
@@ -4077,7 +4132,11 @@
     transform-origin: left top;
   }
   .learn[data-visible="true"] .memorySorter { transform: scale(0.72); }
-  .memoryLoop { transform: translate3d(18px, 0, 0) scale(0.72); }
+  .memoryLoop {
+    height: 468px;
+    transform: scale(0.72);
+    transform-origin: center top;
+  }
   .learn[data-visible="true"] .memoryLoop { transform: scale(0.72); }
   .memoryTrace { min-height: 0; padding-left: 54px; transform-origin: center top; }
   .memoryTraceLine { left: 22px; }
@@ -4090,6 +4149,31 @@
   .footerTop { align-items: flex-start; }
   .footerTop nav { display: grid; grid-template-columns: repeat(2, auto); }
   .footerMeta { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 540px) {
+  .memoryLoop { height: 442px; transform: scale(0.68); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.68); }
+}
+
+@media (max-width: 500px) {
+  .memoryLoop { height: 403px; transform: scale(0.62); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.62); }
+}
+
+@media (max-width: 460px) {
+  .memoryLoop { height: 364px; transform: scale(0.56); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.56); }
+}
+
+@media (max-width: 420px) {
+  .memoryLoop { height: 325px; transform: scale(0.5); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.5); }
+}
+
+@media (max-width: 380px) {
+  .memoryLoop { height: 286px; transform: scale(0.44); }
+  .learn[data-visible="true"] .memoryLoop { transform: scale(0.44); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4149,6 +4233,9 @@
   .updateMeta span::before,
   .featuredUpdate h3,
   .updateRows h3,
+  .updatesSeeAll,
+  .updatesSeeAll::before,
+  .updatesSeeAll i,
   .secondaryAction,
   .secondaryAction i { animation: none !important; transition: none !important; }
   .memoryLoop { opacity: 1; transform: none; }

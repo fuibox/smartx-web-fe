@@ -54,19 +54,31 @@ export function DitherField({ scrollRef }: DitherFieldProps) {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     let startTime = 0;
+    let lastDraw = 0;
     let width = 0;
     let height = 0;
+    let pageVisible = document.visibilityState === "visible";
+
+    const schedule = () => {
+      if (pageVisible && !frame) frame = window.requestAnimationFrame(draw);
+    };
 
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width;
       canvas.height = height;
+      schedule();
     };
-    resize();
-    window.addEventListener("resize", resize);
 
     const draw = (now: number) => {
+      frame = 0;
+      if (!pageVisible) return;
+      if (!reduceMotion.matches && now - lastDraw < 1000 / 30) {
+        schedule();
+        return;
+      }
+      lastDraw = now;
       if (!startTime) startTime = now;
       const elapsed = reduceMotion.matches ? 0 : (now - startTime) / 1000;
       const scroll = scrollRef.current;
@@ -112,15 +124,33 @@ export function DitherField({ scrollRef }: DitherFieldProps) {
         }
       }
 
-      if (!reduceMotion.matches) {
-        frame = window.requestAnimationFrame(draw);
+      // Hero 离开后保留静态终帧；回滚到 Hero 时由 scroll 事件重新唤醒。
+      if (!reduceMotion.matches && scroll < 0.98) schedule();
+    };
+
+    const handleVisibility = () => {
+      pageVisible = document.visibilityState === "visible";
+      if (!pageVisible && frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      } else {
+        schedule();
       }
     };
 
-    frame = window.requestAnimationFrame(draw);
+    resize();
+    schedule();
+    window.addEventListener("resize", resize);
+    window.addEventListener("scroll", schedule, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibility);
+    reduceMotion.addEventListener("change", schedule);
+
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", schedule);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      reduceMotion.removeEventListener("change", schedule);
     };
   }, [scrollRef]);
 

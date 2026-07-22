@@ -23,17 +23,29 @@ export const metadata: Metadata = {
     description,
     url: "/",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SmartX — The AI trading terminal that understands you",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
+    images: ["/opengraph-image.png"],
   },
 };
 
 export default function Home() {
   return (
     <main className={styles.page}>
+      <a className={styles.skipLink} href="#v4-index">
+        Skip to product story
+      </a>
       <V4Hero />
       <V4StoryPage />
     </main>

@@ -80,7 +80,7 @@ export function V4Hero() {
       <section ref={heroRef} className={styles.hero} aria-labelledby="v4-title">
         <p className={styles.heroKicker}>AI trading terminal · Live beta</p>
         <h1 id="v4-title" className={styles.heroTitle}>
-          The AI Trading Terminal
+          The AI Trading Terminal{" "}
           <br />
           That Understands You
         </h1>
