@@ -1,9 +1,9 @@
 # SmartX 官网 V4 方案（当前主线）
 
-> 状态：开发中，路由 `/v4`，本文件是 V4 的唯一权威文档
+> 状态：开发中，公开首页 `/`；`/v4` 仅作旧链接兼容跳转。本文件是 V4 的唯一权威文档
 > 更新日期：2026-07-22
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
-> **与旧方案的关系**：V2 太空叙事（`website-v2-space-narrative-design-intent.md`、`website-v2-frontend-architecture.md`、`visual-motion-spec.md`）为已废弃方向，保留于 `/` 路由作对照，其文档不再更新；V3 编辑化原型（`src/components/v3/`）为已废弃探索。
+> **与旧方案的关系**：V2 太空叙事（`website-v2-space-narrative-design-intent.md`、`website-v2-frontend-architecture.md`、`visual-motion-spec.md`）为已废弃方向，仅保留历史代码，其文档不再更新；V3 编辑化原型（`src/components/v3/`）为已废弃探索。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
 
 ## 1. 定位与叙事（已签字）
@@ -165,7 +165,8 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ## 6. 组件地图
 
 ```text
-src/app/v4/page.tsx              页面组装
+src/app/page.tsx                 V4 公开首页组装
+src/app/v4/page.tsx              旧链接兼容跳转
 src/components/v4/
   hero.tsx                       Hero（滚动进度 + CTA）
   dither-field.tsx               签名抖动场（Canvas 2D）

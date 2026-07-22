@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://smartx.io"),
   title: "SmartX | The AI Trading Terminal Built Around You",
   description:
     "SmartX connects live market signals, smart money context, watchlists, and trading in one AI-native terminal.",
