@@ -242,7 +242,7 @@ const MEMORY_CHANGES: Record<
   interests: { change: "Macro moved up", status: "Updated" },
   signals: { change: "Smart money reinforced", status: "Updated" },
   "trading-style": { change: "Research-first behavior", status: "Recorded" },
-  edge: { change: "Wait for the outcome", status: "Pending" },
+  edge: { change: "Entry timing noted", status: "Recorded" },
 };
 
 const UPDATE_STORIES = [
@@ -790,7 +790,7 @@ function MemoryLoop() {
     <div
       className={styles.memoryLoop}
       role="img"
-      aria-label="The fifth Next Feed candidate enters Memory Reasoner while the queue immediately refills, updates Interest and Signal, records Style, keeps Edge pending, then returns over the first-ranked candidate and fades into the feed"
+      aria-label="The fifth Next Feed candidate enters Memory Reasoner, updates Interest and Signal, records Style and Edge, then the enriched result returns to the top of the queue and re-ranks the feed"
     >
       <div className={styles.loopFeed} aria-label="Next feed ranking">
         <span className={styles.loopFeedLabel}>NEXT FEED</span>
@@ -834,7 +834,7 @@ function MemoryLoop() {
       <span className={styles.loopBranchRail} aria-hidden="true">
         {MEMORY_DOMAINS.map((domain) => (
           <i
-            data-state={domain.id === "edge" ? "pending" : "written"}
+            data-state={"written"}
             style={{ "--memory-color": domain.color } as CSSProperties}
             key={domain.id}
           />
@@ -846,7 +846,7 @@ function MemoryLoop() {
           <span
             className={styles.loopSplitPacket}
             data-domain={domain.id}
-            data-state={domain.id === "edge" ? "pending" : "written"}
+            data-state={"written"}
             style={
               {
                 "--memory-color": domain.color,
@@ -869,9 +869,7 @@ function MemoryLoop() {
           const state =
             domain.id === "interests" || domain.id === "signals"
               ? "absorbed"
-              : domain.id === "trading-style"
-                ? "recorded"
-                : "pending";
+              : "recorded";
 
           return (
             <div
@@ -928,7 +926,7 @@ function MemoryLoop() {
       <span className={styles.loopMergeRail} aria-hidden="true">
         {MEMORY_DOMAINS.map((domain) => (
           <i
-            data-state={domain.id === "edge" ? "pending" : "written"}
+            data-state={"written"}
             style={{ "--memory-color": domain.color } as CSSProperties}
             key={domain.id}
           />
@@ -937,7 +935,7 @@ function MemoryLoop() {
 
       <span className={styles.loopMergePellets} aria-hidden="true">
         {MEMORY_DOMAINS.map((domain, index) => {
-          const state = domain.id === "edge" ? "pending" : "written";
+          const state = "written";
 
           return (
             <i
@@ -1008,7 +1006,7 @@ function MemoryLoop() {
 
       <p className={styles.srOnly}>
         A trade informed by smart money is absorbed by Market interests and Trusted
-        signals, recorded as Trading style, held pending for User edge, and returned
+        signals, recorded as Trading style, noted as User edge, and returned
         to rank the next feed.
       </p>
     </div>

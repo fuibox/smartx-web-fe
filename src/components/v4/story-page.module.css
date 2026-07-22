@@ -2565,10 +2565,11 @@
 .loopSplitPacket[data-domain="trading-style"] i:nth-child(5) { top: 14px; left: 13px; }
 .loopSplitPacket[data-domain="trading-style"] i:nth-child(6) { top: 14px; left: 19px; }
 
-.loopSplitPacket[data-domain="edge"] i:nth-child(1) { top: 0; left: 2px; }
-.loopSplitPacket[data-domain="edge"] i:nth-child(2) { top: 4px; left: 16px; }
-.loopSplitPacket[data-domain="edge"] i:nth-child(3) { top: 12px; left: 8px; }
-.loopSplitPacket[data-domain="edge"] i:nth-child(4) { top: 16px; left: 19px; }
+/* Edge 已激活：紧凑 2×2（四域中最小的包，保持体量层级） */
+.loopSplitPacket[data-domain="edge"] i:nth-child(1) { top: 3px; left: 6px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(2) { top: 3px; left: 12px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(3) { top: 10px; left: 6px; }
+.loopSplitPacket[data-domain="edge"] i:nth-child(4) { top: 10px; left: 12px; }
 
 .loopSplitPacket[data-state="pending"] i {
   border: 1px solid var(--memory-color);
@@ -2920,6 +2921,39 @@
 
 .learn[data-visible="true"] .loopReasoner::after {
   animation: loopPortOut var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopBranchRail i {
+  animation: loopDropGlow var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopBranchRail i:nth-child(2) { animation-delay: 470ms; }
+.learn[data-visible="true"] .loopBranchRail i:nth-child(3) { animation-delay: 540ms; }
+.learn[data-visible="true"] .loopBranchRail i:nth-child(4) { animation-delay: 610ms; }
+
+/* merge 竖降与横行段共享同一 i 的透明度，一次点亮全程管道 */
+.learn[data-visible="true"] .loopMergeRail i {
+  animation: loopMergeGlow var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopMergeRail i:nth-child(2) { animation-delay: 460ms; }
+.learn[data-visible="true"] .loopMergeRail i:nth-child(3) { animation-delay: 520ms; }
+.learn[data-visible="true"] .loopMergeRail i:nth-child(4) { animation-delay: 580ms; }
+
+.learn[data-visible="true"] .loopMergeRail::before {
+  animation: loopJunctionPulse var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteBottom::after {
+  animation: loopCornerFlash var(--loop-cycle) linear 8080ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteSide::after {
+  animation: loopCornerFlash var(--loop-cycle) linear 9280ms infinite both;
+}
+
+.learn[data-visible="true"] .loopRouteTop::after {
+  animation: loopCornerFlash var(--loop-cycle) linear 10240ms infinite both;
 }
 
 .learn[data-visible="true"] .loopBranchRail::after {
@@ -3864,6 +3898,33 @@
   19%, 23% { opacity: 1; }
 }
 
+/* 管道点亮：包经过时对应的连接线短暂提亮，流向有迹可循 */
+@keyframes loopDropGlow {
+  0%, 31% { opacity: 0.42; }
+  34%, 39% { opacity: 1; }
+  44%, 100% { opacity: 0.42; }
+}
+
+@keyframes loopMergeGlow {
+  0%, 49% { opacity: 0.5; }
+  52%, 60% { opacity: 1; }
+  65%, 100% { opacity: 0.5; }
+}
+
+/* 汇合结点：合成包在此成形时轻微一亮 */
+@keyframes loopJunctionPulse {
+  0%, 60% { opacity: 0.55; }
+  63%, 66% { opacity: 1; }
+  71%, 100% { opacity: 0.55; }
+}
+
+/* 回廊角点：回流包路过转角时点亮（配合 delay 对拍） */
+@keyframes loopCornerFlash {
+  0%, 1% { opacity: 0.32; }
+  3% { opacity: 1; }
+  8%, 100% { opacity: 0.32; }
+}
+
 @keyframes loopReceiptIn {
   0%, 10% { opacity: 0; transform: translate3d(-6px, 0, 0); }
   13% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-out); }
@@ -4442,6 +4503,12 @@
   .loopReasoner::before,
   .loopReasoner::after,
   .loopBranchRail::after,
+  .loopBranchRail i,
+  .loopMergeRail i,
+  .loopMergeRail::before,
+  .loopRouteBottom::after,
+  .loopRouteSide::after,
+  .loopRouteTop::after,
   .loopReceipt,
   .loopFeedReplacement i,
   .loopSplitPacket,
