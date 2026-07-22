@@ -790,7 +790,7 @@ function MemoryLoop() {
     <div
       className={styles.memoryLoop}
       role="img"
-      aria-label="The fifth Next Feed candidate enters Memory Reasoner, updates Interest and Signal, records Style and Edge, then the enriched result returns to the top of the queue and re-ranks the feed"
+      aria-label="The fifth Next Feed candidate enters Memory Reasoner, updates Interest and Signal, records Style and Edge, then the enriched memory returns to the feed and visibly re-ranks it: the third candidate is promoted to the top while a new candidate refills the queue"
     >
       <div className={styles.loopFeed} aria-label="Next feed ranking">
         <span className={styles.loopFeedLabel}>NEXT FEED</span>

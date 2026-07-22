@@ -2170,8 +2170,8 @@
   height: 650px;
   justify-self: end;
   isolation: isolate;
-  opacity: 0;
-  transform: translate3d(24px, 0, 0);
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
   transition:
     opacity 520ms var(--ease-out),
     transform 680ms var(--ease-out);
@@ -2181,6 +2181,47 @@
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
+
+/* 入场编排：按叙事序揭示——队列 → 输入轨 → 推理器 → 分支 → 吸收器 → 汇合 → 回廊 */
+.loopFeed,
+.loopInputRail,
+.loopReasoner,
+.loopBranchRail,
+.loopAbsorber,
+.loopMergeRail,
+.loopReturnRoute,
+.loopMobileSummary,
+.loopMobileReturn {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity 480ms var(--ease-out),
+    transform 560ms var(--ease-out);
+}
+
+.learn[data-visible="true"] .loopFeed,
+.learn[data-visible="true"] .loopInputRail,
+.learn[data-visible="true"] .loopReasoner,
+.learn[data-visible="true"] .loopBranchRail,
+.learn[data-visible="true"] .loopAbsorber,
+.learn[data-visible="true"] .loopMergeRail,
+.learn[data-visible="true"] .loopReturnRoute,
+.learn[data-visible="true"] .loopMobileSummary,
+.learn[data-visible="true"] .loopMobileReturn {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.learn[data-visible="true"] .loopInputRail { transition-delay: 120ms; }
+.learn[data-visible="true"] .loopReasoner { transition-delay: 220ms; }
+.learn[data-visible="true"] .loopBranchRail { transition-delay: 340ms; }
+.learn[data-visible="true"] .loopAbsorber {
+  transition-delay: calc(420ms + var(--domain-index) * 70ms);
+}
+.learn[data-visible="true"] .loopMergeRail { transition-delay: 680ms; }
+.learn[data-visible="true"] .loopReturnRoute { transition-delay: 790ms; }
+.learn[data-visible="true"] .loopMobileSummary { transition-delay: 300ms; }
+.learn[data-visible="true"] .loopMobileReturn { transition-delay: 460ms; }
 
 .loopPacket {
   display: grid;
@@ -2290,7 +2331,8 @@
   will-change: transform, opacity;
 }
 
-.loopFeedReplacement { top: -35px; }
+/* 补位包改为从底部入列（rerank 时 05 空位由新候选补入） */
+.loopFeedReplacement { top: 140px; opacity: 0; }
 .loopFeedQueue > .loopFeedCandidate:nth-child(2) { top: 0; }
 .loopFeedQueue > .loopFeedCandidate:nth-child(3) { top: 35px; }
 .loopFeedQueue > .loopFeedCandidate:nth-child(4) { top: 70px; }
@@ -2997,6 +3039,33 @@
     calc(400ms + var(--domain-index) * 60ms) infinite both;
 }
 
+/* Edge 的消化与输出整体压后 340ms：四域中最后落笔，与其他域拉开节拍 */
+.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i {
+  animation-delay: 1010ms;
+}
+
+.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i:nth-child(2) {
+  animation-delay: 1070ms;
+}
+
+.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDigestor i:nth-child(3) {
+  animation-delay: 1130ms;
+}
+
+.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopAbsorberOutput i {
+  animation-delay: calc(1010ms + var(--output-index) * 35ms);
+}
+
+/* 状态字与写入联动：写入前暗沉，写入完成点亮，循环末端回落 */
+.learn[data-visible="true"] .loopDomainMeta small {
+  animation: loopStatusWake var(--loop-cycle) linear
+    calc(400ms + var(--domain-index) * 90ms) infinite both;
+}
+
+.learn[data-visible="true"] .loopAbsorber[data-domain="edge"] .loopDomainMeta small {
+  animation-delay: 1010ms;
+}
+
 .learn[data-visible="true"] .loopMergePellets > i[data-state="pending"] {
   animation: loopMergePending var(--loop-cycle) linear 580ms infinite both;
 }
@@ -3010,12 +3079,21 @@
     calc(400ms + var(--packet-cell) * 45ms) infinite both;
 }
 
-.learn[data-visible="true"] .loopFeedQueue {
-  animation: loopFeedQueueShift var(--loop-cycle) linear 400ms infinite both;
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(2),
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(3) {
+  animation: loopRerankDown var(--loop-cycle) linear 400ms infinite both;
 }
 
-.learn[data-visible="true"] .loopFeedReplacement i {
-  animation: loopReplacementWake var(--loop-cycle) linear 400ms infinite both;
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(4) {
+  animation: loopRerankUp var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:nth-child(4) i {
+  animation: loopPromoteGlow var(--loop-cycle) linear 400ms infinite both;
+}
+
+.learn[data-visible="true"] .loopFeedReplacement {
+  animation: loopRefill var(--loop-cycle) linear 400ms infinite both;
 }
 
 .learn[data-visible="true"] .loopFeedQueue > .loopFeedCandidate:last-child {
@@ -3925,6 +4003,13 @@
   8%, 100% { opacity: 0.32; }
 }
 
+/* 状态字：写入完成后从暗沉点亮，保持到循环尾声 */
+@keyframes loopStatusWake {
+  0%, 42% { opacity: 0.4; }
+  46%, 92% { opacity: 1; }
+  97%, 100% { opacity: 0.4; }
+}
+
 @keyframes loopReceiptIn {
   0%, 10% { opacity: 0; transform: translate3d(-6px, 0, 0); }
   13% { opacity: 1; transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-out); }
@@ -4001,11 +4086,11 @@
   97%, 100% { opacity: 0; }
 }
 
-/* 补位挪到回流到站时刻：91% 前队列底部一直留着"处理中"的空位，
-   回流包停靠队首后队列才下移换排名——因果与画面一致 */
-@keyframes loopFeedQueueShift {
-  0%, 88% { transform: translate3d(0, 0, 0); }
-  90% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+/* 明显 rerank：Memory 回流停靠后，03 号候选被抬升到 01（升 2 格），
+   01/02 各让 1 格，底部空位由新候选补入——feed 被重新排序而非被 memory 顶替 */
+@keyframes loopRerankDown {
+  0%, 90% { transform: translate3d(0, 0, 0); }
+  91% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
   94%, 99.8% { transform: translate3d(0, 35px, 0); }
   99.9% {
     transform: translate3d(0, 35px, 0);
@@ -4014,11 +4099,29 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* 到站交接：灰色补位包在回流包停靠时点亮成为新 #1 */
-@keyframes loopReplacementWake {
-  0%, 88% { opacity: 0.64; }
-  92%, 96% { opacity: 1; }
+@keyframes loopRerankUp {
+  0%, 90% { transform: translate3d(0, 0, 0); }
+  91% { transform: translate3d(0, 0, 0); animation-timing-function: var(--ease-in-out); }
+  94%, 99.8% { transform: translate3d(0, -70px, 0); }
+  99.9% {
+    transform: translate3d(0, -70px, 0);
+    animation-timing-function: steps(1, end);
+  }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* 被 memory 提升的候选：跃升时点亮到满亮度 */
+@keyframes loopPromoteGlow {
+  0%, 91% { opacity: 0.64; }
+  94%, 98% { opacity: 1; }
   100% { opacity: 0.64; }
+}
+
+/* 新候选补入底部空位 */
+@keyframes loopRefill {
+  0%, 92% { opacity: 0; }
+  95%, 98.5% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes loopRouteArrow {
@@ -4510,7 +4613,8 @@
   .loopRouteSide::after,
   .loopRouteTop::after,
   .loopReceipt,
-  .loopFeedReplacement i,
+  .loopFeedReplacement,
+  .loopDomainMeta small,
   .loopSplitPacket,
   .loopAbsorberMachine,
   .loopDigestor i,
@@ -4561,6 +4665,20 @@
   .updatesSeeAll i,
   .secondaryAction,
   .secondaryAction i { animation: none !important; transition: none !important; }
+  /* 入场编排的基态是隐藏——降级模式直接呈现终态 */
+  .loopFeed,
+  .loopInputRail,
+  .loopReasoner,
+  .loopBranchRail,
+  .loopAbsorber,
+  .loopMergeRail,
+  .loopReturnRoute,
+  .loopMobileSummary,
+  .loopMobileReturn {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
   .memoryLoop { opacity: 1; transform: none; }
   .loopReceipt,
   .loopMergePellets > i,
