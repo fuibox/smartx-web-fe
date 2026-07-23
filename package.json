@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "serve .next-build -l 3000",
+    "start": "serve out -l 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
