@@ -1,7 +1,7 @@
 # SmartX 官网 V4 方案（当前主线）
 
 > 状态：上线收口中，公开首页 `/`；`/v4` 仅作旧链接兼容跳转。本文件是 V4 的唯一权威文档
-> 更新日期：2026-07-22
+> 更新日期：2026-07-23
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
 > **与旧方案的关系**：V2 太空叙事与 V3 编辑化原型均为已废弃探索，只保留在 Git 历史与历史文档中，不进入生产源码和构建产物。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
@@ -117,8 +117,9 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ### Closing CTA / Updates / Footer
 
 - Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch Alpha`，次入口 `Read the docs`。
-- Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；数据接口固定为 `category / date / title / excerpt / cover / url`。当前展示 SmartX 官方 Medium 最新三篇，文章分别跳转对应详情，`See all` 跳转 `https://medium.com/@smartxofficial`；后续官网 Blog 列表页与详情页上线后，只替换数据来源和链接，不改变版式。
-- Footer 保持常规导航、社交入口、Terms of Service 与 Privacy Policy，并以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
+- Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；即使 Blog 文章数继续增长，首页也只读取最新三篇。数据接口固定为 `category / date / title / excerpt / cover / slug / sourceUrl`。当前内容从 SmartX 官方 Medium 迁入，但首页标题与 `See all` 均进入站内 `/blog`；`sourceUrl` 只作内部溯源，不在公开页面为 Medium 导流。
+- Blog 使用独立的编辑化阅读系统：`/blog` 为列表首页，采用一篇主稿 + 文本文章行，不增加无意义分类筛选；每页固定 6 篇，文章超过 6 篇后生成 `/blog/page/[page]/` 静态分页，禁止无限滚动。`/blog/[slug]` 为详情页，使用大标题、真实封面或语义化产品视觉、约 680px 的窄正文、桌面端吸顶目录与三篇相关文章。Blog 延续 V4 navy/teal 与像素索引语言；品牌级标题使用 Pixel，长正文使用 UI 字体，禁止把首页章节动效搬进阅读页。详情页支持 Blog 专属明暗阅读主题，阅读时长必须从正文自动计算；正文排版和内容接口以 `docs/blog-reading-system.md` 为准。
+- Footer 将信息拆为三组：左侧品牌与 X / Telegram 社交入口；`Product` 包含 App / Blog / Docs；`Legal` 包含 Terms of Service / Privacy Policy。底部继续以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
 - Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
 - Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期并使用真实文章链接，hover 只做封面轻微收紧、标题与分类短线响应，不额外增加卡片箭头。
 
@@ -149,18 +150,27 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **02 Execute** | 🟡 精修待签字 | 文案已收敛为两条路径；Recall 使用真实交易票据，Strategy follow 使用真实 Watchlist Rules，自动执行能力明确标 Coming |
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
-| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接官方 Medium 最新三篇与 `See all` 外链；Footer 法务入口保留 |
+| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；Footer 已按 Product / Legal 分组 |
+| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 五篇 `/blog/[slug]` 详情；已迁入当前官方 Medium 全部文章，Medium 地址只作内部溯源 |
 
 桌面首版已在 `1440 × 900` 浏览器逐屏验收，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
 ### 正式发布合同
 
-- 唯一可索引页面为 `/`；`/v4/` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
-- 构建产物是 `.next-build/` 静态站点：`npm run build` 生成，`npm start` 只用于本地预览。生产环境直接发布该目录，不运行 `next dev`。
+- 可索引页面为 `/`、`/blog/`、`/blog/page/[page]/` 与已发布的 `/blog/[slug]/`；`/v4/` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
+- 构建产物是 `out/` 静态站点：`npm run build` 生成，`npm start` 只用于本地预览。生产环境直接发布该目录，不运行 `next dev`。
 - Google Search Console verification meta 必须长期保留；`robots.txt`、`sitemap.xml`、Open Graph 图片和自定义 404 随构建生成。
+- 首页输出 Organization / WebSite / SoftwareApplication JSON-LD；Blog 详情输出 BlogPosting JSON-LD。`sitemap.xml` 必须包含 `/`、Blog 列表、静态分页和全部已发布详情页，不能只提交首页。
 - CDN/静态托管层上线时必须验证安全响应头：CSP、`X-Content-Type-Options: nosniff`、点击劫持防护、`Referrer-Policy` 与适用的 `Permissions-Policy`。这些响应头不由静态页面本身代替。
 - 托管层若支持重定向，优先把 `/v4/*` 配置为指向 `/` 的 308；仓库中的客户端跳转仅作为跨平台兜底。
 - 当前移动端只保证内容不丢失、不横向裁切和 reduced-motion 可用；桌面签字后再做独立的移动端构图，不把安全降级视为移动端定稿。
+
+SEO 上线验收顺序：
+
+1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表与全部已发布文章均出现；当前五篇文章时应为 7 条 URL。
+2. 在 Search Console 重新提交或刷新 `sitemap.xml`。Search Console 的 discovered pages 可能延迟更新，不以提交当下的数字判断失败。
+3. 用 Google Rich Results Test 检查首页的 Organization / WebSite / SoftwareApplication，以及文章页的 BlogPosting。
+4. Terms of Service 与 Privacy Policy 必须返回 200，不允许发布带 404 的 Legal 导航。
 
 ## 5. 已废弃的实验（勿重做）
 
@@ -177,6 +187,9 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ```text
 src/app/page.tsx                 V4 公开首页组装
 src/app/v4/page.tsx              旧链接兼容跳转
+src/app/blog/page.tsx            Blog 列表首页
+src/app/blog/page/[page]/page.tsx Blog 静态分页
+src/app/blog/[slug]/page.tsx     Blog 详情
 src/components/v4/
   hero.tsx                       Hero（滚动进度 + CTA）
   dither-field.tsx               签名抖动场（Canvas 2D）
@@ -186,6 +199,13 @@ src/components/v4/
   closing-field.tsx              Closing 的离屏暂停像素流场
   footer-wordmark.tsx            Footer 字标聚合动效
   v4.module.css                  Hero 与共享 tokens
+src/components/blog/             Blog 编辑化页面组件与样式
+src/components/site/             Blog 页眉与全站共享 Footer
+src/content/blog-posts.ts        当前五篇本地编辑源（不被页面直接导入）
+src/content/blog-types.ts        Blog 摘要、详情与正文块契约
+src/content/blog-core.ts         内容验证、规范化、分页与阅读时长
+src/content/blog-repository.ts   首页/Blog/sitemap 的统一发布数据入口
+docs/blog-reading-system.md      Blog 排版映射、主题与后端内容契约
 共享：memory-demo fixture/types、smartx-links
 ```
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import styles from "./story-page.module.css";
+import styles from "../site/site-chrome.module.css";
 
 /**
  * FooterWordmark：超大 SMARTX 字标的像素聚合原型。

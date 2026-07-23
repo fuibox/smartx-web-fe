@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   IoBatteryFull,
   IoCellular,
@@ -16,11 +17,13 @@ import {
 
 import { MEMORY_DOMAINS } from "@/components/memory-demo/memory-demo.fixture";
 import type { MemoryDomainId } from "@/components/memory-demo/memory-demo.types";
-import { createSmartXAppHref } from "@/lib/smartx-links";
+import { LaunchAlphaCta } from "@/components/site/launch-alpha-cta";
+import { SiteFooter } from "@/components/site/site-footer";
+import type { BlogPostSummary } from "@/content/blog-types";
+import { formatBlogDate } from "@/lib/blog-format";
 
 import { ClosingFlowField } from "./closing-field";
 import { EvidenceStage, type StageState } from "./evidence-stage";
-import { FooterWordmark } from "./footer-wordmark";
 import styles from "./story-page.module.css";
 
 const CHAPTERS: Array<{
@@ -244,41 +247,6 @@ const MEMORY_CHANGES: Record<
   "trading-style": { change: "Research-first behavior", status: "Recorded" },
   edge: { change: "Entry timing noted", status: "Recorded" },
 };
-
-const UPDATE_STORIES = [
-  {
-    category: "Campaign",
-    date: "Jul 17, 2026",
-    dateTime: "2026-07-17",
-    title: "SmartX Boost: Trade Alongside the Smart Money",
-    excerpt:
-      "SmartX’s first trading leaderboard rewards the earliest traders who fund, trade, and connect their X account.",
-    cover: "/assets/updates/smartx-boost.webp",
-    coverAlt: "SmartX Boost trading leaderboard campaign",
-    url: "https://medium.com/@smartxofficial/smartx-boost-trade-alongside-the-smart-money-c59f856c97a5",
-  },
-  {
-    category: "Product",
-    date: "Jul 16, 2026",
-    dateTime: "2026-07-16",
-    title: "Introducing Smart Points: Get Rewarded for Being Early",
-    excerpt:
-      "Every trade, deposit, and funded invite now earns points automatically across daily, weekly, and milestone tracks.",
-    url: "https://medium.com/@smartxofficial/introducing-smart-points-get-rewarded-for-being-early-fdef0388fc74",
-  },
-  {
-    category: "Intelligence",
-    date: "Jul 13, 2026",
-    dateTime: "2026-07-13",
-    title:
-      "SmartX: Smart Money Decoded — What the Top 1% of Prediction-Market Traders Actually Read",
-    excerpt:
-      "Why PnL alone hides how top prediction-market traders actually win—and what their trading behavior reveals.",
-    url: "https://medium.com/@smartxofficial/smart-money-decoded-what-the-top-1-of-prediction-market-traders-actually-read-10258f52e46d",
-  },
-] as const;
-
-const MEDIUM_PROFILE_URL = "https://medium.com/@smartxofficial";
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -1148,19 +1116,11 @@ function ClosingSection() {
         </h2>
       </div>
       <div className={styles.closingActions}>
-        <a
+        <LaunchAlphaCta
           ref={ctaRef}
           className={styles.primaryAction}
-          href={createSmartXAppHref("closing_cta")}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>
-            <b>Launch Alpha</b>
-            <b aria-hidden="true">Launch Alpha</b>
-          </span>
-          <i aria-hidden="true">↗</i>
-        </a>
+          source="closing_cta"
+        />
         <a
           className={styles.secondaryAction}
           href="https://smartx.gitbook.io/smartx.docs.io"
@@ -1175,8 +1135,15 @@ function ClosingSection() {
   );
 }
 
-function UpdatesSection() {
-  const featuredUpdate = UPDATE_STORIES[0];
+function UpdatesSection({
+  updates,
+}: {
+  updates: readonly BlogPostSummary[];
+}) {
+  const homepageUpdates = updates.slice(0, 3);
+  const featuredUpdate = homepageUpdates[0];
+
+  if (!featuredUpdate) return null;
 
   return (
     <section id="v4-updates" className={styles.updates} aria-labelledby="v4-updates-title">
@@ -1185,61 +1152,59 @@ function UpdatesSection() {
         <h2 id="v4-updates-title">Updates</h2>
         <div className={styles.updatesHeaderAside}>
           <span>Product thinking, market intelligence, and what comes next.</span>
-          <a
+          <Link
             className={styles.updatesSeeAll}
-            href={MEDIUM_PROFILE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/blog"
           >
             <span>See all</span>
             <i aria-hidden="true">↗</i>
-          </a>
+          </Link>
         </div>
       </header>
 
       <div className={styles.updateList}>
         <article className={styles.featuredUpdate}>
-          <a
+          <Link
             className={styles.updateStoryLink}
-            href={featuredUpdate.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${featuredUpdate.title} — read on Medium`}
+            href={`/blog/${featuredUpdate.slug}`}
+            aria-label={`${featuredUpdate.title} — read article`}
           >
             <div className={styles.updateImage}>
               <Image
-                src={featuredUpdate.cover}
-                alt={featuredUpdate.coverAlt}
+                src={featuredUpdate.cover.src}
+                alt={featuredUpdate.cover.alt}
                 fill
                 sizes="(min-width: 980px) 42vw, 100vw"
               />
             </div>
             <div className={styles.updateMeta}>
               <span>{featuredUpdate.category}</span>
-              <time dateTime={featuredUpdate.dateTime}>{featuredUpdate.date}</time>
+              <time dateTime={featuredUpdate.publishedAt}>
+                {formatBlogDate(featuredUpdate.publishedAt)}
+              </time>
             </div>
             <h3>{featuredUpdate.title}</h3>
             <p>{featuredUpdate.excerpt}</p>
-          </a>
+          </Link>
         </article>
 
         <div className={styles.updateRows}>
-          {UPDATE_STORIES.slice(1).map((update) => (
+          {homepageUpdates.slice(1).map((update) => (
             <article key={update.title}>
-              <a
+              <Link
                 className={styles.updateStoryLink}
-                href={update.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${update.title} — read on Medium`}
+                href={`/blog/${update.slug}`}
+                aria-label={`${update.title} — read article`}
               >
                 <div className={styles.updateMeta}>
                   <span>{update.category}</span>
-                  <time dateTime={update.dateTime}>{update.date}</time>
+                  <time dateTime={update.publishedAt}>
+                    {formatBlogDate(update.publishedAt)}
+                  </time>
                 </div>
                 <h3>{update.title}</h3>
                 <p>{update.excerpt}</p>
-              </a>
+              </Link>
             </article>
           ))}
         </div>
@@ -1248,59 +1213,11 @@ function UpdatesSection() {
   );
 }
 
-function StoryFooter() {
-  return (
-    <footer id="v4-footer" className={styles.footer}>
-      <div className={styles.footerTop}>
-        <Image
-          src="/assets/smartx-logo.svg"
-          alt="SmartX"
-          width={218}
-          height={42}
-          style={{ width: 126, height: "auto" }}
-        />
-        <nav aria-label="Footer">
-          <a href={createSmartXAppHref("footer_link")} target="_blank" rel="noopener noreferrer">
-            App
-          </a>
-          <a
-            href="https://smartx.gitbook.io/smartx.docs.io"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Docs
-          </a>
-          <a href="https://x.com/SmartXTerminal" target="_blank" rel="noopener noreferrer">
-            X
-          </a>
-          <a href="https://t.me/+CTeuBkpOxSNkN2Y0" target="_blank" rel="noopener noreferrer">
-            Telegram
-          </a>
-          <a
-            href="https://smartx.gitbook.io/smartx.docs.io/9.-terms-of-service"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Terms of Service
-          </a>
-          <a
-            href="https://smartx.gitbook.io/smartx.docs.io/10.-privacy-policy"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Privacy Policy
-          </a>
-        </nav>
-      </div>
-      <FooterWordmark />
-      <div className={styles.footerMeta}>
-        <span>© SmartX 2026</span>
-      </div>
-    </footer>
-  );
-}
-
-export function V4StoryPage() {
+export function V4StoryPage({
+  updates,
+}: {
+  updates: readonly BlogPostSummary[];
+}) {
   return (
     <>
       <StoryIndex />
@@ -1308,8 +1225,8 @@ export function V4StoryPage() {
       <LearnSection />
       <VenuesSection />
       <ClosingSection />
-      <UpdatesSection />
-      <StoryFooter />
+      <UpdatesSection updates={updates} />
+      <SiteFooter />
     </>
   );
 }

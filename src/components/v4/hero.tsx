@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-import { createSmartXAppHref } from "@/lib/smartx-links";
+import { LaunchAlphaCta } from "@/components/site/launch-alpha-cta";
 
 import { DitherField } from "./dither-field";
 import styles from "./v4.module.css";
@@ -95,18 +95,11 @@ export function V4Hero() {
           </span>
         </p>
         <div className={styles.heroActions}>
-          <a
+          <LaunchAlphaCta
             className={styles.heroCta}
-            href={createSmartXAppHref("hero_cta")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span className={styles.ctaLabel}>
-              <b>Launch Alpha</b>
-              <b aria-hidden="true">Launch Alpha</b>
-            </span>
-            <i aria-hidden="true">↗</i>
-          </a>
+            labelClassName={styles.ctaLabel}
+            source="hero_cta"
+          />
         </div>
         <span className={styles.heroHint}>
           <span>Scroll</span>

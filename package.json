@@ -11,7 +11,9 @@
     "build": "next build",
     "start": "serve out -l 3000",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:blog",
+    "test:blog": "tsc -p tsconfig.blog-tests.json && node --test .test-dist/tests/blog/*.test.js"
   },
   "dependencies": {
     "next": "15.5.21",

@@ -73,16 +73,20 @@ function hash(seed: number): number {
 type Column = { c: number; base: number; cap: number; phase: number };
 
 /** 基础高度轮廓：左低右高的量能坡 + 每列 ±1 格的天际线噪声 */
-function buildProfile(zone: Zone): Column[] {
+function buildProfile(zone: Zone, compact: boolean): Column[] {
   const { cols, rows, keepOut, targetCol, targetR1 } = zone;
   const columns: Column[] = [];
   /* 窄屏（列布局）：内容纵向堆叠，柱阵只保留一条低矮底带 */
-  const mobile = cols < 78;
+  const mobile = !compact && cols < 78;
   /* CTA 及 docs 链接下方的硬上限：柱顶至少低于按钮底 7 格 */
   const rightCap = Math.max(4, rows - (targetR1 + 7));
   for (let c = 0; c < cols; c += PITCH) {
     const x = c / (cols - 1);
-    const ramp = mobile ? 2 + 3.4 * Math.pow(x, 1.4) : 3 + 13 * Math.pow(x, 1.7);
+    const ramp = mobile
+      ? 2 + 3.4 * Math.pow(x, 1.4)
+      : compact
+        ? 2 + 7 * Math.pow(x, 1.55)
+        : 3 + 13 * Math.pow(x, 1.7);
     const noise = Math.floor(hash(c + 7) * 3) - 1;
     let cap = mobile ? 6 : rows - 2;
     if (!mobile && keepOut && c >= keepOut.c0 - 1 && c <= keepOut.c1 + 1) {
@@ -113,12 +117,17 @@ export function ClosingFlowField({
   sectionRef,
   copyRef,
   ctaRef,
+  className = styles.closingCanvas,
+  variant = "default",
 }: {
   sectionRef: RefObject<HTMLElement | null>;
   copyRef: RefObject<HTMLDivElement | null>;
   ctaRef: RefObject<HTMLAnchorElement | null>;
+  className?: string;
+  variant?: "default" | "compact";
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const compact = variant === "compact";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -175,7 +184,7 @@ export function ClosingFlowField({
       }
 
       /* 涌浪抵达按钮：左边框列亮起再熄灭（窄屏按钮在场外，不做） */
-      if (now !== null && cols >= 78) {
+      if (now !== null && (compact || cols >= 78)) {
         const arrive = Math.exp(-Math.pow((wave - targetCol) / 3, 2));
         if (arrive > 0.05) {
           for (let row = targetR0; row <= targetR1; row += 1) {
@@ -196,7 +205,7 @@ export function ClosingFlowField({
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       zone = computeZone(section, copyRef.current, ctaRef.current);
-      columns = buildProfile(zone);
+      columns = buildProfile(zone, compact);
       if (reduced) draw(null);
     };
 
@@ -225,7 +234,7 @@ export function ClosingFlowField({
       if (frame) window.cancelAnimationFrame(frame);
       visible = false;
     };
-  }, [sectionRef, copyRef, ctaRef]);
+  }, [sectionRef, copyRef, ctaRef, compact]);
 
-  return <canvas ref={canvasRef} className={styles.closingCanvas} aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }
