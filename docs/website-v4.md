@@ -1,7 +1,7 @@
 # SmartX 官网 V4 方案（当前主线）
 
 > 状态：上线收口中，公开首页 `/`；`/v4` 仅作旧链接兼容跳转。本文件是 V4 的唯一权威文档
-> 更新日期：2026-07-23
+> 更新日期：2026-07-24
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
 > **与旧方案的关系**：V2 太空叙事与 V3 编辑化原型均为已废弃探索，只保留在 Git 历史与历史文档中，不进入生产源码和构建产物。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
@@ -139,6 +139,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 - 当前只实现并验收桌面端；移动端在桌面整站成立后单独编排。
 - 手机内容本身可响应，但桌面章节动效不直接机械缩放为移动版。
 - reduced-motion 在桌面阶段同步实现。
+- `1440 × 900` 是桌面构图基准；当 viewport 同时达到 `1800px × 900px` 时进入大屏舞台：Index 最大扩展至 2040px，其余叙事章节扩展至约 1840px，Hero、产品手机、Learn 管线、平台节点与字阶按各自语义同比增大。禁止用整页 `transform: scale()` 或浏览器缩放模拟适配，背景可铺满，但内容必须保留可控的最大阅读宽度。
 
 ## 4. 当前实现状态
 
@@ -153,7 +154,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；Footer 已按 Product / Legal 分组 |
 | **Blog** | 🟡 首版待签字 | `/blog` 列表 + 五篇 `/blog/[slug]` 详情；已迁入当前官方 Medium 全部文章，Medium 地址只作内部溯源 |
 
-桌面首版已在 `1440 × 900` 浏览器逐屏验收，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
+桌面首版已在 `1440 × 900` 浏览器逐屏验收；大屏舞台已在 `1920 × 1080` 与约 `2500 × 1280` 浏览器逐屏回归，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
 ### 正式发布合同
 
@@ -213,7 +214,7 @@ docs/blog-reading-system.md      Blog 排版映射、主题与后端内容契约
 
 1. 按 Index → Signals/Execute → Learn → All-in-one → Closing/Updates 的顺序逐屏评审并冻结桌面构图。
 2. 用真实产品录屏、最终官方 venue SVG 与运营文章替换现有素材槽；替换不得改变已签字结构。
-3. 桌面整站签字后再做移动端专项；随后完成大屏（>1600px）与无障碍完整 pass。
+3. 桌面整站签字后再做移动端专项；大屏舞台已完成，后续继续补齐无障碍完整 pass。
 
 ## 8. 事实依据（三份蒸馏报告要点存档）
 

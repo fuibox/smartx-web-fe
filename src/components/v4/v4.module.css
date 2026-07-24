@@ -2098,6 +2098,60 @@
 /* 移动端短文案切换 + Hero 字阶（≤620 收一档，标题控制在 4 行内） */
 .ledeMobile { display: none; }
 
+@media (min-width: 1800px) and (min-height: 900px) {
+  .siteHeader {
+    max-width: 1720px;
+    padding: 32px 0;
+  }
+
+  .siteHeader nav {
+    gap: 34px;
+  }
+
+  .siteHeader nav a {
+    font-size: 14px;
+  }
+
+  .hero {
+    max-width: 1440px;
+    min-height: calc(100vh - 102px);
+    padding-bottom: 5vh;
+  }
+
+  .heroKicker {
+    margin-bottom: 30px;
+    font-size: 13px;
+  }
+
+  .heroTitle {
+    font-size: clamp(82px, 3.75vw, 94px);
+  }
+
+  .heroLede {
+    max-width: 650px;
+    margin-top: 34px;
+    font-size: 18px;
+  }
+
+  .heroActions {
+    margin-top: 44px;
+  }
+
+  .ctaLabel {
+    min-height: 58px;
+    padding-inline: 40px;
+    font-size: 16px;
+  }
+
+  .heroCta i {
+    width: 58px;
+  }
+
+  .heroHint {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 620px) {
   .ledeDesktop { display: none; }
   .ledeMobile { display: inline; }

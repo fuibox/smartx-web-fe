@@ -4031,6 +4031,346 @@
 
 /* Responsive / reduced motion ------------------------------------------- */
 
+/*
+ * Large desktop stage
+ *
+ * The signed-off desktop composition is authored around 1440×900. Above
+ * 1800px the old max-width caps made every chapter stop growing while the
+ * canvas kept expanding, so a 27-inch display read like a zoomed-out mockup.
+ * This breakpoint increases the authored stage—not the whole document—so
+ * typography, product UI and diagrams retain their intended hierarchy.
+ */
+@media (min-width: 1800px) and (min-height: 900px) {
+  .sectionInner {
+    width: min(100%, 1840px);
+  }
+
+  .kicker {
+    margin-bottom: 26px;
+    font-size: 13px;
+  }
+
+  .indexInner {
+    width: min(100%, 2040px);
+    grid-template-columns: minmax(620px, 36%) minmax(0, 1fr);
+  }
+
+  .indexThesis {
+    padding: clamp(112px, 12vh, 156px) clamp(92px, 5vw, 126px);
+  }
+
+  .indexThesis h2 {
+    font-size: clamp(68px, 3.15vw, 78px);
+  }
+
+  .indexThesis > p:not(.kicker) {
+    max-width: 520px;
+    margin-top: 40px;
+    font-size: 18px;
+  }
+
+  .chapterCell {
+    padding: clamp(58px, 3.6vw, 88px);
+  }
+
+  .chapterNumber {
+    top: clamp(44px, 2.8vw, 64px);
+    left: clamp(58px, 3.6vw, 88px);
+    font-size: 12px;
+  }
+
+  .chapterCopy {
+    gap: 17px;
+  }
+
+  .chapterCopy strong {
+    font-size: clamp(54px, 2.55vw, 64px);
+  }
+
+  .chapterCopy small {
+    max-width: 350px;
+    font-size: 15px;
+  }
+
+  .chapterEvidence {
+    top: clamp(44px, 2.8vw, 64px);
+    right: clamp(58px, 3.6vw, 88px);
+    font-size: 12px;
+  }
+
+  .chapterArrow {
+    right: clamp(58px, 3.6vw, 88px);
+    bottom: clamp(58px, 3.6vw, 88px);
+    font-size: 23px;
+  }
+
+  .journeySticky {
+    min-height: 820px;
+    background-size: 100% 120px, 160px 100%, auto;
+  }
+
+  .journeyCopy {
+    width: min(32vw, 620px);
+  }
+
+  .signalsCopy {
+    left: max(120px, calc((100vw - 2080px) / 2 + 96px));
+  }
+
+  .executeCopy {
+    right: max(120px, calc((100vw - 2080px) / 2 + 96px));
+  }
+
+  .journeyCopy h2 {
+    font-size: clamp(64px, 2.9vw, 72px);
+  }
+
+  .journeyCopy > p:not(.kicker) {
+    max-width: 560px;
+    margin-top: 32px;
+    font-size: 17px;
+  }
+
+  .signalTabs,
+  .sourceReadout,
+  .executePaths {
+    max-width: 560px;
+  }
+
+  .signalTabs {
+    margin-top: 44px;
+  }
+
+  .signalTabs button {
+    min-height: 58px;
+  }
+
+  .signalTabs button strong,
+  .executePathTabs button > strong {
+    font-size: 13px;
+  }
+
+  .sourceReadout,
+  .executePathReadout {
+    gap: 8px;
+    padding-left: 18px;
+  }
+
+  .sourceReadout > strong,
+  .executePathReadout > strong {
+    font-size: 16px;
+  }
+
+  .sourceReadout > small {
+    font-size: 13px;
+  }
+
+  .sourceReadout li {
+    grid-template-columns: 124px minmax(0, 1fr);
+    padding-block: 10px;
+  }
+
+  .sourceReadout li span,
+  .sourceReadout li strong,
+  .executePathReadout li strong,
+  .executePathReadout li span {
+    font-size: 12px;
+  }
+
+  .executePaths {
+    gap: 18px;
+    margin-top: 28px;
+  }
+
+  .executePathTabs {
+    gap: 34px;
+  }
+
+  .executePathReadout li {
+    grid-template-columns: 152px minmax(0, 1fr);
+    padding-block: 10px;
+  }
+
+  .journeyPhone {
+    width: min(410px, 39vh);
+  }
+
+  .learn {
+    min-height: 100vh;
+  }
+
+  .learn .sectionInner {
+    min-height: 100vh;
+    grid-template-columns: minmax(560px, 0.86fr) minmax(800px, 1.14fr);
+    gap: clamp(64px, 4vw, 96px);
+    padding: 8vh clamp(96px, 5vw, 120px);
+  }
+
+  .learnCopy {
+    top: -40px;
+  }
+
+  .learnCopy h2 {
+    font-size: clamp(64px, 2.8vw, 70px);
+  }
+
+  .learnCopy > p:not(.kicker) {
+    max-width: 580px;
+    margin-top: 52px;
+    font-size: 17px;
+  }
+
+  .memoryLoop {
+    top: 8px;
+    justify-self: center;
+    transform: translate3d(18px, 0, 0) scale(1.16);
+    transform-origin: center;
+  }
+
+  .learn[data-visible="true"] .memoryLoop {
+    transform: translate3d(0, 0, 0) scale(1.16);
+  }
+
+  .venues .sectionInner {
+    padding: clamp(82px, 8vh, 104px) clamp(96px, 5vw, 120px) clamp(72px, 7vh, 92px);
+  }
+
+  .venuesHeader {
+    margin-bottom: 46px;
+  }
+
+  .venuesHeader h2 {
+    font-size: clamp(64px, 2.8vw, 70px);
+  }
+
+  .venueSystem {
+    margin-bottom: 54px;
+  }
+
+  .venueSystem img {
+    width: 218px;
+  }
+
+  .venueSpine,
+  .venueGrid {
+    width: min(100%, 1260px);
+    max-width: 1260px;
+  }
+
+  .venueSpine {
+    margin-bottom: 42px;
+  }
+
+  .venueGrid {
+    gap: clamp(30px, 3vh, 38px) clamp(72px, 5vw, 112px);
+  }
+
+  .venueItem {
+    min-height: 138px;
+    gap: 11px;
+  }
+
+  .venueLogoFrame {
+    width: 96px;
+    height: 64px;
+  }
+
+  .venueIdentity strong {
+    font-size: 18px;
+  }
+
+  .venueIdentity span {
+    font-size: 13px;
+  }
+
+  .venueItem[data-venue="polymarket"] .venueLogoFrame img { max-width: 56px; }
+  .venueItem[data-venue="predict"] .venueLogoFrame img { max-width: 57px; }
+  .venueItem[data-venue="hyperliquid"] .venueLogoFrame img { max-width: 57px; }
+  .venueItem[data-venue="aster"] .venueLogoFrame { width: 38px; }
+  .venueItem[data-venue="aster"] .venueLogoFrame img {
+    width: 144px;
+    height: 38px;
+  }
+  .venueItem[data-venue="bstocks"] .venueLogoFrame img { max-width: 57px; }
+  .venueItem[data-venue="ondo"] .venueLogoFrame img { max-width: 59px; }
+
+  .closing {
+    min-height: 60vh;
+    gap: 120px;
+    padding:
+      clamp(108px, 11vh, 148px)
+      max(120px, calc((100vw - 1780px) / 2));
+  }
+
+  .closing h2 {
+    font-size: clamp(60px, 2.65vw, 66px);
+  }
+
+  .closingActions {
+    min-width: 300px;
+    gap: 18px;
+  }
+
+  .primaryAction span {
+    min-width: 220px;
+    min-height: 64px;
+    font-size: 15px;
+  }
+
+  .primaryAction i {
+    width: 64px;
+  }
+
+  .secondaryAction {
+    font-size: 14px;
+  }
+
+  .updates {
+    max-width: 1680px;
+    padding: clamp(128px, 14vh, 174px) 0;
+  }
+
+  .updates > header {
+    margin-bottom: 58px;
+  }
+
+  .updates h2 {
+    font-size: clamp(62px, 2.7vw, 68px);
+  }
+
+  .updatesHeaderAside > span {
+    max-width: 320px;
+    font-size: 15px;
+  }
+
+  .updateList {
+    grid-template-columns: minmax(0, 1.18fr) minmax(420px, 0.82fr);
+    gap: clamp(72px, 5vw, 108px);
+  }
+
+  .featuredUpdate {
+    min-height: 560px;
+  }
+
+  .updateImage {
+    min-height: 390px;
+  }
+
+  .featuredUpdate h3,
+  .updateRows h3 {
+    font-size: 24px;
+  }
+
+  .featuredUpdate .updateStoryLink > p,
+  .updateRows .updateStoryLink > p {
+    font-size: 15px;
+  }
+
+  .updateRows {
+    padding-left: clamp(54px, 4vw, 76px);
+  }
+}
+
 @media (max-width: 1180px) {
   .indexInner { grid-template-columns: minmax(340px, 34%) minmax(0, 1fr); }
   .indexThesis { padding-inline: 44px; }
@@ -4611,5 +4951,24 @@
     height: auto;
     aspect-ratio: 390 / 844;
     justify-self: center;
+  }
+}
+
+@media (min-width: 1800px) and (min-height: 900px) and (prefers-reduced-motion: reduce) {
+  .journeyFallback > article {
+    gap: clamp(88px, 7vw, 148px);
+    padding-inline: max(120px, calc((100vw - 1840px) / 2));
+  }
+
+  .journeyFallback h2 {
+    font-size: clamp(64px, 2.9vw, 72px);
+  }
+
+  .journeyFallback .productPhone {
+    width: min(410px, 39vh);
+  }
+
+  .memoryLoop {
+    transform: scale(1.16);
   }
 }

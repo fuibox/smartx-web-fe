@@ -367,6 +367,35 @@
   white-space: nowrap;
 }
 
+@media (min-width: 1800px) and (min-height: 900px) {
+  .footer {
+    padding:
+      92px
+      max(120px, calc((100vw - 1780px) / 2))
+      32px;
+  }
+
+  .footerDirectory {
+    grid-template-columns: minmax(380px, 1.6fr) minmax(180px, 0.55fr) minmax(240px, 0.65fr);
+  }
+
+  .footerGroup h2 {
+    font-size: 16px;
+  }
+
+  .footerGroup a {
+    font-size: 13px;
+  }
+
+  .footerWordmarkWrap {
+    margin-top: 90px;
+  }
+
+  .footerWordmark {
+    font-size: clamp(260px, 16vw, 400px);
+  }
+}
+
 @media (max-width: 760px) {
   .header {
     width: min(100% - 40px, 1248px);
