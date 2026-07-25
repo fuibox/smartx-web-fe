@@ -181,6 +181,11 @@
   background: #071018;
 }
 
+.featuredStory .coverVisual {
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+}
+
 .coverVisual::after {
   position: absolute;
   inset: 0;
@@ -996,6 +1001,10 @@
 
   .coverVisual {
     min-height: 54vw;
+  }
+
+  .featuredStory .coverVisual {
+    min-height: 0;
   }
 
   .featuredStoryCopy {

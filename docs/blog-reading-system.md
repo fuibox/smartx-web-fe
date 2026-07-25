@@ -1,7 +1,7 @@
 # SmartX Blog 阅读系统与内容契约
 
 > 状态：V1 已实施
-> 更新日期：2026-07-23
+> 更新日期：2026-07-25
 > 适用路由：`/blog`、`/blog/page/[page]`、`/blog/[slug]`
 
 ## 1. 目标
@@ -63,10 +63,11 @@ type BlogSection = {
 };
 ```
 
-当前五篇 Medium 迁移稿仍允许在 `src/content/blog-posts.ts` 使用
+最初五篇 Medium 迁移稿仍允许在 `src/content/blog-posts.ts` 使用
 `paragraphs / bullets / quote` 输入；它们会在仓储初始化时被一次性规范化为
-`blocks`。页面组件永远只接收规范格式，不能直接读取迁移字段。新内容和后端返回
-必须直接使用 `blocks`，从而保留内容块真实顺序。
+`blocks`。2026-07-24 起同步的新内容直接使用规范 `blocks`。页面组件永远只接收
+规范格式，不能直接读取迁移字段。新内容和后端返回必须直接使用 `blocks`，从而
+保留内容块真实顺序。
 
 规范化阶段会阻止以下内容进入构建：
 
@@ -167,7 +168,8 @@ CMS 接入时只替换 repository 的数据适配层；`/blog`、详情、首页
 `sitemap.xml` 不应改变数据读取方式。仓储只向公开页面返回 `published` 内容。
 
 静态导出在只有一页文章时会生成 `/blog/page/1/` 作为到 `/blog/` 的规范跳转，
-不会伪造 `/blog/page/2/`。第七篇已发布文章出现后，构建会自动生成真实第二页。
+不会伪造 `/blog/page/2/`。当前七篇已发布文章已生成真实第二页，后续页数继续由
+统一仓储中的 published 数量自动推导。
 
 内容逻辑由 `tests/blog/blog-core.test.ts` 覆盖；每次内容模型或 CMS 适配变更后
 必须运行 `npm test`。

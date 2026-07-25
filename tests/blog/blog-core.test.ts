@@ -43,7 +43,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 5);
+  assert.equal(posts.length, 7);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -54,6 +54,14 @@ test("the production source validates into canonical body blocks", () => {
       ),
     ),
   );
+
+  const published = selectBlogPosts(posts, "published");
+  const firstPage = paginateBlogPosts(published, 1, 6);
+  const secondPage = paginateBlogPosts(published, 2, 6);
+
+  assert.equal(firstPage.items.length, 6);
+  assert.equal(secondPage.items.length, 1);
+  assert.equal(secondPage.items[0]?.slug, "smartx-signal-bot-guide");
 });
 
 test("normalization rejects mixed or empty section formats", () => {

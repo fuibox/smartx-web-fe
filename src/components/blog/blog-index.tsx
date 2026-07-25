@@ -82,7 +82,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
               href={`/blog/${featuredPost.slug}`}
               aria-label={`Read ${featuredPost.title}`}
             >
-              <BlogVisual post={featuredPost} priority />
+              <BlogVisual post={featuredPost} priority showLabel={false} />
               <div className={styles.featuredStoryCopy}>
                 <div className={styles.storyMeta}>
                   <span>{featuredPost.category}</span>

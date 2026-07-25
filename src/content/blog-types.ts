@@ -56,7 +56,7 @@ type LegacyBlogSectionSource = {
 };
 
 /**
- * Temporary import shape for the five Medium migrations.
+ * Temporary import shape for the initial Medium migrations.
  * Public consumers only receive canonical `BlogSection` records.
  */
 export type BlogSectionSource =
