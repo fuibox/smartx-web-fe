@@ -1,4 +1,4 @@
-const SMARTX_SITE_URL = "https://smartx.io/";
+import { resolveSmartXUrl } from "./site-metadata";
 
 export function formatBlogIndex(index: number) {
   return String(index).padStart(2, "0");
@@ -28,6 +28,4 @@ export function formatBlogReadTime(minutes: number) {
   return `${minutes} min read`;
 }
 
-export function resolveSmartXUrl(pathOrUrl: string) {
-  return new URL(pathOrUrl, SMARTX_SITE_URL).toString();
-}
+export { resolveSmartXUrl };

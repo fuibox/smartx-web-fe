@@ -4,6 +4,7 @@ import {
   getBlogArchivePageCount,
   listAllPublishedBlogPosts,
 } from "@/content/blog-repository";
+import { resolveSmartXUrl } from "@/lib/site-metadata";
 
 export const dynamic = "force-static";
 
@@ -18,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     {
       url: "https://smartx.io/",
-      lastModified: "2026-07-22",
+      lastModified: latestBlogUpdate,
       changeFrequency: "weekly",
       priority: 1,
     },
@@ -42,6 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: post.updatedAt ?? post.publishedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+      images: [resolveSmartXUrl(post.cover.src)],
     })),
   ];
 }

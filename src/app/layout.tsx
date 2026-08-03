@@ -1,12 +1,21 @@
 import type { Metadata, Viewport } from "next";
 
+import {
+  SMARTX_DEFAULT_SOCIAL_IMAGE,
+  SMARTX_OPEN_GRAPH_DEFAULTS,
+  SMARTX_SITE_URL,
+  SMARTX_TWITTER_DEFAULTS,
+} from "@/lib/site-metadata";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://smartx.io"),
+  metadataBase: new URL(SMARTX_SITE_URL),
   title: "SmartX | The AI Trading Terminal Built Around You",
   description:
     "SmartX connects live market signals, smart money context, watchlists, and trading in one AI-native terminal.",
+  creator: "SmartX",
+  publisher: "SmartX",
   referrer: "strict-origin-when-cross-origin",
   icons: {
     icon: "/assets/favicon.ico",
@@ -15,25 +24,19 @@ export const metadata: Metadata = {
     google: "ULRDqnBcK_2XDkvPUK6-3ioSqEiAo-wibKnuIcaQYBs",
   },
   openGraph: {
+    ...SMARTX_OPEN_GRAPH_DEFAULTS,
     title: "SmartX | The AI Trading Terminal Built Around You",
     description:
       "See the move, understand the context, and act from one AI-native trading terminal.",
     type: "website",
-    images: [
-      {
-        url: "/opengraph-image.png",
-        width: 1200,
-        height: 630,
-        alt: "SmartX — The AI trading terminal that understands you",
-      },
-    ],
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
-    card: "summary_large_image",
+    ...SMARTX_TWITTER_DEFAULTS,
     title: "SmartX | The AI Trading Terminal Built Around You",
     description:
       "See the move, understand the context, and act from one AI-native trading terminal.",
-    images: ["/opengraph-image.png"],
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
 };
 

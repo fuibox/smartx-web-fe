@@ -66,12 +66,14 @@ export type BlogSectionSource =
 export type BlogCover = {
   src: string;
   alt: string;
+  width: number;
+  height: number;
 };
 
 export type BlogSeo = {
-  title?: string;
-  description?: string;
-  image?: string;
+  title: string;
+  description: string;
+  image?: BlogCover;
 };
 
 export type BlogPostSource = {

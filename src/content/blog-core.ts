@@ -13,6 +13,9 @@ const LATIN_WORDS_PER_MINUTE = 220;
 const CJK_CHARACTERS_PER_MINUTE = 500;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const SEO_TITLE_MAX_LENGTH = 65;
+const SEO_DESCRIPTION_MIN_LENGTH = 100;
+const SEO_DESCRIPTION_MAX_LENGTH = 170;
 
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`[blog] ${message}`);
@@ -32,6 +35,22 @@ function validateUrl(value: string, field: string, allowRelative = false) {
   } catch {
     throw new Error(`[blog] ${field} must be an absolute URL${allowRelative ? " or a root-relative path" : ""}.`);
   }
+}
+
+function validateCover(
+  cover: BlogPostSource["cover"],
+  field: string,
+) {
+  nonEmpty(cover.alt, `${field}.alt`);
+  validateUrl(cover.src, `${field}.src`, true);
+  invariant(
+    Number.isInteger(cover.width) && cover.width > 0,
+    `${field}.width must be a positive integer.`,
+  );
+  invariant(
+    Number.isInteger(cover.height) && cover.height > 0,
+    `${field}.height must be a positive integer.`,
+  );
 }
 
 function validateBlock(
@@ -117,8 +136,7 @@ export function normalizeBlogPost(source: BlogPostSource): BlogPostDetail {
   invariant(SLUG.test(source.slug), `${source.slug}.slug must be kebab-case.`);
   nonEmpty(source.title, `${source.slug}.title`);
   nonEmpty(source.excerpt, `${source.slug}.excerpt`);
-  nonEmpty(source.cover.alt, `${source.slug}.cover.alt`);
-  validateUrl(source.cover.src, `${source.slug}.cover.src`, true);
+  validateCover(source.cover, `${source.slug}.cover`);
 
   invariant(
     ISO_DATE.test(source.publishedAt) &&
@@ -141,8 +159,27 @@ export function normalizeBlogPost(source: BlogPostSource): BlogPostDetail {
   if (source.sourceUrl) {
     validateUrl(source.sourceUrl, `${source.slug}.sourceUrl`);
   }
+  if (source.status === "published") {
+    invariant(
+      source.seo,
+      `${source.slug}.seo is required for published posts.`,
+    );
+  }
+  if (source.seo) {
+    nonEmpty(source.seo.title, `${source.slug}.seo.title`);
+    nonEmpty(source.seo.description, `${source.slug}.seo.description`);
+    invariant(
+      source.seo.title.length <= SEO_TITLE_MAX_LENGTH,
+      `${source.slug}.seo.title must be ${SEO_TITLE_MAX_LENGTH} characters or fewer.`,
+    );
+    invariant(
+      source.seo.description.length >= SEO_DESCRIPTION_MIN_LENGTH &&
+        source.seo.description.length <= SEO_DESCRIPTION_MAX_LENGTH,
+      `${source.slug}.seo.description must be between ${SEO_DESCRIPTION_MIN_LENGTH} and ${SEO_DESCRIPTION_MAX_LENGTH} characters.`,
+    );
+  }
   if (source.seo?.image) {
-    validateUrl(source.seo.image, `${source.slug}.seo.image`, true);
+    validateCover(source.seo.image, `${source.slug}.seo.image`);
   }
 
   invariant(
@@ -210,7 +247,10 @@ export function sortBlogPosts(
   return [...posts].sort((a, b) => {
     const publishedDifference = b.publishedAt.localeCompare(a.publishedAt);
     if (publishedDifference !== 0) return publishedDifference;
-    return a.slug.localeCompare(b.slug);
+    // The source collection is kept in editorial publish order. Preserve that
+    // order for same-day releases because `publishedAt` intentionally stores a
+    // calendar date rather than exposing Medium's timestamp to the UI.
+    return 0;
   });
 }
 

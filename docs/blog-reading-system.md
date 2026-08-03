@@ -1,7 +1,7 @@
 # SmartX Blog 阅读系统与内容契约
 
 > 状态：V1 已实施
-> 更新日期：2026-07-25
+> 更新日期：2026-08-03
 > 适用路由：`/blog`、`/blog/page/[page]`、`/blog/[slug]`
 
 ## 1. 目标
@@ -74,7 +74,8 @@ type BlogSection = {
 - 同一章节同时提供 `blocks` 与旧字段。
 - 空 `blocks`、空列表、空段落。
 - 重复文章 slug、重复 H2/H3 id。
-- 非 ISO 日期、更新时间早于发布时间、无效图片或来源 URL。
+- 非 ISO 日期、更新时间早于发布时间、无效图片尺寸或来源 URL。
+- 已发布文章缺少完整 SEO 标题与描述，或超过站内约定的字符预算。
 
 ### 列表规则
 
@@ -82,11 +83,16 @@ type BlogSection = {
 - `ordered-list`：JetBrainsMono 的 `01 / 02 / 03` 计数，表达步骤、优先级或顺序。
 - 不允许仅为了视觉统一把两者渲染成同一种样式；列表语义由内容决定。
 
-## 5. 摘要与副标题
+## 5. 摘要、SEO 与副标题
 
-- `excerpt`：必填，只用于列表摘要、SEO、Open Graph。
+- `excerpt`：必填，只用于站内列表摘要，不直接承担搜索摘要。
 - `dek`：可选，只在详情页标题下出现；文章没有额外论点时不渲染，也不保留空白。
 - `sourceUrl`：保留为内部迁移和版权溯源字段，不在公开页面显示 Medium 入口。
+- `seo.title`：已发布文章必填，站内编辑预算不超过 `65` 个字符；正文 H1 仍保留文章原始标题。
+- `seo.description`：已发布文章必填，站内编辑预算为 `100–170` 个字符；用于搜索结果、Open Graph、Twitter 与 BlogPosting。
+- `seo.image`：可选的专用社交分享图；未提供时使用文章 `cover`。两者都必须提供 `src / alt / width / height`。
+
+字符预算是 SmartX 的发布质量门槛，并非搜索引擎承诺的固定截断长度。页面的 canonical、robots、Open Graph、Twitter 和 JSON-LD 均从同一篇文章记录生成，禁止在页面组件中再次手写一份。
 
 ## 6. 自动阅读时长
 
@@ -137,17 +143,17 @@ type BlogPostSummary = {
   title: string;
   excerpt: string;
   dek?: string;
-  cover: { src: string; alt: string };
+  cover: { src: string; alt: string; width: number; height: number };
 };
 
 type BlogPostDetail = BlogPostSummary & {
   sourceUrl?: string; // internal only
   sections: BlogSection[];
   note?: string;
-  seo?: {
-    title?: string;
-    description?: string;
-    image?: string;
+  seo: {
+    title: string;
+    description: string;
+    image?: { src: string; alt: string; width: number; height: number };
   };
 };
 ```
@@ -168,8 +174,9 @@ CMS 接入时只替换 repository 的数据适配层；`/blog`、详情、首页
 `sitemap.xml` 不应改变数据读取方式。仓储只向公开页面返回 `published` 内容。
 
 静态导出在只有一页文章时会生成 `/blog/page/1/` 作为到 `/blog/` 的规范跳转，
-不会伪造 `/blog/page/2/`。当前七篇已发布文章已生成真实第二页，后续页数继续由
-统一仓储中的 published 数量自动推导。
+不会伪造 `/blog/page/2/`。当前十七篇已发布文章已生成真实第二、三页，后续页数继续由
+统一仓储中的 published 数量自动推导。同一天发布的文章按编辑源中的排列顺序展示，
+确保首页最新三篇与运营的实际发布顺序一致。
 
 内容逻辑由 `tests/blog/blog-core.test.ts` 覆盖；每次内容模型或 CMS 适配变更后
 必须运行 `npm test`。
@@ -184,4 +191,6 @@ CMS 接入时只替换 repository 的数据适配层；`/blog`、详情、首页
 - 明暗主题刷新后保持，键盘可切换，图片不被主题滤镜处理。
 - 相关文章固定最多三篇；列表固定每页六篇，不使用无限滚动。
 - 首页、列表、详情、静态分页与 sitemap 只读取统一仓储中的 published 内容。
-- `/blog/page/2/` 只在第七篇已发布文章出现后存在，不能返回 soft 404。
+- 静态分页只在对应文章数量达到后生成，不能返回 soft 404。
+- 已发布文章的 SEO 标题不超过 65 字符，描述保持在 100–170 字符，并有可解析尺寸的社交图片。
+- 生成产物中的首页、Blog 列表、分页和详情页均具备 title、description、canonical、robots、Open Graph 与 Twitter 元数据。

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 
 import { BlogIndex } from "@/components/blog/blog-index";
+import {
+  SMARTX_DEFAULT_SOCIAL_IMAGE,
+  SMARTX_INDEXABLE_ROBOTS,
+  SMARTX_OPEN_GRAPH_DEFAULTS,
+  SMARTX_TWITTER_DEFAULTS,
+} from "@/lib/site-metadata";
 
-const title = "SmartX Journal | Product thinking and market intelligence";
+const title = "SmartX Journal | Prediction Market Guides & Research";
 const description =
-  "Product thinking, market intelligence, and what comes next from SmartX.";
+  "Read SmartX Journal for prediction-market guides, product updates, smart money research, and practical analysis for sharper trading decisions.";
 
 export const metadata: Metadata = {
   title,
@@ -12,16 +18,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/blog/",
   },
+  robots: SMARTX_INDEXABLE_ROBOTS,
   openGraph: {
+    ...SMARTX_OPEN_GRAPH_DEFAULTS,
     title,
     description,
     url: "/blog/",
     type: "website",
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
-    card: "summary_large_image",
+    ...SMARTX_TWITTER_DEFAULTS,
     title,
     description,
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
 };
 

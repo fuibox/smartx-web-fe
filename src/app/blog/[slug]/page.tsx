@@ -19,8 +19,16 @@ import {
   formatBlogDate,
   formatBlogIndex,
   formatBlogReadTime,
-  resolveSmartXUrl,
 } from "@/lib/blog-format";
+import {
+  resolveSmartXUrl,
+  SMARTX_INDEXABLE_ROBOTS,
+  SMARTX_LOGO_URL,
+  SMARTX_OPEN_GRAPH_DEFAULTS,
+  SMARTX_ORGANIZATION_ID,
+  SMARTX_TWITTER_DEFAULTS,
+  SMARTX_WEBSITE_ID,
+} from "@/lib/site-metadata";
 
 type BlogPostPageProps = {
   params: Promise<{
@@ -74,35 +82,52 @@ export async function generateMetadata({
 
   if (!post) return {};
 
-  const title = post.seo?.title ?? `${post.title} | SmartX Journal`;
+  const title = post.seo?.title ?? post.title;
   const description = post.seo?.description ?? post.excerpt;
-  const socialImage = post.seo?.image ?? post.cover.src;
+  const socialImage = post.seo?.image ?? post.cover;
 
   return {
     title,
     description,
+    authors: [{ name: "SmartX", url: "https://smartx.io/" }],
+    creator: "SmartX",
+    publisher: "SmartX",
+    category: post.category,
     alternates: {
       canonical: `/blog/${post.slug}/`,
     },
+    robots: SMARTX_INDEXABLE_ROBOTS,
     openGraph: {
+      ...SMARTX_OPEN_GRAPH_DEFAULTS,
       title,
       description,
       url: `/blog/${post.slug}/`,
       type: "article",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
+      authors: ["https://smartx.io/"],
+      section: post.category,
       images: [
         {
-          url: socialImage,
-          alt: post.cover.alt,
+          url: socialImage.src,
+          width: socialImage.width,
+          height: socialImage.height,
+          alt: socialImage.alt,
         },
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      ...SMARTX_TWITTER_DEFAULTS,
       title,
       description,
-      images: [socialImage],
+      images: [
+        {
+          url: socialImage.src,
+          width: socialImage.width,
+          height: socialImage.height,
+          alt: socialImage.alt,
+        },
+      ],
     },
   };
 }
@@ -117,29 +142,45 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const readingStats = getBlogReadingStats(post);
   const readTime = formatBlogReadTime(readingStats.minutes);
   const articleUrl = `https://smartx.io/blog/${post.slug}/`;
-  const socialImage = post.seo?.image ?? post.cover.src;
+  const socialImage = post.seo?.image ?? post.cover;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
+    "@id": `${articleUrl}#article`,
+    url: articleUrl,
     headline: post.title,
     description: post.seo?.description ?? post.excerpt,
+    inLanguage: "en",
+    articleSection: post.category,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
     wordCount: readingStats.words + readingStats.cjkCharacters,
     timeRequired: `PT${readingStats.minutes}M`,
     mainEntityOfPage: articleUrl,
-    image: resolveSmartXUrl(socialImage),
+    isPartOf: { "@id": SMARTX_WEBSITE_ID },
+    image: {
+      "@type": "ImageObject",
+      url: resolveSmartXUrl(socialImage.src),
+      width: socialImage.width,
+      height: socialImage.height,
+      caption: socialImage.alt,
+    },
     author: {
       "@type": "Organization",
+      "@id": SMARTX_ORGANIZATION_ID,
       name: "SmartX",
       url: "https://smartx.io/",
     },
     publisher: {
       "@type": "Organization",
+      "@id": SMARTX_ORGANIZATION_ID,
       name: "SmartX",
+      url: "https://smartx.io/",
       logo: {
         "@type": "ImageObject",
-        url: "https://smartx.io/assets/smartx-logo.svg",
+        url: SMARTX_LOGO_URL,
+        width: 218,
+        height: 42,
       },
     },
   };

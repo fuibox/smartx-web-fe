@@ -25,9 +25,16 @@ function makeSource(
     publishedAt: "2026-07-01",
     title: "Example post",
     excerpt: "A stable test fixture.",
+    seo: {
+      title: "Example prediction market article",
+      description:
+        "A complete example description that explains the prediction-market article clearly enough for search and social previews.",
+    },
     cover: {
       src: "/assets/example.webp",
       alt: "Example cover",
+      width: 1200,
+      height: 630,
     },
     sections: [
       {
@@ -43,7 +50,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 7);
+  assert.equal(posts.length, 17);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -54,14 +61,33 @@ test("the production source validates into canonical body blocks", () => {
       ),
     ),
   );
+  assert.ok(
+    posts.every(
+      (post) =>
+        post.seo &&
+        post.seo.title.length <= 65 &&
+        post.seo.description.length >= 100 &&
+        post.seo.description.length <= 170,
+    ),
+  );
 
   const published = selectBlogPosts(posts, "published");
   const firstPage = paginateBlogPosts(published, 1, 6);
   const secondPage = paginateBlogPosts(published, 2, 6);
+  const thirdPage = paginateBlogPosts(published, 3, 6);
 
   assert.equal(firstPage.items.length, 6);
-  assert.equal(secondPage.items.length, 1);
-  assert.equal(secondPage.items[0]?.slug, "smartx-signal-bot-guide");
+  assert.equal(secondPage.items.length, 6);
+  assert.equal(thirdPage.items.length, 5);
+  assert.equal(thirdPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
+  assert.deepEqual(
+    firstPage.items.slice(0, 3).map((post) => post.slug),
+    [
+      "how-to-read-a-polymarket-wallet-and-what-the-data-actually-tells-you",
+      "how-to-think-about-probability-on-prediction-markets",
+      "the-psychology-of-trading-prediction-markets-and-why-most-traders-lose-more-than-they-should",
+    ],
+  );
 });
 
 test("normalization rejects mixed or empty section formats", () => {
@@ -94,6 +120,38 @@ test("normalization rejects mixed or empty section formats", () => {
   );
 });
 
+test("published posts require complete, concise SEO metadata", () => {
+  assert.throws(
+    () => normalizeBlogPost(makeSource({ seo: undefined })),
+    /seo is required for published posts/,
+  );
+  assert.throws(
+    () =>
+      normalizeBlogPost(
+        makeSource({
+          seo: {
+            title: "A".repeat(66),
+            description:
+              "A complete example description that explains the prediction-market article clearly enough for search and social previews.",
+          },
+        }),
+      ),
+    /seo.title must be 65 characters or fewer/,
+  );
+  assert.throws(
+    () =>
+      normalizeBlogPost(
+        makeSource({
+          seo: {
+            title: "A concise SEO title",
+            description: "Too short.",
+          },
+        }),
+      ),
+    /seo.description must be between 100 and 170 characters/,
+  );
+});
+
 test("published selection is filtered and sorted before pagination", () => {
   const posts = normalizeBlogPosts([
     makeSource({ slug: "older", publishedAt: "2026-06-01" }),
@@ -117,6 +175,18 @@ test("published selection is filtered and sorted before pagination", () => {
   assert.equal(firstPage.items[0]?.slug, "newer");
   assert.equal(secondPage.items[0]?.slug, "older");
   assert.deepEqual(paginateBlogPosts(published, 3, 1).items, []);
+});
+
+test("same-day releases preserve editorial source order", () => {
+  const posts = normalizeBlogPosts([
+    makeSource({ slug: "published-first", publishedAt: "2026-08-03" }),
+    makeSource({ slug: "published-second", publishedAt: "2026-08-03" }),
+  ]);
+
+  assert.deepEqual(
+    selectBlogPosts(posts, "published").map((post) => post.slug),
+    ["published-first", "published-second"],
+  );
 });
 
 test("reading time is derived from canonical body content", () => {

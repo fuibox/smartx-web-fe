@@ -4,6 +4,15 @@ import { V4Hero } from "@/components/v4/hero";
 import { V4StoryPage } from "@/components/v4/story-page";
 import styles from "@/components/v4/v4.module.css";
 import { getLatestBlogPosts } from "@/content/blog-repository";
+import {
+  SMARTX_DEFAULT_SOCIAL_IMAGE,
+  SMARTX_INDEXABLE_ROBOTS,
+  SMARTX_LOGO_URL,
+  SMARTX_OPEN_GRAPH_DEFAULTS,
+  SMARTX_ORGANIZATION_ID,
+  SMARTX_TWITTER_DEFAULTS,
+  SMARTX_WEBSITE_ID,
+} from "@/lib/site-metadata";
 
 const title = "SmartX | The first AI trading terminal that understands you";
 const description =
@@ -13,10 +22,17 @@ const structuredData = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://smartx.io/#org",
+      "@id": SMARTX_ORGANIZATION_ID,
       name: "SmartX",
       url: "https://smartx.io/",
-      logo: "https://smartx.io/opengraph-image.png",
+      logo: {
+        "@type": "ImageObject",
+        "@id": "https://smartx.io/#logo",
+        url: SMARTX_LOGO_URL,
+        contentUrl: SMARTX_LOGO_URL,
+        width: 218,
+        height: 42,
+      },
       description,
       sameAs: [
         "https://x.com/SmartXTerminal",
@@ -26,11 +42,12 @@ const structuredData = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://smartx.io/#site",
+      "@id": SMARTX_WEBSITE_ID,
       url: "https://smartx.io/",
       name: "SmartX",
+      inLanguage: "en",
       description: "The first AI trading terminal that understands you",
-      publisher: { "@id": "https://smartx.io/#org" },
+      publisher: { "@id": SMARTX_ORGANIZATION_ID },
     },
     {
       "@type": "SoftwareApplication",
@@ -38,6 +55,7 @@ const structuredData = {
       name: "SmartX",
       applicationCategory: "FinanceApplication",
       operatingSystem: "Web",
+      inLanguage: "en",
       url: "https://app.smartx.io/",
       image: "https://smartx.io/opengraph-image.png",
       description:
@@ -57,29 +75,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: SMARTX_INDEXABLE_ROBOTS,
   openGraph: {
+    ...SMARTX_OPEN_GRAPH_DEFAULTS,
     title,
     description,
     url: "/",
     type: "website",
-    images: [
-      {
-        url: "/opengraph-image.png",
-        width: 1200,
-        height: 630,
-        alt: "SmartX — The AI trading terminal that understands you",
-      },
-    ],
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
-    card: "summary_large_image",
+    ...SMARTX_TWITTER_DEFAULTS,
     title,
     description,
-    images: ["/opengraph-image.png"],
+    images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
 };
 

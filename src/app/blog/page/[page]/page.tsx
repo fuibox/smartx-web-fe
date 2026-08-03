@@ -3,6 +3,12 @@ import { notFound, redirect } from "next/navigation";
 
 import { BlogIndex } from "@/components/blog/blog-index";
 import { getBlogArchivePageCount } from "@/content/blog-repository";
+import {
+  SMARTX_DEFAULT_SOCIAL_IMAGE,
+  SMARTX_INDEXABLE_ROBOTS,
+  SMARTX_OPEN_GRAPH_DEFAULTS,
+  SMARTX_TWITTER_DEFAULTS,
+} from "@/lib/site-metadata";
 
 type BlogArchivePageProps = {
   params: Promise<{ page: string }>;
@@ -35,7 +41,11 @@ export async function generateMetadata({
   if (pageNumber === 1) {
     return {
       alternates: { canonical: "/blog/" },
-      robots: { index: false, follow: true },
+      robots: {
+        index: false,
+        follow: true,
+        googleBot: { index: false, follow: true },
+      },
     };
   }
 
@@ -47,25 +57,28 @@ export async function generateMetadata({
     return {};
   }
 
-  const title = `SmartX Journal — Page ${pageNumber}`;
-  const description =
-    "Product thinking, market intelligence, and what comes next from SmartX.";
+  const title = `SmartX Journal: Prediction Market Research — Page ${pageNumber}`;
+  const description = `Browse page ${pageNumber} of SmartX Journal for prediction-market guides, market intelligence, product updates, and practical research from SmartX.`;
   const canonical = `/blog/page/${pageNumber}/`;
 
   return {
     title,
     description,
     alternates: { canonical },
+    robots: SMARTX_INDEXABLE_ROBOTS,
     openGraph: {
+      ...SMARTX_OPEN_GRAPH_DEFAULTS,
       title,
       description,
       url: canonical,
       type: "website",
+      images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
     },
     twitter: {
-      card: "summary_large_image",
+      ...SMARTX_TWITTER_DEFAULTS,
       title,
       description,
+      images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
     },
   };
 }
