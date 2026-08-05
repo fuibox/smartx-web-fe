@@ -50,7 +50,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 17);
+  assert.equal(posts.length, 19);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -75,11 +75,14 @@ test("the production source validates into canonical body blocks", () => {
   const firstPage = paginateBlogPosts(published, 1, 6);
   const secondPage = paginateBlogPosts(published, 2, 6);
   const thirdPage = paginateBlogPosts(published, 3, 6);
+  const fourthPage = paginateBlogPosts(published, 4, 6);
 
   assert.equal(firstPage.items.length, 6);
   assert.equal(secondPage.items.length, 6);
-  assert.equal(thirdPage.items.length, 5);
-  assert.equal(thirdPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
+  assert.equal(thirdPage.items.length, 6);
+  assert.equal(fourthPage.items.length, 1);
+  assert.equal(firstPage.totalPages, 4);
+  assert.equal(fourthPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
   assert.deepEqual(
     firstPage.items.slice(0, 3).map((post) => post.slug),
     [

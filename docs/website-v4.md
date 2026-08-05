@@ -152,7 +152,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
 | **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；Footer 已按 Product / Legal 分组 |
-| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 十七篇 `/blog/[slug]` 详情；已迁入截至 2026-08-03 的官方 Medium 全部文章，Medium 地址只作内部溯源 |
+| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 十九篇 `/blog/[slug]` 详情；已迁入截至 2026-08-03 的官方 Medium 全部文章，Medium 地址只作内部溯源 |
 
 桌面首版已在 `1440 × 900` 浏览器逐屏验收；大屏舞台已在 `1920 × 1080` 与约 `2500 × 1280` 浏览器逐屏回归，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
@@ -168,7 +168,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 SEO 上线验收顺序：
 
-1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前十七篇文章时应为 21 条 URL。
+1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前十九篇文章时应为 24 条 URL。
 2. 在 Search Console 重新提交或刷新 `sitemap.xml`。Search Console 的 discovered pages 可能延迟更新，不以提交当下的数字判断失败。
 3. 用 Google Rich Results Test 检查首页的 Organization / WebSite / SoftwareApplication，以及文章页的 BlogPosting。
 4. Terms of Service 与 Privacy Policy 必须返回 200，不允许发布带 404 的 Legal 导航。
@@ -204,7 +204,7 @@ src/components/v4/
   v4.module.css                  Hero 与共享 tokens
 src/components/blog/             Blog 编辑化页面组件与样式
 src/components/site/             Blog 页眉与全站共享 Footer
-src/content/blog-posts.ts        当前十七篇本地编辑源（不被页面直接导入）
+src/content/blog-posts.ts        当前十九篇本地编辑源（不被页面直接导入）
 src/content/blog-types.ts        Blog 摘要、详情与正文块契约
 src/content/blog-core.ts         内容验证、规范化、分页与阅读时长
 src/content/blog-repository.ts   首页/Blog/sitemap 的统一发布数据入口
