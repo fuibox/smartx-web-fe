@@ -50,7 +50,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 19);
+  assert.equal(posts.length, 21);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -80,7 +80,7 @@ test("the production source validates into canonical body blocks", () => {
   assert.equal(firstPage.items.length, 6);
   assert.equal(secondPage.items.length, 6);
   assert.equal(thirdPage.items.length, 6);
-  assert.equal(fourthPage.items.length, 1);
+  assert.equal(fourthPage.items.length, 3);
   assert.equal(firstPage.totalPages, 4);
   assert.equal(fourthPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
   assert.deepEqual(
