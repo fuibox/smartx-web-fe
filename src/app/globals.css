@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Inter, self-hosted like the other two faces. AGENTS.md and CLAUDE.md both
+   name it as the face that carries every piece of reading text, but it was
+   never declared, so `--font-ui` fell through to the OS default: Segoe UI on
+   Windows, San Francisco on macOS. Latin subset only; the site has no CJK. */
+@font-face {
+  font-family: Inter;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/Inter-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/Inter-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/Inter-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/Inter-700.woff2") format("woff2");
+}
+
 @font-face {
   font-family: JetBrainsMono;
   font-weight: 400;
@@ -33,7 +65,10 @@
 :root {
   --font-jb: JetBrainsMono, monospace;
   --font-pixel: PixelOperatorMono, monospace;
+  /* Left as the OS stack so nothing outside the blog changes shape in this
+     pass. `--font-inter` is the one the blog opts into. */
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-inter: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * {

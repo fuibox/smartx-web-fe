@@ -30,7 +30,7 @@
     96px 96px;
   color: var(--paper);
   color-scheme: dark;
-  font-family: var(--font-ui);
+  font-family: var(--font-inter);
 }
 
 :global(html[data-blog-theme="light"]) .page {
@@ -41,7 +41,10 @@
   --paper: #0d1c22;
   --body: #263940;
   --muted: #536870;
-  --dim: #6a7e85;
+  /* Was #6a7e85, which is 3.87:1 on this canvas. The token carries the meta
+     line, and that line is 11px, so it was the smallest text on the page and
+     the only thing failing AA. #5c7078 reads as the same grey at 4.72:1. */
+  --dim: #5c7078;
   --canvas-wash: rgba(241, 245, 242, 0.965);
   --grid-line: rgba(31, 72, 68, 0.045);
   --rule: rgba(34, 64, 69, 0.15);
@@ -101,57 +104,113 @@
   text-transform: uppercase;
 }
 
-.journalHero {
+/* Masthead.
+   The old hero was three columns of unequal weight over 348px, with the title
+   at 88px and a 42px story count competing with it, and the reader reached the
+   first headline 470px down. A masthead's job is to say what the publication
+   is and hand over; this one states the name, the beat and the shape of the
+   archive in a third of the height. */
+.masthead {
   position: relative;
   z-index: 1;
-  display: grid;
   width: min(100% - 64px, 1248px);
-  min-height: 348px;
-  align-items: end;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.65fr) 150px;
-  gap: clamp(36px, 6vw, 92px);
   margin: 0 auto;
-  padding: 76px 0 52px;
-  border-bottom: 1px solid var(--rule);
+  padding: 56px 0 0;
 }
 
-.journalHero h1 {
-  margin: 24px 0 0;
+/* The name is printed once. It had appeared as a teal kicker and again as the
+   wordmark directly beneath, with the archive month trailing the kicker as a
+   third fragment. The month is gone too: every entry already carries its own
+   date, the lead's date sits beside the lead, and a masthead folio taken from
+   the newest post is a fact the page states three times. */
+.masthead h1 {
+  margin: 0;
   font-family: var(--font-pixel);
-  font-size: clamp(56px, 6.2vw, 88px);
+  font-size: clamp(40px, 4.2vw, 58px);
   font-weight: 700;
-  line-height: 0.9;
+  line-height: 0.92;
   letter-spacing: 0;
 }
 
-.journalHero > p {
-  margin: 0 0 6px;
-  color: var(--body);
-  font-size: 15px;
-  line-height: 1.75;
+/* Under the wordmark, not beside it. Sitting to the right of a 58px display
+   title and bottom-aligned to it, the line read as a caption that had drifted:
+   body-sized type holding a display slot. A standfirst is its own line, and
+   larger than the body it introduces. */
+/* One line on a desktop measure, and two colours rather than one. At --body it
+   was the same grey as the excerpts below, so the line introducing the
+   publication spoke in the voice of its own captions; at --paper it competed
+   with the wordmark directly above it. Splitting it lets the remit stay quiet
+   and the promise carry the accent, which is what the sentence is actually
+   doing. */
+.mastheadLede {
+  max-width: none;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: clamp(16px, 1.3vw, 18px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: -0.008em;
 }
 
-.heroIndex {
-  display: grid;
-  justify-items: end;
-  padding-left: 28px;
-  border-left: 1px solid var(--rule);
+.mastheadLede span {
+  color: var(--teal);
+}
+
+/* The desks, counted. Reads as the masthead's second line rather than as a
+   control: nothing here is clickable, so nothing here looks clickable. */
+.deskIndex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 30px 0 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.deskIndex > div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 13px 22px 13px 0;
+  margin-right: 22px;
+  border-right: 1px solid var(--rule);
+}
+
+/* The last desk and the total both end their run, so neither carries a divider
+   into empty space. */
+.deskIndex > div:last-child,
+.deskIndex > div:nth-last-child(2) {
+  margin-right: 0;
+  border-right: 0;
+}
+
+.deskIndex dt {
+  color: var(--muted);
   font-family: var(--font-jb);
-}
-
-.heroIndex span,
-.heroIndex small {
-  color: var(--dim);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.heroIndex strong {
-  margin: 13px 0 9px;
+.deskIndex dd {
+  margin: 0;
+  color: var(--paper);
+  font-family: var(--font-jb);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.deskTotal {
+  margin-left: auto;
+  padding-right: 0 !important;
+}
+
+.deskTotal dt {
   color: var(--teal);
-  font-size: 42px;
-  line-height: 1;
+}
+
+.deskTotal dd {
+  color: var(--teal);
 }
 
 .storyArchive {
@@ -159,18 +218,74 @@
   z-index: 1;
   width: min(100% - 64px, 1248px);
   margin: 0 auto;
-  padding: 0 0 136px;
+  padding: 0 0 72px;
 }
 
+/* No rule here. The archive heading below carries its own, and the two sat 57px
+   apart with the label floating between them, which read as a box that had
+   failed to line up rather than as two sections. The heading's rule is the
+   list's top edge; one line does both jobs. */
 .featuredStory {
-  border-bottom: 1px solid var(--rule-strong);
+  border-bottom: 0;
 }
 
 .featuredStory > a {
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr);
-  gap: clamp(38px, 5vw, 74px);
-  padding: 36px 0 42px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1.06fr) minmax(360px, 0.94fr);
+  gap: clamp(34px, 4.4vw, 62px);
+  padding: 40px 0 44px;
+}
+
+/* Says which one is the lead, on the same line as the story's own metadata
+   rather than stacked above it. Three label rows ran ahead of the headline
+   before this; now there is one. */
+.leadLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-bottom: 22px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.leadMarker {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--teal-rule);
+  background: var(--teal-wash);
+  color: var(--teal);
+  font-family: var(--font-jb);
+  /* The size sits here rather than on a bare class because
+     `.featuredStoryCopy > p` outranks a single class and was silently holding
+     this at 14px. */
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The teal tick before the category is the same colour as the category itself,
+   so beside a teal badge the two ran together as one shape. The badge is the
+   accent on this row; the category is not. */
+.leadLine .storyMeta span {
+  color: var(--muted);
+}
+
+.leadLine .storyMeta span::before {
+  display: none;
+}
+
+.featuredDek {
+  max-width: 46ch;
+  margin: 16px 0 0 !important;
+  color: var(--body) !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
 }
 
 .coverVisual {
@@ -193,6 +308,13 @@
   border-radius: inherit;
   content: "";
   pointer-events: none;
+}
+
+/* The covers are dark artwork whichever theme is on. On the light page a
+   0.15-alpha rule against a near-black image is invisible, so the picture read
+   as a hole punched in the paper rather than a framed image. */
+:global(html[data-blog-theme="light"]) .coverVisual::after {
+  border-color: rgba(13, 28, 34, 0.5);
 }
 
 .coverVisual img {
@@ -234,6 +356,14 @@
   text-transform: uppercase;
 }
 
+/* `small` carries a 0.8em user-agent size, so the read time was rendering at
+   8.8px against a stated 11px floor. The element is here for its meaning, not
+   its size. */
+.storyMeta small,
+.articleMeta small {
+  font-size: inherit;
+}
+
 .storyMeta span,
 .articleMeta span {
   display: inline-flex;
@@ -260,14 +390,20 @@
   content: "/";
 }
 
+/* Headlines are reading text, not a manifesto. PixelOperatorMono is reserved
+   for the section declarations and the logo precisely because a bitmap face
+   loses its letterforms at sentence length: at 30px "Why" read as "Uhy" and
+   "Need" as "Heed" in the list below. The page title stays pixel; everything
+   a reader has to actually parse is Inter. */
 .featuredStory h2 {
-  max-width: 520px;
-  margin: 24px 0 0;
-  font-family: var(--font-pixel);
-  font-size: clamp(28px, 2.7vw, 38px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: 0;
+  max-width: 560px;
+  margin: 22px 0 0;
+  font-family: var(--font-inter);
+  font-size: clamp(27px, 2.5vw, 34px);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.021em;
+  text-wrap: balance;
 }
 
 .featuredStoryCopy > p {
@@ -296,51 +432,125 @@
   font-style: normal;
 }
 
-.storyRows {
+/* The section rule between the lead and the archive, so the two are read as
+   different orders of importance rather than one long list. */
+.archiveHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0;
+  padding: 46px 0 14px;
   border-bottom: 1px solid var(--rule-strong);
 }
 
-.storyRows article + article {
+/* Both halves in the same voice. Sentence-case Inter on the left against
+   letterspaced mono on the right read as two labels from two different
+   designs; the page already speaks in mono kickers, so this one does too. */
+.archiveHeading span,
+.archiveHeading i {
+  font-family: var(--font-jb);
+  font-size: 11px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.archiveHeading span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.archiveHeading i {
+  color: var(--dim);
+}
+
+.storyRows {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--rule-strong);
+  list-style: none;
+}
+
+.storyRows li + li {
   border-top: 1px solid var(--rule);
 }
 
+/* An index is for scanning. At 42px of padding around a 30px two-line title
+   each entry ran 185-241px, so six stories filled two and a half screens and
+   no two headlines could be compared without scrolling. The thumbnail earns
+   its column: every post already ships its own cover, and the list had been
+   throwing all twenty-one of them away. */
 .storyRows a {
   display: grid;
   align-items: center;
-  grid-template-columns: 74px minmax(0, 1fr) 42px;
-  gap: 30px;
-  padding: 42px 0;
+  grid-template-columns: 42px 224px minmax(0, 1fr) 38px;
+  gap: 26px;
+  padding: 18px 0;
+}
+
+.storyThumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+/* The covers are authored at 1400x788, so anything other than 16:9 crops them.
+   At 3:2 the box was cutting 15% off the sides of every banner, and at 148px
+   there was not enough of one left to recognise. */
+.storyThumb .coverVisual {
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 3px;
+}
+
+.storyCopy {
+  min-width: 0;
 }
 
 .storyNumber {
-  align-self: start;
+  align-self: center;
   color: var(--dim);
   font-family: var(--font-jb);
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.storyRows h2 {
-  max-width: 790px;
-  margin: 16px 0 0;
-  font-family: var(--font-pixel);
-  font-size: clamp(24px, 2.25vw, 30px);
-  font-weight: 700;
-  line-height: 1.14;
-  letter-spacing: 0;
+/* Wide enough that a headline of ordinary length lands on one line. At 46ch
+   most of these wrapped, which both doubled the row and left two thirds of a
+   1,248px row empty. `pretty` only tidies the last line of the few that still
+   wrap; `balance` was splitting one-line titles into two short ones. */
+.storyRows h3 {
+  max-width: 62ch;
+  margin: 8px 0 0;
+  font-family: var(--font-inter);
+  font-size: clamp(18px, 1.45vw, 21px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.014em;
+  text-wrap: pretty;
 }
 
+/* One line, clipped. In a list the excerpt is a hint about the headline, not a
+   second headline: at two and three lines it doubled the row and buried the
+   next title. */
 .storyRows p {
-  max-width: 700px;
-  margin: 13px 0 0;
+  display: -webkit-box;
+  max-width: 78ch;
+  margin: 6px 0 0;
+  overflow: hidden;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: 13.5px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 
 .storyArrow {
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   place-items: center;
   border: 1px solid var(--rule-strong);
   color: var(--teal);
@@ -419,7 +629,7 @@
   .coverVisual img,
   .storyMeta span::before,
   .featuredStory h2,
-  .storyRows h2,
+  .storyRows h3,
   .storyRows a,
   .storyArrow,
   .pagination a,
@@ -447,7 +657,7 @@
   }
 
   .featuredStory a:hover h2,
-  .storyRows a:hover h2,
+  .storyRows a:hover h3,
   .relatedStories a:hover h3 {
     color: var(--teal);
   }
@@ -980,19 +1190,24 @@
 }
 
 @media (max-width: 900px) {
-  .journalHero {
-    min-height: 340px;
-    grid-template-columns: minmax(0, 1fr) 140px;
+  .mastheadRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
 
-  .journalHero > p {
-    grid-column: 1;
-    grid-row: 2;
+  .mastheadLede {
+    max-width: 46ch;
+    margin-bottom: 0;
   }
 
-  .heroIndex {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+  /* The thumbnail is the first thing to go when the row narrows: at this width
+     it costs more than it returns. */
+  .storyRows a {
+    grid-template-columns: 42px minmax(0, 1fr) 38px;
+  }
+
+  .storyThumb {
+    display: none;
   }
 
   .featuredStory > a {
@@ -1042,7 +1257,7 @@
     display: none;
   }
 
-  .journalHero,
+  .masthead,
   .storyArchive,
   .articleHeader,
   .articleLayout,
@@ -1050,41 +1265,34 @@
     width: min(100% - 40px, 1248px);
   }
 
-  .journalHero {
-    min-height: 0;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-    padding: 82px 0 48px;
+  .masthead {
+    padding: 40px 0 0;
   }
 
-  .journalHero h1 {
-    font-size: clamp(46px, 14vw, 62px);
+  .masthead h1 {
+    font-size: clamp(38px, 11vw, 50px);
   }
 
-  .journalHero > p {
-    grid-row: auto;
+  /* Scrolls sideways rather than stacking into six rows of two words. */
+  .deskIndex {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-top: 24px;
+    scrollbar-width: none;
   }
 
-  .journalHero > p br {
+  .deskIndex::-webkit-scrollbar {
     display: none;
   }
 
-  .heroIndex {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    grid-column: 1;
-    grid-row: auto;
-    gap: 14px;
-    padding: 18px 0 0;
-    border-top: 1px solid var(--rule);
-    border-left: 0;
+  .deskIndex > div {
+    flex: none;
+    padding: 11px 16px 11px 0;
+    margin-right: 16px;
   }
 
-  .heroIndex strong {
-    order: -1;
-    margin: 0;
-    font-size: 30px;
+  .deskTotal {
+    margin-left: 0;
   }
 
   .storyArchive {
@@ -1104,14 +1312,17 @@
     font-size: 28px;
   }
 
+  /* Kept below the desktop rhythm rather than above it. This was 32px while
+     desktop is 24px, so a narrow screen scrolled further per story than a wide
+     one. */
   .storyRows a {
     grid-template-columns: 34px minmax(0, 1fr);
     gap: 16px;
-    padding: 32px 0;
+    padding: 20px 0;
   }
 
-  .storyRows h2 {
-    font-size: 22px;
+  .storyRows h3 {
+    font-size: 18px;
   }
 
   .storyArrow {
@@ -1218,7 +1429,7 @@
   .coverVisual img,
   .storyMeta span::before,
   .featuredStory h2,
-  .storyRows h2,
+  .storyRows h3,
   .storyRows a,
   .storyArrow,
   .pagination a,
