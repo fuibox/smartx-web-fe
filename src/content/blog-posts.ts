@@ -6,6 +6,748 @@ import type { BlogPostSource } from "./blog-types";
  */
 export const BLOG_POST_SOURCES = [
   {
+    slug: "how-to-win-on-polymarket-the-systems-that-separate-consistent-traders-from-the-rest",
+    status: "published",
+    category: "Guide",
+    publishedAt: "2026-08-15",
+    title: "How to Win on Polymarket: The Systems That Separate Consistent Traders from the Rest",
+    dek: "Winning consistently is less about prediction skill than the systems that govern market selection, risk, and review.",
+    excerpt: "A practical operating system for filtering markets, checking trades, measuring category performance, and controlling drawdowns.",
+    seo: {
+      title: "How to Win on Polymarket with a Repeatable Trading System",
+      description:
+        "Build a repeatable Polymarket trading system with market filters, pre-trade checks, category-level performance tracking, and drawdown rules.",
+    },
+    cover: {
+      src: "/assets/updates/how-to-win-on-polymarket.webp",
+      alt: "How to Win on Polymarket: The Systems That Separate Consistent Traders from the Rest",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/how-to-win-on-polymarket-the-systems-that-separate-consistent-traders-from-the-rest-e9329bfb11df",
+    sections: [
+      {
+        id: "why-consistent-winning-requires-structure",
+        heading: "Why consistent winning requires structure",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "“How do I win on Polymarket?” is the most common question from new prediction market traders. The honest answer is that winning consistently requires something most people don’t expect: structure.",
+          },
+          {
+            type: "paragraph",
+            text: "Not prediction skill. Not superior intelligence. Not access to proprietary data. Structure — a set of systems that force you to be disciplined about where you trade, how much you risk, and how you evaluate your performance over time.",
+          },
+          {
+            type: "paragraph",
+            text: "The traders who show up consistently on Polymarket leaderboards aren’t necessarily smarter than everyone else. They’ve built better systems.",
+          },
+        ],
+      },
+      {
+        id: "system-1-a-market-filter",
+        heading: "System 1: A market filter",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The first thing consistent Polymarket winners have is a filter for which markets they’ll consider trading at all. This filter is usually narrow. It might be: only NBA games, only Fed meeting outcomes, only soccer matches in the top five European leagues.",
+          },
+          {
+            type: "paragraph",
+            text: "If you don’t have a filter, you’re implicitly saying “I can have an edge in any market.” That’s almost certainly not true. The filter exists to protect you from the large number of markets where you’re guessing rather than edge-trading.",
+          },
+        ],
+      },
+      {
+        id: "system-2-a-pre-trade-checklist",
+        heading: "System 2: A pre-trade checklist",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Before entering any position, run through a short checklist: What’s the current market probability? What’s my estimated probability, and why is it different? What information or analysis supports my estimate? What’s my entry size? What’s my exit condition (profit target and loss limit)? Does this market have sufficient liquidity at my intended size?",
+          },
+          {
+            type: "paragraph",
+            text: "If you can’t answer these questions, you’re not ready to trade the market. The checklist takes two minutes and eliminates a large class of trades that lose money.",
+          },
+        ],
+      },
+      {
+        id: "system-3-categorized-performance-tracking",
+        heading: "System 3: Categorized performance tracking",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Winning on Polymarket isn’t about winning all your trades. It’s about winning more in the categories where you have edge and losing less in the ones where you don’t. The only way to know the difference is to track your results by category.",
+          },
+          {
+            type: "paragraph",
+            text: "Most traders track total P&L. The better metric is win rate and ROI broken down by market category. You might find that your sports markets return 18% on capital deployed while your political markets return -7%. That’s not a signal to fix your political market analysis — it’s a signal to stop trading political markets.",
+          },
+        ],
+      },
+      {
+        id: "system-4-a-drawdown-rule",
+        heading: "System 4: A drawdown rule",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Every consistent Polymarket trader has a drawdown rule: a maximum loss percentage that triggers a mandatory pause and review. Common versions are 10%, 15%, or 20% of account equity.",
+          },
+          {
+            type: "paragraph",
+            text: "When you hit your drawdown limit, you stop trading for at least a week and review every losing trade in detail. The review isn’t about beating yourself up — it’s about identifying whether the losses were due to bad process or bad variance. One of these needs to change. The other doesn’t.",
+          },
+        ],
+      },
+      {
+        id: "what-winning-looks-like-in-practice",
+        heading: "What winning looks like in practice",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "A consistent Polymarket winner over a 12-month period might have a 58% win rate in their specialty category, an average ROI of 20–25% on capital deployed, and a maximum drawdown of 15–18%. They’re not batting 1.000. They’re not making 200%. They’re running a repeatable process that generates positive expected value.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX helps traders build and track exactly this kind of system — giving you a clear view of your performance by category, your calibration, and where your edge actually lives in your trading history.",
+          },
+          {
+            type: "paragraph",
+            text: "Start building your system at app.smartx.io.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "skill-in-prediction-markets-is-real-copying-it-still-loses-money",
+    status: "published",
+    category: "Intelligence",
+    publishedAt: "2026-08-14",
+    title: "Skill in prediction markets is real. Copying it still loses money.",
+    dek: "What 741,322 on-chain fills say about following the best traders, and why both halves of that sentence are true at once.",
+    excerpt: "A split-sample study finds persistent trader skill but no profitable copy-trading return, even under an impossible zero-delay assumption.",
+    seo: {
+      title: "Prediction Market Skill Is Real—Why Copy Trading Still Loses",
+      description:
+        "Analysis of 741,322 on-chain fills finds persistent prediction market skill, yet copying top traders still loses money even with zero delay.",
+    },
+    cover: {
+      src: "/assets/updates/skill-in-prediction-markets.webp",
+      alt: "Skill in prediction markets is real. Copying it still loses money.",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/skill-in-prediction-markets-is-real-copying-it-still-loses-money-e02bdf6ae1de",
+    sections: [
+      {
+        id: "the-promise-we-tested",
+        heading: "The promise we tested",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Every product in this category sells the same promise. Find the wallets that win, put their trades in front of you, and let their skill become your returns. It is an easy promise to make because the first half is testable and the second half never gets tested.",
+          },
+          {
+            type: "paragraph",
+            text: "So we tested both.",
+          },
+          {
+            type: "paragraph",
+            text: "We pulled 741,322 settled fills from public prediction market data across three categories, measured whether the traders who did well in one set of events also did well in a completely different set, and then measured what happened to someone who simply copied them.",
+          },
+          {
+            type: "paragraph",
+            text: "The answers point in opposite directions, and the gap between them is the entire problem with how following is sold today.",
+          },
+        ],
+      },
+      {
+        id: "first-the-part-everyone-gets-right",
+        heading: "First, the part everyone gets right",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Skill is real. It persists across events. It is not an illusion produced by a few lucky months.",
+          },
+          {
+            type: "paragraph",
+            text: "To check this we needed a design that could not flatter itself. If you rank traders on a set of results and then measure them on the same results, you have proven that winners won. That is a tautology dressed as a finding.",
+          },
+          {
+            type: "paragraph",
+            text: "Instead we split each category’s events into two halves. Call them set A and set B. A trader had to have traded in both, with at least five fills in each, to be counted at all. We ranked everyone on set A only, then went and looked at what those same addresses did in set B, which had no part in the ranking.",
+          },
+          {
+            type: "paragraph",
+            text: "If skill is real, the set A ranking should predict set B results. If it is noise, it should predict nothing.",
+          },
+          {
+            type: "paragraph",
+            text: "Sports covers 400,529 fills across 29 separate events, from 63,298 addresses, of which 838 met the both-halves requirement. Politics covers 274,747 fills across 65 events and 363 qualifying addresses. Crypto covers 66,046 fills across 47 events and 126 qualifying addresses.",
+          },
+          {
+            type: "paragraph",
+            text: "A correlation of 0.712 between two disjoint sets of events is not subtle. Restrict it to addresses with twenty or more trades and sports rises to 0.754 and politics to 0.797. More evidence per trader, cleaner signal, exactly as you would expect if the thing being measured is real.",
+          },
+          {
+            type: "paragraph",
+            text: "We also removed the World Cup from the sports sample, because a single tournament with long-dated positions can manufacture correlation on its own. Correlation went up, from 0.440 to 0.712. The effect was not a scheduling artifact. It was being hidden by one.",
+          },
+          {
+            type: "paragraph",
+            text: "There is a second finding buried in that table that almost nobody talks about.",
+          },
+          {
+            type: "paragraph",
+            text: "Being bad is more persistent than being good. In crypto the bottom group went from -77.4% to -76.1%. They barely regressed at all. The top group fell from 55.3% to 20.4%. Losing money is a more reliable trait than making it, which is uncomfortable and also useful, and we will come back to it.",
+          },
+        ],
+      },
+      {
+        id: "now-the-part-that-gets-sold-and-never-checked",
+        heading: "Now the part that gets sold and never checked",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "If skill persists, copying it should work. That is the whole pitch.",
+          },
+          {
+            type: "paragraph",
+            text: "We took the sports data, ranked addresses on set A, and selected the top 64 by ROI. Their average set A return was 56.1%. By any reasonable definition these are the traders a follow product would put in front of you.",
+          },
+          {
+            type: "paragraph",
+            text: "Then we followed them. Not on set A, where they were selected. On set B, which had nothing to do with the ranking.",
+          },
+          {
+            type: "paragraph",
+            text: "Those 64 addresses produced 10,841 fills in set B. Of those, 860 were buys at prices that could actually be followed, meaning not already pinned against 0 or 1 where nothing is left to capture. We simulated buying each of those 860 positions at the price available zero, five, fifteen, thirty, sixty, and one hundred eighty minutes after the original fill.",
+          },
+          {
+            type: "paragraph",
+            text: "Read the first row again. At zero delay the follower makes -0.10%.",
+          },
+          {
+            type: "paragraph",
+            text: "Zero delay means you saw the fill and got the exact same price, instantly, with no slippage and no competition. It is a physically impossible advantage and it still does not work. Which means the problem was never latency. Every article about copy trading that ends with “you need to be faster” is solving a problem that is not there.",
+          },
+        ],
+      },
+      {
+        id: "both-findings-are-true-and-here-is-how",
+        heading: "Both findings are true, and here is how",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "This looks like a contradiction. The traders are demonstrably skilled. Copying their trades returns nothing. Pick one.",
+          },
+          {
+            type: "paragraph",
+            text: "You do not have to. The two measurements count different things.",
+          },
+          {
+            type: "paragraph",
+            text: "The correlation test measures ROI per address. It asks whether a person who returned well on one set of events returns well on another. The follow test measures ROI per fill. It asks whether an individual trade, entered at an observable price, made money.",
+          },
+          {
+            type: "paragraph",
+            text: "Those come apart when returns are concentrated. If a trader’s year is made by a small number of large, well-timed positions and paid for by a long tail of small losing ones, their per-address ROI can be excellent while their average fill sits near zero. Copying every fill buys the tail along with the wins, at prices that have already moved.",
+          },
+          {
+            type: "paragraph",
+            text: "Which points at what the skill actually is.",
+          },
+          {
+            type: "paragraph",
+            text: "Their edge is in which markets they enter and when they leave, not in the entry price you can see. By the time a fill is public it has already done its work on the order book. The information that made the trade good was available before the trade, not inside it. Copying the fill copies the residue.",
+          },
+          {
+            type: "paragraph",
+            text: "This is also why the bottom group persists so stubbornly. A bad trader is not making one large mistake you could avoid by not copying one trade. They are making a structural error in market selection, repeatedly, and it shows up in every fill they place.",
+          },
+        ],
+      },
+      {
+        id: "what-this-means-if-you-are-actually-trading",
+        heading: "What this means if you are actually trading",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Three things follow from this, and none of them is “stop paying attention to other traders.”",
+          },
+          {
+            type: "paragraph",
+            text: "A track record is evidence about a person, not an instruction about a trade. The correlation is real. A trader with a strong record across separate events is genuinely more likely to be right than a random address. That fact is worth knowing. It just does not convert into “buy what they bought” without losing everything in the conversion.",
+          },
+          {
+            type: "paragraph",
+            text: "Timing signals from fills are worth roughly nothing. We measured this directly at six delays and the best number in the table is -0.06%. If a product’s entire value proposition is showing you fills faster, the data says the speed is not the constraint.",
+          },
+          {
+            type: "paragraph",
+            text: "Avoiding bad traders is more reliable than following good ones. This is the finding we did not expect and the one we would act on first. The bottom group’s persistence is higher than the top group’s. If you are going to use other people’s records for anything, use them to filter out the noise before you use them to find signal.",
+          },
+        ],
+      },
+      {
+        id: "what-we-are-building-from-it",
+        heading: "What we are building from it",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "We run SmartX because of the gap in the middle of this data, not in spite of it.",
+          },
+          {
+            type: "paragraph",
+            text: "The category sells the fill. The fill is the part with no edge in it. What has edge is everything around the fill: which markets a trader is actually good at, how large they size when they have conviction, whether their record survives being split in half, and whether any of that matches how you trade.",
+          },
+          {
+            type: "paragraph",
+            text: "That is the layer we are building. Not a faster feed of what someone bought, which we have now measured and can tell you does not work. A record you can interrogate, attached to a real position, matched to the way you actually take risk.",
+          },
+          {
+            type: "paragraph",
+            text: "A screenshot is not a track record. A fill is not a strategy. And the honest version of “follow smart money” is a great deal more complicated, and a great deal more useful, than a green number in a feed.",
+          },
+          {
+            type: "heading",
+            level: 3,
+            id: "method-notes",
+            text: "Method notes",
+          },
+          {
+            type: "paragraph",
+            text: "Fill data comes from public prediction market APIs. Sports covers markets ending between June and July 2026, politics and crypto from September 2025 onward. Addresses needed at least five fills in each half to qualify, and at least ten in each half for the follow test. Only buys were followed; following exits is a different strategy and a different test. Follow prices use the first observed trade at or after the target timestamp, which is a close approximation of what a follower would actually pay. ROI is profit over volume at entry price, not over bankroll.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "polymarket-liquidity-why-it-matters-more-than-most-traders-realize",
+    status: "published",
+    category: "Guide",
+    publishedAt: "2026-08-13",
+    title: "Polymarket Liquidity: Why It Matters More Than Most Traders Realize",
+    dek: "Liquidity determines whether a sound probability estimate can survive spreads, market impact, and the eventual exit.",
+    excerpt: "How order-book depth, bid-ask spreads, trade size, and market activity determine whether a Polymarket edge becomes profit.",
+    seo: {
+      title: "Polymarket Liquidity: Spreads, Depth, and Position Sizing",
+      description:
+        "Learn how Polymarket liquidity, bid-ask spreads, order-book depth, and position sizing affect execution costs and whether a trading edge pays off.",
+    },
+    cover: {
+      src: "/assets/updates/polymarket-liquidity.webp",
+      alt: "Polymarket Liquidity: Why It Matters More Than Most Traders Realize",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/polymarket-liquidity-why-it-matters-more-than-most-traders-realize-0e0f9412ceff",
+    sections: [
+      {
+        id: "liquidity-turns-edge-into-profit",
+        heading: "Liquidity turns edge into profit",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "New Polymarket traders pay a lot of attention to probability. They spend time researching outcomes, forming opinions, and deciding which way they think a market will resolve. What they don’t spend enough time on is liquidity — and it’s often why they underperform even when their analysis is correct.",
+          },
+          {
+            type: "paragraph",
+            text: "Liquidity is the practical constraint that determines whether your edge translates into actual profit. Understanding it is non-optional for serious Polymarket trading.",
+          },
+        ],
+      },
+      {
+        id: "what-liquidity-means-on-polymarket",
+        heading: "What liquidity means on Polymarket",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Polymarket operates as a central limit order book (CLOB). When you buy YES shares, you’re buying them from a seller on the other side of the trade. The difference between the price you pay and the midpoint of the market is the spread — the implicit cost of entering the trade.",
+          },
+          {
+            type: "paragraph",
+            text: "In a liquid market, the spread might be 0.5–1%. In an illiquid market, it might be 3–5% or wider. This matters enormously for your net returns. If you’re entering and exiting a position with a 3% total spread, you need your edge to exceed 3% before you’ve made a single cent. Most edges aren’t large enough to absorb that cost repeatedly.",
+          },
+        ],
+      },
+      {
+        id: "how-to-evaluate-liquidity-before-trading",
+        heading: "How to evaluate liquidity before trading",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Before entering any Polymarket position, check: Order book depth — how many shares are available within 1–2% of the current midpoint? Bid-ask spread at your intended trade size. Historical volume — has this market been actively traded? Time to resolution — markets close to resolution are often more liquid.",
+          },
+        ],
+      },
+      {
+        id: "the-size-discipline-problem",
+        heading: "The size discipline problem",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "One mistake that liquidity-aware traders avoid is deploying too much capital into a single illiquid market. If a market only has $10K of depth at reasonable prices, entering a $5K position is going to move the price meaningfully and cost you in spread. The right trade size in an illiquid market is often much smaller than your conviction would suggest.",
+          },
+          {
+            type: "paragraph",
+            text: "This is where many traders give up performance: they find a good edge, enter too large in an illiquid market, pay a wide spread, and then find the market difficult to exit later. The edge was real — the position sizing relative to liquidity killed the return.",
+          },
+        ],
+      },
+      {
+        id: "when-to-skip-a-market-entirely",
+        heading: "When to skip a market entirely",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Some Polymarket markets simply don’t have enough liquidity to be worth trading for anyone beyond very small position sizes. Signs that a market should be skipped: total volume under $50K, bid-ask spread consistently above 4%, last trade more than several hours ago, fewer than three active prices in the book.",
+          },
+          {
+            type: "paragraph",
+            text: "Trading a compelling but illiquid market is almost always worse than waiting for a liquid market where your edge is slightly lower. The execution cost difference is too large to ignore.",
+          },
+          {
+            type: "paragraph",
+            text: "Understanding liquidity and building it into your trade selection process is one of the highest-value improvements a mid-level Polymarket trader can make.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX surfaces liquidity data alongside recommendation signals so you can see not just where your edge is, but whether the market can actually absorb your trade at a reasonable cost.",
+          },
+          {
+            type: "paragraph",
+            text: "Explore it at https://app.smartx.io/?ref=hwGjVafr.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "how-to-track-and-measure-your-prediction-market-returns",
+    status: "published",
+    category: "Guide",
+    publishedAt: "2026-08-13",
+    title: "How to Track and Measure Your Prediction Market Returns",
+    dek: "Total profit shows the outcome; category returns, calibration, and sizing patterns show whether the process is repeatable.",
+    excerpt: "A practical framework for measuring category win rate, ROI on deployed capital, sizing quality, calibration, and long-term improvement.",
+    seo: {
+      title: "How to Track Prediction Market Returns That Actually Matter",
+      description:
+        "Track prediction market returns with category win rates, ROI on deployed capital, position-sizing results, and calibration instead of total P&L alone.",
+    },
+    cover: {
+      src: "/assets/updates/track-prediction-market-returns.webp",
+      alt: "How to Track and Measure Your Prediction Market Returns",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/how-to-track-and-measure-your-prediction-market-returns-446a5c3f1efd",
+    sections: [
+      {
+        id: "build-a-feedback-loop-not-a-scoreboard",
+        heading: "Build a feedback loop, not a scoreboard",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Most Polymarket traders have a rough sense of whether they’re up or down. Very few have a precise, actionable view of their returns across categories, position types, and time horizons. That gap — between knowing you’re profitable and knowing why you’re profitable — is the difference between a trader who can sustain their results and one who can’t.",
+          },
+          {
+            type: "paragraph",
+            text: "Tracking prediction market returns properly is less about celebrating wins and more about building a feedback loop that makes you better over time.",
+          },
+        ],
+      },
+      {
+        id: "why-total-p-and-l-is-the-wrong-metric",
+        heading: "Why total P&L is the wrong metric",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Total P&L tells you the outcome. It doesn’t tell you anything about your process. Two traders can both show $5,000 profit over three months — one through consistent edge in a specific category, one through a single lucky bet that obscures a losing record everywhere else. Only one of those is repeatable.",
+          },
+        ],
+      },
+      {
+        id: "the-metrics-that-actually-matter",
+        heading: "The metrics that actually matter",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Win rate by category: what percentage of your NBA trades resolve in your favor? Your political markets? If you’re 62% on sports and 44% on politics, that’s not a sign to improve your political analysis — it’s a signal to stop trading politics.",
+          },
+          {
+            type: "paragraph",
+            text: "ROI on capital deployed: total profit as a percentage of total capital put to work, broken down by category and by time horizon. A 15% ROI in markets that resolve within a week is very different from 15% ROI in markets that take three months.",
+          },
+          {
+            type: "paragraph",
+            text: "Average position sizing vs. outcome: do your larger positions perform better or worse than smaller ones? If your high-conviction trades underperform your standard trades, your calibration needs work.",
+          },
+          {
+            type: "paragraph",
+            text: "Calibration: when you thought something was 70% likely, did it happen about 70% of the time? A well-calibrated trader with 55% win rate is in much better shape than a miscalibrated trader with 60%.",
+          },
+        ],
+      },
+      {
+        id: "building-a-simple-tracking-system",
+        heading: "Building a simple tracking system",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "You don’t need sophisticated software to track prediction market returns well. A spreadsheet with the following columns covers most of what matters: market name, category, direction (YES/NO), entry price, exit price, position size, P&L, resolution date, and a one-line note on your thesis.",
+          },
+          {
+            type: "paragraph",
+            text: "Review this monthly. Look for patterns: categories where you consistently win, position types that underperform, markets where you over-sized relative to your edge.",
+          },
+        ],
+      },
+      {
+        id: "the-compounding-effect-of-good-tracking",
+        heading: "The compounding effect of good tracking",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Traders who track their performance carefully have a significant long-term advantage over those who don’t. It’s not just that they improve faster — it’s that they learn to deploy capital where their edge is highest, avoid categories where they consistently underperform, and adjust position sizing based on historical calibration data.",
+          },
+          {
+            type: "paragraph",
+            text: "Over 12–18 months, this compounds significantly. A trader who knows their edge is in sports markets and deploys 80% of their capital there will almost always outperform a generalist.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX is designed to automate this tracking process — your trade history analyzed by category, calibration, and sizing patterns, without building the spreadsheet yourself.",
+          },
+          {
+            type: "paragraph",
+            text: "Start tracking what actually matters at https://app.smartx.io/?ref=hwGjVafr.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "smartx-review-is-this-ai-terminal-worth-it-for-polymarket-traders",
+    status: "published",
+    category: "Product",
+    publishedAt: "2026-08-12",
+    title: "SmartX Review: Is This AI Terminal Worth It for Polymarket Traders?",
+    dek: "SmartX turns on-chain trade history into a structured memory and a personalized map of where each trader may have an edge.",
+    excerpt: "An evaluation of SmartX Trade Memory, Personalized Recommendations, wallet analytics, ideal users, and where the product adds value.",
+    seo: {
+      title: "SmartX Review: AI Trading Tools for Polymarket Traders",
+      description:
+        "Review SmartX Trade Memory, personalized market recommendations, wallet analytics, and which active Polymarket traders benefit most from the AI terminal.",
+    },
+    cover: {
+      src: "/assets/updates/smartx-review.webp",
+      alt: "SmartX Review: Is This AI Terminal Worth It for Polymarket Traders?",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/smartx-review-is-this-ai-terminal-worth-it-for-polymarket-traders-dba315cef148",
+    sections: [
+      {
+        id: "the-analytics-gap-on-polymarket",
+        heading: "The analytics gap on Polymarket",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "If you’ve been trading on Polymarket for more than a few months, you’ve probably noticed that the platform itself gives you very little in terms of analytical tools. You can see market prices, your open positions, and your basic account balance. That’s largely it.",
+          },
+          {
+            type: "paragraph",
+            text: "This gap — between the data available on-chain and the analytical tools available in the platform — is what SmartX was built to address. This review covers what SmartX actually does, who it’s built for, and whether it’s worth using.",
+          },
+        ],
+      },
+      {
+        id: "what-smartx-is",
+        heading: "What SmartX is",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "SmartX is an AI-powered trading terminal designed specifically for Polymarket. It’s not a general crypto tool or a prediction market aggregator. It’s built to do two things well: help you understand your own trading history and surface markets where your historical performance suggests you have an edge.",
+          },
+          {
+            type: "paragraph",
+            text: "The two core features are Trade Memory and Personalized Recommendations.",
+          },
+          {
+            type: "paragraph",
+            text: "Trade Memory records your decision context for every trade — not just the outcome, but the reasoning behind it, the entry conditions, and how the position performed. Over time, this builds a structured history of your trading that lets you see patterns you’d never find by scrolling through your wallet.",
+          },
+          {
+            type: "paragraph",
+            text: "Personalized Recommendations uses your historical data to identify markets similar to the ones you’ve historically done well in. If your data shows you consistently outperform in NBA markets, SmartX will surface similar markets and flag them as high-priority for your attention.",
+          },
+        ],
+      },
+      {
+        id: "who-it-is-for",
+        heading: "Who it’s for",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "SmartX is useful for traders who have been on Polymarket long enough to have meaningful trade history — typically 30+ trades across multiple categories. At that scale, pattern analysis starts to mean something, and the Personalized Recommendations feature has enough data to surface genuine signal.",
+          },
+          {
+            type: "paragraph",
+            text: "For brand-new traders, the product is less immediately useful. The recommendations need history to be accurate. New users get more value from the Trade Memory feature — building a structured log of their trades and reasoning from day one.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX is not built for casual traders who do a few trades a month. It’s built for traders who are actively trying to improve and are approaching prediction markets as a skill-development exercise rather than entertainment.",
+          },
+        ],
+      },
+      {
+        id: "what-the-product-does-well",
+        heading: "What the product does well",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The strongest feature is the depth of wallet analysis. SmartX surfaces metrics that are genuinely difficult to compute manually: category-level win rates, calibration scores, average ROI by market type, and how your performance in different categories has trended over time.",
+          },
+          {
+            type: "paragraph",
+            text: "The Personalized Recommendations interface is clean and actionable. Markets are surfaced with a confidence score and a brief explanation of why they match your historical edge profile. It doesn’t tell you what to trade — it tells you where to look.",
+          },
+        ],
+      },
+      {
+        id: "the-bottom-line",
+        heading: "The bottom line",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "For a Polymarket trader who takes their results seriously and wants better tools for tracking performance and identifying high-edge opportunities, SmartX fills a real gap. There’s no other tool that does both wallet analysis and personalized market surfacing specifically for prediction markets at this depth.",
+          },
+          {
+            type: "paragraph",
+            text: "Try it at https://app.smartx.io/?ref=hwGjVafr — the analysis of your existing trade history is available immediately after connecting your wallet.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "what-makes-prediction-markets-on-chain-the-technical-foundation-that-changes-everything",
+    status: "published",
+    category: "Intelligence",
+    publishedAt: "2026-08-10",
+    title: "What Makes Prediction Markets On-Chain: The Technical Foundation That Changes Everything",
+    dek: "Public, permanent trade data changes who can study market behavior, what tools can be built, and how settlement is trusted.",
+    excerpt: "How Polymarket’s public ledger enables wallet analysis, composable trading tools, auditable settlement, and deeper systematic research.",
+    seo: {
+      title: "Why On-Chain Prediction Markets Change Trading Analysis",
+      description:
+        "Understand how Polymarket’s on-chain data enables public wallet analysis, composable trading tools, auditable settlement, and systematic research.",
+    },
+    cover: {
+      src: "/assets/updates/prediction-markets-on-chain.webp",
+      alt: "What Makes Prediction Markets On-Chain: The Technical Foundation That Changes Everything",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/what-makes-prediction-markets-on-chain-the-technical-foundation-that-changes-everything-a19cfad5d792",
+    sections: [
+      {
+        id: "infrastructure-changes-the-game",
+        heading: "Infrastructure changes the game",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "When people talk about Polymarket, they usually focus on the trading. The markets, the probabilities, the leaderboards. What gets less attention is the infrastructure — the fact that Polymarket is an on-chain prediction market, and what that actually means for traders.",
+          },
+          {
+            type: "paragraph",
+            text: "This isn’t a technical detail. It’s a structural feature that changes the nature of the game in ways that matter practically.",
+          },
+        ],
+      },
+      {
+        id: "what-on-chain-means-in-plain-terms",
+        heading: "What “on-chain” means in plain terms",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Every trade on Polymarket is recorded on the Polygon blockchain. This means that every position, every entry price, every exit, every wallet — it’s all public, permanent, and auditable. Not public in the way that a centralized platform makes data available when it feels like it. Public in the way that anyone can query the blockchain and see the complete trade history of any wallet, any time, without permission.",
+          },
+          {
+            type: "paragraph",
+            text: "This is categorically different from sports betting, stock trading, or any other financial market most people interact with. Those markets operate on closed ledgers. The data is owned by the platform and shared selectively if at all. Polymarket’s data is owned by no one and available to everyone.",
+          },
+        ],
+      },
+      {
+        id: "why-this-creates-an-unusual-information-environment",
+        heading: "Why this creates an unusual information environment",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "In a traditional market, the only way to study successful traders is if they choose to share their results. In an on-chain prediction market, every successful trader’s history is already public. You can look up the top Polymarket wallets by return, analyze their positions, identify their categories of specialization, study their sizing patterns, and understand what a profitable prediction market strategy looks like in practice.",
+          },
+          {
+            type: "paragraph",
+            text: "This transparency creates an information environment unlike anything else in speculative trading. The edge that successful traders have developed is visible and, to a meaningful degree, learnable.",
+          },
+        ],
+      },
+      {
+        id: "composability-why-on-chain-data-enables-better-tools",
+        heading: "Composability: why on-chain data enables better tools",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Because Polymarket’s data lives on-chain, any developer can build tools that interact with it. This is how products like SmartX work: by reading on-chain trade data and building analytics layers on top of it that the base platform doesn’t provide.",
+          },
+          {
+            type: "paragraph",
+            text: "In a centralized prediction market, this would require a partnership with the platform and access to proprietary data. On Polymarket, the data is already there. The ecosystem of tools that’s grown up around it — analytics dashboards, wallet tracking tools, AI terminals — exists precisely because of this open data structure.",
+          },
+        ],
+      },
+      {
+        id: "the-trust-implications",
+        heading: "The trust implications",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "An on-chain market is also trustless in a specific technical sense: the resolution and payout logic is encoded in smart contracts, not enforced by a company. When a market resolves, the payouts are distributed automatically based on contract logic, not at the discretion of a platform operator. This eliminates certain classes of counterparty risk that exist in centralized prediction markets.",
+          },
+        ],
+      },
+      {
+        id: "what-this-means-for-serious-traders",
+        heading: "What this means for serious traders",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The on-chain foundation of Polymarket isn’t a technical curiosity — it’s what makes serious, systematic prediction market trading possible. The data availability, the tool ecosystem, and the trust structure all flow from the decision to build on public blockchain infrastructure.",
+          },
+          {
+            type: "paragraph",
+            text: "Traders who understand this structure have access to analytical depth that simply doesn’t exist in any other trading environment of comparable scale.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX is built to take full advantage of this open data structure — surfacing insights from your on-chain trade history that would otherwise require hours of manual analysis.",
+          },
+          {
+            type: "paragraph",
+            text: "Start at https://app.smartx.io/?ref=hwGjVafr.",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-to-read-a-polymarket-wallet-and-what-the-data-actually-tells-you",
     status: "published",
     category: "Guide",

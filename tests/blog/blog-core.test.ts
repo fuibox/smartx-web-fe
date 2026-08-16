@@ -50,7 +50,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 21);
+  assert.equal(posts.length, 27);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -76,19 +76,21 @@ test("the production source validates into canonical body blocks", () => {
   const secondPage = paginateBlogPosts(published, 2, 6);
   const thirdPage = paginateBlogPosts(published, 3, 6);
   const fourthPage = paginateBlogPosts(published, 4, 6);
+  const fifthPage = paginateBlogPosts(published, 5, 6);
 
   assert.equal(firstPage.items.length, 6);
   assert.equal(secondPage.items.length, 6);
   assert.equal(thirdPage.items.length, 6);
-  assert.equal(fourthPage.items.length, 3);
-  assert.equal(firstPage.totalPages, 4);
-  assert.equal(fourthPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
+  assert.equal(fourthPage.items.length, 6);
+  assert.equal(fifthPage.items.length, 3);
+  assert.equal(firstPage.totalPages, 5);
+  assert.equal(fifthPage.items.at(-1)?.slug, "smartx-signal-bot-guide");
   assert.deepEqual(
     firstPage.items.slice(0, 3).map((post) => post.slug),
     [
-      "how-to-read-a-polymarket-wallet-and-what-the-data-actually-tells-you",
-      "how-to-think-about-probability-on-prediction-markets",
-      "the-psychology-of-trading-prediction-markets-and-why-most-traders-lose-more-than-they-should",
+      "how-to-win-on-polymarket-the-systems-that-separate-consistent-traders-from-the-rest",
+      "skill-in-prediction-markets-is-real-copying-it-still-loses-money",
+      "polymarket-liquidity-why-it-matters-more-than-most-traders-realize",
     ],
   );
 });
