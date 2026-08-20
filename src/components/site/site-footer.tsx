@@ -50,6 +50,7 @@ export function SiteFooter() {
           >
             App
           </a>
+          <Link href="/waitlist">Waitlist</Link>
           <Link href="/blog">Blog</Link>
           <a
             href="https://smartx.gitbook.io/smartx.docs.io"

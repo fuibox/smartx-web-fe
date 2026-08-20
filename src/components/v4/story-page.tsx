@@ -17,7 +17,7 @@ import {
 
 import { MEMORY_DOMAINS } from "@/components/memory-demo/memory-demo.fixture";
 import type { MemoryDomainId } from "@/components/memory-demo/memory-demo.types";
-import { LaunchAlphaCta } from "@/components/site/launch-alpha-cta";
+import { JoinWaitlistCta } from "@/components/site/join-waitlist-cta";
 import { SiteFooter } from "@/components/site/site-footer";
 import type { BlogPostSummary } from "@/content/blog-types";
 import { formatBlogDate } from "@/lib/blog-format";
@@ -1116,10 +1116,9 @@ function ClosingSection() {
         </h2>
       </div>
       <div className={styles.closingActions}>
-        <LaunchAlphaCta
+        <JoinWaitlistCta
           ref={ctaRef}
           className={styles.primaryAction}
-          source="closing_cta"
         />
         <a
           className={styles.secondaryAction}

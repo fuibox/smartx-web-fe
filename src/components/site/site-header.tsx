@@ -7,7 +7,7 @@ import { LaunchAlphaCta } from "@/components/site/launch-alpha-cta";
 import styles from "./site-chrome.module.css";
 
 type SiteHeaderProps = {
-  active?: "blog";
+  active?: "blog" | "waitlist";
 };
 
 export function SiteHeader({ active }: SiteHeaderProps) {
@@ -20,6 +20,12 @@ export function SiteHeader({ active }: SiteHeaderProps) {
       <nav className={styles.headerNav} aria-label="Site">
         <Link href="/" className={active ? undefined : styles.activeLink}>
           Home
+        </Link>
+        <Link
+          href="/waitlist"
+          className={active === "waitlist" ? styles.activeLink : undefined}
+        >
+          Waitlist
         </Link>
         <Link href="/blog" className={active === "blog" ? styles.activeLink : undefined}>
           Blog

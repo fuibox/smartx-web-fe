@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-import { LaunchAlphaCta } from "@/components/site/launch-alpha-cta";
+import { JoinWaitlistCta } from "@/components/site/join-waitlist-cta";
 
 import { DitherField } from "./dither-field";
 import styles from "./v4.module.css";
@@ -61,6 +61,7 @@ export function V4Hero() {
           />
         </span>
         <nav aria-label="Site">
+          <a href="/waitlist/">Waitlist</a>
           <a href="https://x.com/SmartXTerminal" target="_blank" rel="noopener noreferrer">
             X
           </a>
@@ -95,10 +96,9 @@ export function V4Hero() {
           </span>
         </p>
         <div className={styles.heroActions}>
-          <LaunchAlphaCta
+          <JoinWaitlistCta
             className={styles.heroCta}
             labelClassName={styles.ctaLabel}
-            source="hero_cta"
           />
         </div>
         <span className={styles.heroHint}>
