@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -12,13 +12,11 @@ import styles from "./waitlist.module.css";
 type Stage = "gate" | "quiz" | "email" | "verify" | "result";
 type Dimension = "risk" | "signal" | "social";
 type Pole = "DEGEN" | "SNIPER" | "GUT" | "DATA" | "PACK" | "LONE";
-type Stat = "conviction" | "instinct" | "resilience";
 
 type QuizOption = {
   id: "A" | "B" | "C" | "D";
   label: string;
   pole: Pole;
-  stats: Partial<Record<Stat, number>>;
 };
 
 type Question = {
@@ -27,14 +25,13 @@ type Question = {
   options: readonly QuizOption[];
 };
 
-type Animal = {
+type Persona = {
   name: string;
   cn: string;
   code: string;
-  rarity: number;
-  verdict: string;
-  partner: string;
-  enemy: string;
+  mark: string;
+  description: string;
+  roast: string;
 };
 
 const QUESTIONS: readonly Question[] = [
@@ -42,75 +39,144 @@ const QUESTIONS: readonly Question[] = [
     dimension: "signal",
     prompt: "You wake in the middle of the night. What calls you first?",
     options: [
-      { id: "A", label: "The chart. If I am awake, the market must be saying something.", pole: "DATA", stats: { instinct: 10 } },
-      { id: "B", label: "The price. One glance tells me the mood.", pole: "GUT", stats: { resilience: 10 } },
-      { id: "C", label: "The timeline. I want to know what everyone is seeing.", pole: "GUT", stats: { instinct: 5, conviction: 5 } },
-      { id: "D", label: "Nothing. Sleep is the best stop-loss.", pole: "DATA", stats: { resilience: 15 } },
+      { id: "A", label: "The chart. If I am awake, the market must be saying something.", pole: "DATA" },
+      { id: "B", label: "The price. One glance tells me the mood.", pole: "GUT" },
+      { id: "C", label: "The timeline. I want to know what everyone is seeing.", pole: "GUT" },
+      { id: "D", label: "Nothing. Sleep is the best stop-loss.", pole: "DATA" },
     ],
   },
   {
     dimension: "risk",
     prompt: "A coin you do not own is up 40%. What do you do?",
     options: [
-      { id: "A", label: "Buy now. Momentum rarely waits.", pole: "DEGEN", stats: { conviction: 15 } },
-      { id: "B", label: "Open the chart for research. The order is already placed.", pole: "DEGEN", stats: { conviction: 10, instinct: 5 } },
-      { id: "C", label: "Set my entry and wait.", pole: "SNIPER", stats: { instinct: 10 } },
-      { id: "D", label: "Watch. Every spike eventually cools.", pole: "SNIPER", stats: { resilience: 10, instinct: 5 } },
+      { id: "A", label: "Buy now. Momentum rarely waits.", pole: "DEGEN" },
+      { id: "B", label: "Open the chart for research. The order is already placed.", pole: "DEGEN" },
+      { id: "C", label: "Set my entry and wait.", pole: "SNIPER" },
+      { id: "D", label: "Watch. Every spike eventually cools.", pole: "SNIPER" },
     ],
   },
   {
     dimension: "social",
     prompt: "Your position drops 30%. Who hears about it?",
     options: [
-      { id: "A", label: "The group chat. Shared pain is lighter.", pole: "PACK", stats: { conviction: 5 } },
-      { id: "B", label: "No one. I close it and move on.", pole: "LONE", stats: { resilience: 15 } },
-      { id: "C", label: "Everyone. I buy more and call the dip.", pole: "PACK", stats: { conviction: 15 } },
-      { id: "D", label: "Only me. Some losses stay private.", pole: "LONE", stats: { resilience: 10 } },
+      { id: "A", label: "The group chat. Shared pain is lighter.", pole: "PACK" },
+      { id: "B", label: "No one. I close it and move on.", pole: "LONE" },
+      { id: "C", label: "Everyone. I buy more and call the dip.", pole: "PACK" },
+      { id: "D", label: "Only me. Some losses stay private.", pole: "LONE" },
     ],
   },
   {
     dimension: "signal",
     prompt: "Where do your strongest trade ideas come from?",
     options: [
-      { id: "A", label: "Charts and data.", pole: "DATA", stats: { instinct: 15 } },
-      { id: "B", label: "Wallets I quietly track.", pole: "DATA", stats: { instinct: 10, conviction: 5 } },
-      { id: "C", label: "The group chat, right after someone says ‘send it.’", pole: "GUT", stats: { conviction: 10 } },
-      { id: "D", label: "Instinct. The idea arrives before the evidence.", pole: "GUT", stats: { conviction: 10, instinct: 5 } },
+      { id: "A", label: "Charts and data.", pole: "DATA" },
+      { id: "B", label: "Wallets I quietly track.", pole: "DATA" },
+      { id: "C", label: "The group chat, right after someone says ‘send it.’", pole: "GUT" },
+      { id: "D", label: "Instinct. The idea arrives before the evidence.", pole: "GUT" },
     ],
   },
   {
     dimension: "risk",
     prompt: "What kind of leverage feels right?",
     options: [
-      { id: "A", label: "Spot only. Patience is enough.", pole: "SNIPER", stats: { resilience: 15 } },
-      { id: "B", label: "3×. Enough power, enough restraint.", pole: "SNIPER", stats: { resilience: 10 } },
-      { id: "C", label: "20×. Otherwise the market feels too quiet.", pole: "DEGEN", stats: { conviction: 15 } },
-      { id: "D", label: "Whatever makes the liquidation price look theoretical.", pole: "DEGEN", stats: { conviction: 10, instinct: -5 } },
+      { id: "A", label: "Spot only. Patience is enough.", pole: "SNIPER" },
+      { id: "B", label: "3×. Enough power, enough restraint.", pole: "SNIPER" },
+      { id: "C", label: "20×. Otherwise the market feels too quiet.", pole: "DEGEN" },
+      { id: "D", label: "Whatever makes the liquidation price look theoretical.", pole: "DEGEN" },
     ],
   },
   {
     dimension: "social",
     prompt: "You catch a 10×. Who hears first?",
     options: [
-      { id: "A", label: "Screenshot, group chat, X.", pole: "PACK", stats: { conviction: 10 } },
-      { id: "B", label: "Nowhere. I take profit and keep it quiet.", pole: "LONE", stats: { resilience: 10, instinct: 5 } },
-      { id: "C", label: "My friends. Good fortune should be shared.", pole: "PACK", stats: { conviction: 10, resilience: 5 } },
-      { id: "D", label: "Back into the market. My game, my pace.", pole: "LONE", stats: { conviction: 10, resilience: 5 } },
+      { id: "A", label: "Screenshot, group chat, X.", pole: "PACK" },
+      { id: "B", label: "Nowhere. I take profit and keep it quiet.", pole: "LONE" },
+      { id: "C", label: "My friends. Good fortune should be shared.", pole: "PACK" },
+      { id: "D", label: "Back into the market. My game, my pace.", pole: "LONE" },
     ],
   },
 ];
 
-const ANIMALS: Record<string, Animal> = {
-  "DEGEN|GUT|PACK": { name: "Degen Ape", cn: "梭哈猿", code: "APE", rarity: 17, verdict: "You do not trade. You donate to the market — and once in a while, it builds you a statue.", partner: "Moon Wolf", enemy: "Shadow Cat" },
-  "DEGEN|GUT|LONE": { name: "Moon Wolf", cn: "月嚎狼", code: "WOLF", rarity: 11, verdict: "You howl once, then bet everything. The pack follows the sound — into glory or the void.", partner: "Degen Ape", enemy: "Diamond Turtle" },
-  "DEGEN|DATA|PACK": { name: "Echo Parrot", cn: "复读鹦鹉", code: "PARROT", rarity: 14, verdict: "The group says send it, you send it. Good news: you are never alone. Bad news: you get liquidated together.", partner: "Whale Whisperer", enemy: "Hibernating Bear" },
-  "DEGEN|DATA|LONE": { name: "Chart Fox", cn: "图表狐", code: "FOX", rarity: 15, verdict: "You have drawn more trendlines than life plans. Shame the market does not read your charts.", partner: "Shadow Cat", enemy: "Degen Ape" },
-  "SNIPER|GUT|PACK": { name: "Diamond Turtle", cn: "钻石龟", code: "TURTLE", rarity: 13, verdict: "Your bags survived three bear markets. Not faith — you forgot the password.", partner: "Hibernating Bear", enemy: "Moon Wolf" },
-  "SNIPER|GUT|LONE": { name: "Hibernating Bear", cn: "冬眠熊", code: "BEAR", rarity: 5, verdict: "You sleep through 99% of the market. The 1% you are awake, something gets mauled.", partner: "Diamond Turtle", enemy: "Echo Parrot" },
-  "SNIPER|DATA|PACK": { name: "Whale Whisperer", cn: "鲸语者", code: "WHALE", rarity: 9, verdict: "You do not trade. You stalk the people who do. When the smart money moves, you move — eventually.", partner: "Echo Parrot", enemy: "The Owl" },
-  "SNIPER|DATA|LONE": { name: "Shadow Cat", cn: "影猫", code: "CAT", rarity: 12, verdict: "You lurk for three months for one strike. The day you strike, the exchange goes down.", partner: "Chart Fox", enemy: "Degen Ape" },
-  OWL: { name: "The Owl", cn: "猫头鹰", code: "OWL", rarity: 4, verdict: "Awake while everyone celebrates. Calm while everyone panics. We built SmartX looking for you.", partner: "Shadow Cat", enemy: "None on record" },
+const PERSONAS: Record<string, Persona> = {
+  "DEGEN|GUT|PACK": {
+    name: "The Liquidity Donor",
+    cn: "送钱者",
+    code: "APE",
+    mark: "LQD",
+    description: "You chase heat, trust the vibe, and usually bring the group chat with you. Wherever the market needs liquidity, your wallet arrives first.",
+    roast: "You’re not trading. You’re funding the ecosystem.",
+  },
+  "DEGEN|GUT|LONE": {
+    name: "The All-In Mystic",
+    cn: "梭哈仙人",
+    code: "WOLF",
+    mark: "AIM",
+    description: "You do not need a poll or a spreadsheet. You have a feeling—and right before every all-in, it feels like enlightenment.",
+    roast: "Every all-in starts with enlightenment and ends with reincarnation.",
+  },
+  "DEGEN|DATA|PACK": {
+    name: "The Signal General",
+    cn: "喊单军师",
+    code: "PARROT",
+    mark: "SIG",
+    description: "Charts checked. Wallets tracked. Three hours of analysis later, the strategy still comes down to two words: send it. Naturally, everyone must hear about it.",
+    roast: "Three hours of research. Two-word thesis: send it.",
+  },
+  "DEGEN|DATA|LONE": {
+    name: "The Candle Prophet",
+    cn: "K线教主",
+    code: "FOX",
+    mark: "CND",
+    description: "You trust candles, structure, and support levels more than people. Your system explains almost everything—except, occasionally, your position size.",
+    roast: "You can chart every line except the one marking enough exposure.",
+  },
+  "SNIPER|GUT|PACK": {
+    name: "The Dip Ringleader",
+    cn: "抄底带头大哥",
+    code: "TURTLE",
+    mark: "DIP",
+    description: "You do not chase; you wait for the pullback. Once your gut calls the bottom, the whole group chat gets recruited to buy it with you.",
+    roast: "You’re not buying the dip. You’re giving the downtrend a demo.",
+  },
+  "SNIPER|GUT|LONE": {
+    name: "The Market Doctor",
+    cn: "行情老中医",
+    code: "BEAR",
+    mark: "DOC",
+    description: "You do not rush and you do not need the crowd. Other traders read indicators; you take the market’s pulse and decide whether its complexion looks healthy.",
+    roast: "Every symptom diagnosed. Every loss professionally explained.",
+  },
+  "SNIPER|DATA|PACK": {
+    name: "The Onchain Detective",
+    cn: "链上侦探",
+    code: "WHALE",
+    mark: "CHN",
+    description: "Charts, flows, smart wallets—you inspect everything. You know who moved, what they bought, and where the money went before the group chat asks.",
+    roast: "You know everyone’s position except, occasionally, your own.",
+  },
+  "SNIPER|DATA|LONE": {
+    name: "The Limit Sniper",
+    cn: "潜伏狙击手",
+    code: "CAT",
+    mark: "LMT",
+    description: "The thesis is ready and the entry is precise. You will wait as long as it takes—even when the market has no intention of coming back for you.",
+    roast: "The limit order was perfect. Shame you two never met again.",
+  },
+  OWL: {
+    name: "The Risk Monk",
+    cn: "风控大师",
+    code: "OWL",
+    mark: "RSK",
+    description: "Low leverage. Clean exits. Profits taken without ceremony. While everyone hunts the next 10×, you make sure there is a next trade.",
+    roast: "They study how to double once. You study how to stay in the game.",
+  },
 };
+
+const PERSONAS_BY_CODE = Object.values(PERSONAS).reduce<Record<string, Persona>>((index, persona) => {
+  index[persona.code] = persona;
+  index[persona.mark] = persona;
+  return index;
+}, {});
 
 const OWL_SIGNATURE = ["D", "D", "B", "A", "B", "B"] as const;
 const AXES: Record<Dimension, readonly Pole[]> = {
@@ -118,13 +184,8 @@ const AXES: Record<Dimension, readonly Pole[]> = {
   signal: ["GUT", "DATA"],
   social: ["PACK", "LONE"],
 };
-const ROMAN = ["I", "II", "III", "IV", "V", "VI"] as const;
 const WAITLIST_URL = "https://smartx.io/waitlist/";
 const OTP_CODE = "824193";
-
-function clampScore(value: number) {
-  return Math.min(99, Math.max(5, value));
-}
 
 function resolvePole(answers: readonly QuizOption[], dimension: Dimension) {
   const relevant = answers.filter((_, index) => QUESTIONS[index].dimension === dimension);
@@ -143,52 +204,99 @@ function resolveOutcome(answerIds: readonly string[]) {
   const risk = resolvePole(answers, "risk");
   const signal = resolvePole(answers, "signal");
   const social = resolvePole(answers, "social");
-  const animal = owlHits >= 4 ? ANIMALS.OWL : ANIMALS[`${risk}|${signal}|${social}`];
-  const stats = answers.reduce(
-    (total, answer) => ({
-      conviction: total.conviction + (answer.stats.conviction ?? 0),
-      instinct: total.instinct + (answer.stats.instinct ?? 0),
-      resilience: total.resilience + (answer.stats.resilience ?? 0),
-    }),
-    { conviction: 30, instinct: 30, resilience: 30 },
-  );
-
   return {
-    animal,
+    persona: owlHits >= 4 ? PERSONAS.OWL : PERSONAS[`${risk}|${signal}|${social}`],
     poles: [risk, signal, social],
-    stats: {
-      conviction: clampScore(stats.conviction),
-      instinct: clampScore(stats.instinct),
-      resilience: clampScore(stats.resilience),
-    },
   };
 }
 
-function makeCodes(animal: Animal) {
+function makeCodes(persona: Persona) {
   const fragments = ["7X2K", "N4Q8", "M9R3", "K2V6", "F8P1", "C5T7", "Y3L9", "H6W4", "B1J8", "D7S2"];
-  const count = animal.code === "OWL" ? 10 : 5;
-  return fragments.slice(0, count).map((fragment) => `SMARTX-${animal.code}-${fragment}`);
+  const count = persona.mark === "RSK" ? 10 : 5;
+  return fragments.slice(0, count).map((fragment) => `SMARTX-${persona.mark}-${fragment}`);
 }
 
-const VALID_INVITE_CODES = new Set(
-  ["123456", ...Object.values(ANIMALS).flatMap((animal) => makeCodes(animal))],
-);
+function makeLegacyCodes(persona: Persona) {
+  const fragments = ["7X2K", "N4Q8", "M9R3", "K2V6", "F8P1", "C5T7", "Y3L9", "H6W4", "B1J8", "D7S2"];
+  const count = persona.code === "OWL" ? 10 : 5;
+  return fragments.slice(0, count).map((fragment) => `SMARTX-${persona.code}-${fragment}`);
+}
+
+const VALID_INVITE_CODES = new Set([
+  "123456",
+  ...Object.values(PERSONAS).flatMap((persona) => [...makeCodes(persona), ...makeLegacyCodes(persona)]),
+]);
 
 function makePosition(email: string) {
   const seed = [...email].reduce((sum, character) => sum + character.charCodeAt(0), 0);
   return 7_900 + (seed % 1_800);
 }
 
-function makeInvitationUrl(code?: string) {
+function makeInvitationUrl(code?: string, resultCode?: string) {
   const url = new URL(WAITLIST_URL);
+  if (resultCode) url.searchParams.set("result", resultCode);
   if (code) url.searchParams.set("invite", code);
   return url.toString();
+}
+
+function ArtworkPlaceholder({ label, compact = false }: { label: string; compact?: boolean }) {
+  return (
+    <span className={styles.artPlaceholder} data-compact={compact} aria-label="Artwork placeholder">
+      <span>{label}</span>
+      <small>Artwork direction TBD</small>
+    </span>
+  );
+}
+
+type PersonaPosterProps = {
+  persona: Persona;
+  poles?: readonly string[];
+  preparedCards?: Partial<Record<ResultCardFormat, RenderedResultCard>>;
+  exportError?: boolean;
+  preview?: boolean;
+};
+
+function PersonaPoster({ persona, poles, preparedCards, exportError, preview = false }: PersonaPosterProps) {
+  return (
+    <article className={styles.personaPoster} data-preview={preview}>
+      <header>
+        <Image src="/assets/smartx-logo.svg" alt="SmartX" width={218} height={42} />
+        <span>Trader type</span>
+      </header>
+      <div className={styles.posterIdentity}>
+        <span>{poles?.join(" · ") ?? "A friend’s result"}</span>
+        <h2>{persona.name}</h2>
+        <p>{persona.cn}</p>
+      </div>
+      <ArtworkPlaceholder label={persona.mark} compact={preview} />
+      <p className={styles.posterDescription}>{persona.description}</p>
+      <blockquote>“{persona.roast}”</blockquote>
+      {!preview && (
+        <section className={styles.cardDownloads} aria-label="Download result card">
+          <span>Download result</span>
+          <div>
+            {preparedCards?.story ? (
+              <a href={preparedCards.story.href} download={preparedCards.story.filename}>Story <small>1080 × 1920</small></a>
+            ) : (
+              <span>{exportError ? "Story unavailable" : "Preparing story…"}</span>
+            )}
+            {preparedCards?.og ? (
+              <a href={preparedCards.og.href} download={preparedCards.og.filename}>X / OG <small>1200 × 630</small></a>
+            ) : (
+              <span>{exportError ? "OG unavailable" : "Preparing OG…"}</span>
+            )}
+          </div>
+        </section>
+      )}
+    </article>
+  );
 }
 
 export function WaitlistExperience() {
   const [stage, setStage] = useState<Stage>("gate");
   const [inviteCode, setInviteCode] = useState("");
   const [gateError, setGateError] = useState("");
+  const [sharedPersonaCode, setSharedPersonaCode] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [otp, setOtp] = useState("");
@@ -208,23 +316,25 @@ export function WaitlistExperience() {
     if (answerIds.length !== QUESTIONS.length) return resolveOutcome(OWL_SIGNATURE);
     return resolveOutcome(answerIds);
   }, [answerIds]);
-  const codes = useMemo(() => makeCodes(outcome.animal), [outcome.animal]);
+  const referralPersona = sharedPersonaCode ? PERSONAS_BY_CODE[sharedPersonaCode] : null;
+  const codes = useMemo(() => makeCodes(outcome.persona), [outcome.persona]);
   const basePosition = useMemo(() => makePosition(email), [email]);
   const position = Math.max(1, basePosition - (shared ? 500 : 0));
   const selectedCode = codes.at(inviteIndex);
-  const invitationUrl = makeInvitationUrl(selectedCode);
-  const socialReady = telegramOpened && xOpened;
-  const signsRemaining = Number(!telegramOpened) + Number(!xOpened);
+  const invitationUrl = makeInvitationUrl(selectedCode, outcome.persona.mark);
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("invite")?.trim().toUpperCase();
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("invite")?.trim().toUpperCase();
+    const resultCode = params.get("result")?.trim().toUpperCase();
+    if (resultCode && PERSONAS_BY_CODE[resultCode]) setSharedPersonaCode(resultCode);
     if (!code) return;
     setInviteCode(code);
-    if (VALID_INVITE_CODES.has(code)) {
-      setStage("quiz");
+    if (!VALID_INVITE_CODES.has(code)) {
+      setGateError("This invite code isn’t valid.");
       return;
     }
-    setGateError("This invite code isn’t valid.");
+    if (!resultCode) setStage("quiz");
   }, []);
 
   useEffect(() => {
@@ -233,29 +343,31 @@ export function WaitlistExperience() {
     let rendered: RenderedResultCard[] = [];
     setPreparedCards({});
     setExportError(false);
-    const data = {
-      ...outcome.animal,
-      poles: outcome.poles,
-      stats: outcome.stats,
-    };
-    Promise.all([
-      renderResultCard(data, "story"),
-      renderResultCard(data, "og"),
-    ]).then((cards) => {
-      rendered = cards;
-      if (disposed) {
-        cards.forEach((card) => URL.revokeObjectURL(card.href));
-        return;
-      }
-      setPreparedCards({ story: cards[0], og: cards[1] });
-    }).catch(() => {
-      if (!disposed) setExportError(true);
-    });
+    const data = { ...outcome.persona, code: outcome.persona.mark, poles: outcome.poles };
+    Promise.all([renderResultCard(data, "story"), renderResultCard(data, "og")])
+      .then((cards) => {
+        rendered = cards;
+        if (disposed) {
+          cards.forEach((card) => URL.revokeObjectURL(card.href));
+          return;
+        }
+        setPreparedCards({ story: cards[0], og: cards[1] });
+      })
+      .catch(() => {
+        if (!disposed) setExportError(true);
+      });
     return () => {
       disposed = true;
       rendered.forEach((card) => URL.revokeObjectURL(card.href));
     };
   }, [stage, outcome]);
+
+  const beginQuiz = () => {
+    setGateError("");
+    setQuestionIndex(0);
+    setAnswerIds([]);
+    setStage("quiz");
+  };
 
   const submitGate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -265,10 +377,24 @@ export function WaitlistExperience() {
       return;
     }
     setInviteCode(normalizedCode);
+    beginQuiz();
+  };
+
+  const beginFromReferral = () => {
+    const normalizedCode = inviteCode.trim().toUpperCase();
+    if (!VALID_INVITE_CODES.has(normalizedCode)) {
+      setSharedPersonaCode(null);
+      setGateError("That invitation has expired. Enter another code to continue.");
+      return;
+    }
+    beginQuiz();
+  };
+
+  const clearReferral = () => {
+    setSharedPersonaCode(null);
+    setInviteCode("");
     setGateError("");
-    setQuestionIndex(0);
-    setAnswerIds([]);
-    setStage("quiz");
+    window.history.replaceState({}, "", "/waitlist/");
   };
 
   const submitEmail = (event: FormEvent<HTMLFormElement>) => {
@@ -296,9 +422,7 @@ export function WaitlistExperience() {
   };
 
   const openCommunity = (network: "telegram" | "x") => {
-    const url = network === "telegram"
-      ? "https://t.me/+CTeuBkpOxSNkN2Y0"
-      : "https://x.com/SmartXTerminal";
+    const url = network === "telegram" ? "https://t.me/+CTeuBkpOxSNkN2Y0" : "https://x.com/SmartXTerminal";
     window.open(url, "_blank", "noopener,noreferrer");
     if (network === "telegram") setTelegramOpened(true);
     if (network === "x") setXOpened(true);
@@ -323,11 +447,9 @@ export function WaitlistExperience() {
   };
 
   const shareResult = () => {
-    const identity = outcome.animal.code === "OWL" ? "I’m The Owl" : `I’m a ${outcome.animal.name}`;
-    const text = `${identity} — rarer than ${100 - outcome.animal.rarity}% of traders.\n\nConviction ${outcome.stats.conviction} · Instinct ${outcome.stats.instinct} · Resilience ${outcome.stats.resilience}\n\nFind your Trading Spirit Animal.`;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", text);
-    shareUrl.searchParams.set("url", makeInvitationUrl());
+    shareUrl.searchParams.set("text", `My SmartX trader type is ${outcome.persona.name}.\n\n“${outcome.persona.roast}”\n\nFind yours in six questions.`);
+    shareUrl.searchParams.set("url", makeInvitationUrl(codes[0], outcome.persona.mark));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     setShared(true);
   };
@@ -335,22 +457,20 @@ export function WaitlistExperience() {
   const shareInvitation = () => {
     if (!selectedCode) return;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", `I have a one-time SmartX invite. Claim invite ${ROMAN[inviteIndex] ?? inviteIndex + 1} before someone else does.`);
+    shareUrl.searchParams.set("text", `I got ${outcome.persona.name} on the SmartX trader type test. Use my one-time invite to find yours.`);
     shareUrl.searchParams.set("url", invitationUrl);
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
   };
 
   const copyInvitation = async (code?: string) => {
     const copyKey = code ?? "activity";
-    await navigator.clipboard.writeText(makeInvitationUrl(code));
+    await navigator.clipboard.writeText(makeInvitationUrl(code, outcome.persona.mark));
     setCopiedCode(copyKey);
     window.setTimeout(() => setCopiedCode(null), 1400);
   };
 
   const restart = () => {
     setStage("quiz");
-    setTelegramOpened(false);
-    setXOpened(false);
     setQuestionIndex(0);
     setAnswerIds([]);
     setCopiedCode(null);
@@ -363,81 +483,115 @@ export function WaitlistExperience() {
   return (
     <main className={styles.page}>
       <a className={styles.skipLink} href="#waitlist-content">Skip to waitlist</a>
-
       <header className={styles.header}>
         <Link href="/" aria-label="SmartX home" className={styles.logo}>
           <Image src="/assets/smartx-logo.svg" alt="" width={218} height={42} priority />
         </Link>
-        <span className={styles.prototypeFlag}>Prototype · No data saved</span>
+        <span>Invite-only alpha</span>
       </header>
 
       <section className={styles.stage} id="waitlist-content" aria-live="polite">
-        {stage === "gate" && (
+        {stage === "gate" && referralPersona && (
+          <div className={styles.referralStage}>
+            <PersonaPoster persona={referralPersona} preview />
+            <div className={styles.referralCopy}>
+              <span className={styles.eyebrow}>A friend sent you their result</span>
+              <h1>Think you trade<br />differently?</h1>
+              <p>Six questions reveal the habits behind your entries, exits, and group-chat confidence.</p>
+              <button className={styles.primaryButton} type="button" onClick={beginFromReferral}>
+                Find my trader type <span>→</span>
+              </button>
+              <button className={styles.textButton} type="button" onClick={clearReferral}>Use another invite</button>
+            </div>
+          </div>
+        )}
+
+        {stage === "gate" && !referralPersona && (
           <div className={styles.gateStage}>
-            <h1>Enter your<br /><em>invite.</em></h1>
-            <p className={styles.lede}>
-              Use your one-time invite to unlock the 40-second trader type test.
-            </p>
+            <div className={styles.gateCopy}>
+              <span className={styles.eyebrow}>The SmartX trader type test</span>
+              <h1>What kind of trader are you—<em>really?</em></h1>
+              <p>Six questions. Nine trading personas. One result your group chat may already know.</p>
+            </div>
             <form className={styles.gateForm} onSubmit={submitGate}>
               <label htmlFor="invite-code">Invite code</label>
-              <div className={styles.inputRow}>
-                <input
-                  id="invite-code"
-                  type="text"
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  spellCheck={false}
-                  placeholder="SMARTX-OWL-7X2K"
-                  value={inviteCode}
-                  onChange={(event) => {
-                    setInviteCode(event.target.value.toUpperCase());
-                    setGateError("");
-                  }}
-                  aria-invalid={Boolean(gateError)}
-                  aria-describedby={gateError ? "invite-error" : "invite-note"}
-                  required
-                />
-                <button type="submit"><span>Continue</span><i aria-hidden="true">→</i></button>
-              </div>
-              {gateError
-                ? <small className={styles.gateError} id="invite-error" role="alert">{gateError}</small>
-                : <small id="invite-note">Each invite can be claimed once. It is reserved while you finish the test.</small>}
+              <input
+                id="invite-code"
+                type="text"
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                placeholder="SMARTX-RSK-7X2K"
+                value={inviteCode}
+                onChange={(event) => {
+                  setInviteCode(event.target.value.toUpperCase());
+                  setGateError("");
+                }}
+                aria-invalid={Boolean(gateError)}
+                aria-describedby={gateError ? "invite-error" : "invite-note"}
+                required
+              />
+              <button className={styles.primaryButton} type="submit">Reveal my type <span>→</span></button>
+              {gateError ? (
+                <small className={styles.formError} id="invite-error" role="alert">{gateError}</small>
+              ) : (
+                <small id="invite-note">Your invite is reserved for this session after validation.</small>
+              )}
+              <button className={styles.testCodeButton} type="button" onClick={() => { setInviteCode("123456"); setGateError(""); }}>
+                Use prototype code 123456
+              </button>
             </form>
           </div>
         )}
 
-        {stage === "email" && (
-          <div className={styles.joinStage}>
-            <h1>Save your<em>result.</em></h1>
-            <p className={styles.lede}>
-              Enter your email to reveal your trader type and activate your waitlist position.
-            </p>
-            <form className={styles.joinForm} onSubmit={submitEmail}>
-              <label htmlFor="waitlist-email">Email address</label>
-              <div className={styles.inputRow}>
-                <input
-                  id="waitlist-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@domain.com"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                />
-                <button type="submit"><span>Save my result</span><i aria-hidden="true">→</i></button>
+        {stage === "quiz" && (
+          <div className={styles.quizStage} key={questionIndex}>
+            <div className={styles.quizControls}>
+              {questionIndex > 0 ? <button type="button" onClick={goBack}>← Back</button> : <span />}
+              <div className={styles.progress} aria-label={`Question ${questionIndex + 1} of ${QUESTIONS.length}`}>
+                {QUESTIONS.map((question, index) => <i key={question.prompt} data-active={index <= questionIndex} />)}
               </div>
-              <small>Prototype only · your email stays in this browser and is not submitted.</small>
+            </div>
+            <h1>{QUESTIONS[questionIndex].prompt}</h1>
+            <div className={styles.optionGrid}>
+              {QUESTIONS[questionIndex].options.map((option) => (
+                <button type="button" key={option.id} onClick={() => answerQuestion(option)}>
+                  <ArtworkPlaceholder label={option.id} compact />
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {stage === "email" && (
+          <div className={styles.formStage}>
+            <span className={styles.eyebrow}>Your result is ready</span>
+            <h1>Keep it.</h1>
+            <p>Bind an email to save your result and activate your waitlist position.</p>
+            <form onSubmit={submitEmail}>
+              <label htmlFor="waitlist-email">Email address</label>
+              <input
+                id="waitlist-email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@domain.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+              <button className={styles.primaryButton} type="submit">Continue <span>→</span></button>
+              <small>Prototype only · no data is submitted.</small>
             </form>
           </div>
         )}
 
         {stage === "verify" && (
-          <div className={styles.otpStage}>
-            <h1>Confirm your<br /><em>email.</em></h1>
-            <p className={styles.lede}>
-              We sent a six-digit code to <b>{email}</b>. Verify it to activate your waitlist position.
-            </p>
-            <form className={styles.otpForm} onSubmit={submitOtp}>
+          <div className={styles.formStage}>
+            <span className={styles.eyebrow}>Check your inbox</span>
+            <h1>Six digits.</h1>
+            <p>Enter the code sent to <b>{email}</b>.</p>
+            <form onSubmit={submitOtp}>
               <label htmlFor="waitlist-otp">Verification code</label>
               <input
                 className={styles.otpInput}
@@ -458,168 +612,74 @@ export function WaitlistExperience() {
                 autoFocus
                 required
               />
-              <button className={styles.verifyButton} type="submit">
-                <span>Activate my position</span><i aria-hidden="true">→</i>
-              </button>
-              {otpError
-                ? <small className={styles.otpError} id="otp-error" role="alert">{otpError}</small>
-                : <small id="otp-note">Prototype verification code · <b>{OTP_CODE}</b></small>}
-              <div className={styles.otpMeta}>
-                <button type="button" onClick={() => { setOtpResent(true); setOtpError(""); }}>Resend code</button>
-                <span>{otpResent ? "A new code was sent." : "Code expires in 10 minutes."}</span>
-                <button type="button" onClick={() => { setEmailVerified(false); setStage("email"); }}>Change email</button>
+              <button className={styles.primaryButton} type="submit">See my result <span>→</span></button>
+              {otpError ? (
+                <small className={styles.formError} id="otp-error" role="alert">{otpError}</small>
+              ) : (
+                <small id="otp-note">Prototype code · <b>{OTP_CODE}</b></small>
+              )}
+              <div className={styles.formMeta}>
+                <button type="button" onClick={() => { setOtpResent(true); setOtpError(""); }}>
+                  {otpResent ? "Code sent again" : "Resend code"}
+                </button>
+                <button type="button" onClick={() => setStage("email")}>Change email</button>
               </div>
             </form>
           </div>
         )}
 
-        {stage === "quiz" && (
-          <div className={styles.quizStage} key={questionIndex}>
-            <div className={styles.quizTopline}>
-              {questionIndex > 0 ? <button className={styles.backButton} type="button" onClick={goBack}>← Previous</button> : <span />}
-              <span aria-label={`Question ${questionIndex + 1} of ${QUESTIONS.length}`}>{questionIndex + 1} / {QUESTIONS.length}</span>
-            </div>
-            <header className={styles.questionHeader}>
-              <h1>{QUESTIONS[questionIndex].prompt}</h1>
-            </header>
-            <div className={styles.cardSpread}>
-              {QUESTIONS[questionIndex].options.map((option, index) => (
-                <button type="button" key={option.id} onClick={() => answerQuestion(option)}>
-                  <span className={styles.cardRoman}>{ROMAN[index]}</span>
-                  <span className={styles.cardArt} aria-hidden="true">
-                    <Image
-                      src={`/assets/waitlist/cards/q${questionIndex + 1}-${option.id.toLowerCase()}.webp`}
-                      alt=""
-                      fill
-                      priority={index === 0}
-                      sizes="(max-width: 520px) calc(100vw - 80px), (max-width: 820px) 44vw, 280px"
-                    />
-                  </span>
-                  <span className={styles.cardAnswer}>{option.label}</span>
-                  <small>Select <i aria-hidden="true">→</i></small>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {stage === "result" && (
           <div className={styles.resultStage}>
-            <article className={styles.resultCard} data-owl={outcome.animal.code === "OWL"}>
-              <span className={styles.resultSheen} aria-hidden="true" />
-              <header>
-                <Image className={styles.resultLogo} src="/assets/smartx-logo.svg" alt="SmartX" width={218} height={42} />
-                <span>Trading Spirit Animal</span>
-              </header>
-              <div className={styles.resultIdentity}>
-                <p>{outcome.animal.code === "OWL" ? "Hidden gilded edition · 4%" : "Your trading spirit is"}</p>
-                <h1>{outcome.animal.name}</h1>
-                <span>{outcome.animal.cn}</span>
+            <PersonaPoster
+              persona={outcome.persona}
+              poles={outcome.poles}
+              preparedCards={preparedCards}
+              exportError={exportError}
+            />
+            <aside className={styles.resultPanel}>
+              <span className={styles.eyebrow}>Email verified · position active</span>
+              <div className={styles.rankBlock} data-boosted={shared}>
+                <span>Your waitlist position</span>
+                <strong key={position}>#{position.toLocaleString("en-US")}</strong>
+                <small>{shared ? "Result shared · moved up 500 places" : "Share your result to move up 500 places"}</small>
               </div>
-              <div className={styles.resultArtwork}>
-                <Image
-                  src={`/assets/waitlist/spirits/${outcome.animal.code.toLowerCase()}.webp`}
-                  alt={`${outcome.animal.name} celestial tarot illustration`}
-                  fill
-                  sizes="240px"
-                  priority
-                />
-                <span>{outcome.poles.join(" · ")}</span>
-              </div>
-              <blockquote>“{outcome.animal.verdict}”</blockquote>
-              <div className={styles.statList}>
-                {Object.entries(outcome.stats).map(([label, score]) => (
-                  <div key={label}>
-                    <span>{label}</span>
-                    <i><b style={{ "--score": `${score}%` } as CSSProperties} /></i>
-                    <strong>{score}</strong>
+
+              <section className={styles.communityBlock}>
+                <header><h2>Stay close to SmartX</h2><span>Optional</span></header>
+                <div>
+                  <button type="button" data-complete={telegramOpened} onClick={() => openCommunity("telegram")}>
+                    <FaTelegramPlane aria-hidden="true" /><span>Join Telegram</span><b>{telegramOpened ? "Opened ✓" : "↗"}</b>
+                  </button>
+                  <button type="button" data-complete={xOpened} onClick={() => openCommunity("x")}>
+                    <FaXTwitter aria-hidden="true" /><span>Follow on X</span><b>{xOpened ? "Opened ✓" : "↗"}</b>
+                  </button>
+                </div>
+              </section>
+
+              {!shared ? (
+                <button className={styles.shareButton} type="button" onClick={shareResult}>
+                  Share result & unlock invites <span>↗</span>
+                </button>
+              ) : (
+                <section className={styles.invitationDeck} aria-label="Invitation card deck">
+                  <header><span>Your one-time invites</span><b>{inviteIndex + 1} / {codes.length}</b></header>
+                  <div className={styles.inviteCodeCard}>
+                    <span>{outcome.persona.name}</span>
+                    <strong>{selectedCode}</strong>
+                    <small>One claim · includes your result preview</small>
                   </div>
-                ))}
-              </div>
-              <div className={styles.affinityRow}>
-                <div><span>Best match</span><strong>{outcome.animal.partner}</strong></div>
-                <div><span>Natural rival</span><strong>{outcome.animal.enemy}</strong></div>
-              </div>
-              <section className={styles.cardDownloads}>
-                <header><span>Download result</span><b>PNG</b></header>
-                <div>
-                  {preparedCards.story ? (
-                    <a href={preparedCards.story.href} download={preparedCards.story.filename}>
-                      <span>Story</span><small>1080 × 1920</small>
-                    </a>
-                  ) : (
-                    <span className={styles.savePlaceholder}><span>Story</span><small>{exportError ? "Unavailable" : "Preparing…"}</small></span>
-                  )}
-                  {preparedCards.og ? (
-                    <a href={preparedCards.og.href} download={preparedCards.og.filename}>
-                      <span>X / OG</span><small>1200 × 630</small>
-                    </a>
-                  ) : (
-                    <span className={styles.savePlaceholder}><span>X / OG</span><small>{exportError ? "Unavailable" : "Preparing…"}</small></span>
-                  )}
-                </div>
-              </section>
-              <footer><span>Rarer than {100 - outcome.animal.rarity}% of traders</span><b>For entertainment, not financial advice.</b></footer>
-            </article>
-
-            <aside className={styles.accessPanel}>
-              <div className={styles.rankPanel} data-boosted={shared}>
-                <div>
-                  <span>Your waitlist position</span>
-                  <strong key={position}>#{position.toLocaleString("en-US")}</strong>
-                  <small>{shared ? "Shared · moved up 500 places" : "Email verified · position active"}</small>
-                </div>
-                <p><b>+500 places</b><span>for every trader who enters through one of your invitation links</span></p>
-              </div>
-
-              <section className={styles.growthPanel}>
-                <header>
-                  <span>Share & invite</span>
-                  <b>{codes.length} invites</b>
-                </header>
-                {!shared ? (
-                  <>
-                    <p>Complete both, then share your result to unlock invites and move up 500 places.</p>
-                    <div className={styles.growthSteps}>
-                      <button type="button" data-complete={telegramOpened} onClick={() => openCommunity("telegram")}>
-                        <FaTelegramPlane aria-hidden="true" />
-                        <b>Join Telegram</b>
-                        <i>{telegramOpened ? "Done ✓" : "Open ↗"}</i>
-                      </button>
-                      <button type="button" data-complete={xOpened} onClick={() => openCommunity("x")}>
-                        <FaXTwitter aria-hidden="true" />
-                        <b>Follow on X</b>
-                        <i>{xOpened ? "Done ✓" : "Open ↗"}</i>
-                      </button>
-                    </div>
-                    <button className={styles.growthButton} type="button" disabled={!socialReady} onClick={shareResult}>
-                      {socialReady ? "Share result & unlock" : `${signsRemaining} ${signsRemaining === 1 ? "step" : "steps"} remaining`}
-                      <span>{socialReady ? "↗" : ""}</span>
+                  <div className={styles.inviteActions}>
+                    <button type="button" onClick={() => copyInvitation(selectedCode)}>
+                      {copiedCode === selectedCode ? "Copied ✓" : "Copy link"}
                     </button>
-                  </>
-                ) : (
-                  <section className={styles.invitationDeck} aria-label="Invitation card deck">
-                    <div className={styles.inviteCard} data-owl={outcome.animal.code === "OWL"} key={selectedCode}>
-                      <header><span>SmartX invite</span><b>One-time · No. {inviteIndex + 1}</b></header>
-                      <div className={styles.inviteSigil} aria-hidden="true">✦</div>
-                      {selectedCode && <strong>{selectedCode}</strong>}
-                      <code>{invitationUrl.replace("https://", "")}</code>
-                      <footer><span>Unused</span><b>Claim once</b></footer>
-                    </div>
-                    <div className={styles.deckActions}>
-                      <button type="button" onClick={() => copyInvitation(selectedCode)}>
-                        {copiedCode === selectedCode ? "Invitation copied ✓" : "Copy this invitation"}
-                      </button>
-                      <button type="button" onClick={shareInvitation}>Send on X ↗</button>
-                    </div>
-                    <div className={styles.deckNavigation}>
-                      <button type="button" disabled={inviteIndex === 0} onClick={() => setInviteIndex((current) => current - 1)}>← Previous</button>
-                      <span>{inviteIndex + 1} of {codes.length}</span>
-                      <button type="button" disabled={inviteIndex === codes.length - 1} onClick={() => setInviteIndex((current) => current + 1)}>Next →</button>
-                    </div>
-                  </section>
-                )}
-              </section>
+                    <button type="button" onClick={shareInvitation}>Send on X ↗</button>
+                  </div>
+                  <div className={styles.inviteNavigation}>
+                    <button type="button" disabled={inviteIndex === 0} onClick={() => setInviteIndex((current) => current - 1)}>←</button>
+                    <button type="button" disabled={inviteIndex === codes.length - 1} onClick={() => setInviteIndex((current) => current + 1)}>→</button>
+                  </div>
+                </section>
+              )}
               <button className={styles.restartButton} type="button" onClick={restart}>Take the test again</button>
             </aside>
           </div>

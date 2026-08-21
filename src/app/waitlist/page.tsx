@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { WaitlistExperience } from "@/components/waitlist/waitlist-experience";
 
 export const metadata: Metadata = {
-  title: "SmartX Waitlist | Find Your Trading Spirit Animal",
+  title: "SmartX Waitlist | Find Your Trader Type",
   description:
-    "Take a 40-second trading personality test, reveal your spirit animal, and move up the SmartX waitlist.",
+    "Take the six-question SmartX trader type test, save your result, and join the invite-only waitlist.",
   alternates: { canonical: "/waitlist/" },
   robots: { index: false, follow: false },
 };
