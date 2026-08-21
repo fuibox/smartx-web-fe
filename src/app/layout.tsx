@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
 
+import "@fontsource/ibm-plex-serif/400.css";
+import "@fontsource/ibm-plex-serif/500.css";
+import "@fontsource/ibm-plex-serif/600.css";
+
 import {
   SMARTX_DEFAULT_SOCIAL_IMAGE,
   SMARTX_OPEN_GRAPH_DEFAULTS,

@@ -45,9 +45,9 @@ Waitlist 是官网进入 SmartX 的第一段轻量产品体验，不是独立的
 Landing 工作文案：
 
 - Kicker: `THE SMARTX TRADER TYPE TEST`
-- H1: `What kind of trader are you—really?`
-- Lede: `Six questions. Nine trading personas. One result your group chat may already know.`
-- CTA: `Reveal my type`
+- H1: `How do you trade when it gets real?`
+- Lede: `Six decisions reveal your risk, signal, and social instincts.`
+- CTA: `Begin`
 
 ### 2.2 好友分享入口
 
@@ -74,7 +74,7 @@ Landing 工作文案：
 
 - 每屏一道题、一张主图、四条纵向文本选项。
 - 桌面端建议图片与答题区左右排列；移动端图片在上、选项在下。
-- 只保留低存在感的返回按钮和六段进度线。
+- 只保留低存在感的返回按钮和六个进度点，不显示维度名或 `4 OF 6`。
 - 选择答案后进入下一题；返回时可以覆盖答案。
 - 六题完成后才要求邮箱；邮箱验证成功后生成并激活排名。
 - Telegram 和 X 始终为可选动作，不影响查看结果或排名。
@@ -82,36 +82,51 @@ Landing 工作文案：
 邮箱页只说明一件事：
 
 - Kicker: `YOUR RESULT IS READY`
-- H1: `Keep it.`
-- Lede: `Bind an email to save your result and activate your waitlist position.`
+- H1: `Save your result.`
+- Lede: `Bind an email to keep it and create your waitlist position.`
 
 ## 3. 测试与计分
 
-### 3.1 三条连续属性
+### 3.1 双层计分模型
 
-| 属性 | 低端 | 高端 | 表达的行为差异 |
+测试同时产出两组不同的数据，不能混为一谈：
+
+1. **人格判型轴**决定用户属于哪一种人格。
+2. **结果展示属性**形成结果卡上的信仰、嗅觉和复原力数值。
+
+#### 人格判型轴
+
+| 判型轴 | 低端 | 高端 | 表达的行为差异 |
 | --- | --- | --- | --- |
 | Risk posture | Sniper | Degen | 等待计划内机会，还是主动追逐高波动机会 |
 | Decision basis | Gut | Data | 更依赖直觉与叙事，还是证据、图表与链上数据 |
 | Trading mode | Lone | Pack | 独立决策，还是主动参考并影响社群 |
 
-每条属性由两道题测量。每道题的四个选项只测量一个主维度，并分别赋值：
+每条判型轴由两道题测量。每道题的四个选项只测量一个主轴，并分别赋予 `axis_weight`：
 
 ```text
 -2 / -1 / +1 / +2
 ```
 
-两题相加后，每条轴可获得 `-4` 到 `+4` 的九档结果。展示值统一换算为 `0–100`：
-
-```text
-display_score = (raw_score + 4) / 8 × 100
-```
-
-结果页可以显示整数，但不使用小数，也不把六道题包装成心理测量学结论。
-
-人格由三条属性的方向决定；属性数值保留强弱差异。因此两位用户可以得到同一人格，但拥有不同的三项数值。
+两题相加后，每条判型轴可获得 `-4` 到 `+4` 的九档结果。三条轴的方向组合决定八种常规人格；判型轴在结果页只作为 `DEGEN · DATA · PACK` 一类解释标签，不作为结果卡的三条属性条。
 
 若某条轴恰好为 `0`，使用该轴第二道题的答案方向打破平局；规则固定且随 `quiz_version` 保存。
+
+#### 结果展示属性
+
+| 展示属性 | 英文 | 表达的行为差异 |
+| --- | --- | --- |
+| 信仰 | Conviction | 敢押、敢扛，以及对自己判断的坚持程度 |
+| 嗅觉 | Instinct | 发现机会、读取信号和判断时机的敏感度 |
+| 复原力 | Resilience | 面对亏损、止损和波动后继续留在场内的能力 |
+
+每个答案除 `axis_weight` 外，还可以为一到两项展示属性写入 `stat_delta`。展示属性从 30 分起算，最终限制在 `5–99`：
+
+```text
+stat_score = clamp(5, 99, 30 + sum(stat_delta))
+```
+
+人格只由判型轴决定，展示属性只由属性加点决定。两位用户可以得到同一人格，但拥有不同的信仰、嗅觉和复原力。结果页可以显示整数，但不使用小数，也不把六道题包装成心理测量学结论。
 
 ### 3.2 六道题的建议结构
 
@@ -121,61 +136,61 @@ display_score = (raw_score + 4) / 8 × 100
 
 **R1 · A coin you do not own is up 40%. What do you do?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Buy now. Momentum rarely waits. | +2 |
-| Start small now and add if it holds. | +1 |
-| Set my entry and wait. | -1 |
-| Pass. No setup, no trade. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Buy now. Momentum rarely waits. | +2 | Conviction +15 |
+| Start small now and add if it holds. | +1 | Conviction +10 · Instinct +5 |
+| Set my entry and wait. | -1 | Instinct +10 |
+| Pass. No setup, no trade. | -2 | Resilience +10 · Instinct +5 |
 
 **R2 · Your position moves 20% against you. What happens next?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Add immediately. The market is improving my entry. | +2 |
-| Give it more room before deciding. | +1 |
-| Reduce the position according to plan. | -1 |
-| Exit at invalidation. No debate. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Add immediately. The market is improving my entry. | +2 | Conviction +15 |
+| Give it more room before deciding. | +1 | Conviction +10 · Resilience +5 |
+| Reduce the position according to plan. | -1 | Resilience +10 · Instinct +5 |
+| Exit at invalidation. No debate. | -2 | Resilience +15 |
 
 #### Decision basis
 
 **D1 · Before entering a trade, what convinces you most?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Wallet flows, data, and a clear invalidation level. | +2 |
-| Chart structure and price confirmation. | +1 |
-| The market’s mood and momentum. | -1 |
-| A strong thesis that simply feels early. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Wallet flows, data, and a clear invalidation level. | +2 | Instinct +15 |
+| Chart structure and price confirmation. | +1 | Instinct +10 · Resilience +5 |
+| The market’s mood and momentum. | -1 | Conviction +5 · Instinct +5 |
+| A strong thesis that simply feels early. | -2 | Conviction +10 · Instinct +5 |
 
 **D2 · A trader you trust posts a high-conviction call. What do you do?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Verify it with onchain data and market structure. | +2 |
-| Check the chart before taking a position. | +1 |
-| Open a small starter because I trust the source. | -1 |
-| Follow immediately. Conviction is contagious. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Verify it with onchain data and market structure. | +2 | Instinct +15 |
+| Check the chart before taking a position. | +1 | Instinct +10 · Resilience +5 |
+| Open a small starter because I trust the source. | -1 | Conviction +5 · Instinct +5 |
+| Follow immediately. Conviction is contagious. | -2 | Conviction +10 |
 
 #### Trading mode
 
 **S1 · You catch a 10×. Who hears first?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Screenshot, group chat, X. | +2 |
-| My close trading group. | +1 |
-| One trusted friend, maybe. | -1 |
-| No one. I take profit and keep moving. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Screenshot, group chat, X. | +2 | Conviction +10 |
+| My close trading group. | +1 | Conviction +5 · Resilience +5 |
+| One trusted friend, maybe. | -1 | Resilience +5 · Instinct +5 |
+| No one. I take profit and keep moving. | -2 | Resilience +10 · Instinct +5 |
 
 **S2 · Your group chat strongly disagrees with your trade. What do you do?**
 
-| 选项方向 | 分值 |
-| --- | ---: |
-| Debate it with the group and adjust if they have a point. | +2 |
-| Listen first, then decide. | +1 |
-| Note the feedback but keep my plan. | -1 |
-| Ignore the noise and execute alone. | -2 |
+| 选项方向 | `axis_weight` | `stat_delta` |
+| --- | ---: | --- |
+| Debate it with the group and adjust if they have a point. | +2 | Resilience +5 · Instinct +5 |
+| Listen first, then decide. | +1 | Instinct +10 · Resilience +5 |
+| Note the feedback but keep my plan. | -1 | Conviction +5 · Resilience +10 |
+| Ignore the noise and execute alone. | -2 | Conviction +10 · Resilience +5 |
 
 ### 3.3 九种人格
 
@@ -230,6 +245,11 @@ Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture �
 - 页面关闭或保留过期后自动释放。
 - 若邀请码过期或被占用，用户已经完成的答案必须保留，只需更换邀请码，不得要求重答。
 - 前端不显示倒计时，只提示：`Your invite is reserved for this session.`
+- 入口错误必须区分并给出下一步：
+  - 无效：`Invite code not recognized. Check the code and try again.`
+  - 已使用：`This invite has already been claimed. Ask for another one.`
+  - 被其他会话暂时锁定：`This invite is being used in another session. Try again in 2 minutes.`
+- 原型保留 `123456`，`Use prototype code` 在本地一键直接进入第一题；生产环境移除该入口。
 
 ### 4.2 结果快照
 
@@ -238,7 +258,7 @@ Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture �
 结果快照冻结：
 
 - `quiz_version`
-- 六道答案及三条原始分、展示分
+- 六道答案、三条判型轴原始分和三项展示属性分
 - `persona_id`
 - `best_match_id` 与 `natural_rival_id`
 - `copy_version` 与 `card_version`
@@ -247,7 +267,7 @@ Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture �
 
 ### 4.3 结果页层级
 
-1. 人格名、三项属性和一句 roast。
+1. 人格名、判型标签、信仰/嗅觉/复原力和一句 roast。
 2. Best Match / Natural Rival 及简短解释。
 3. Waitlist 排名和一个主要分享 CTA。
 4. 可选 Telegram / X。
@@ -281,24 +301,25 @@ Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture �
 
 ### 6.1 核心埋点
 
-| 事件 | 关键属性 |
-| --- | --- |
-| `waitlist_landing_view` | `entry_type: direct/referral`, `result_id_present`, `invite_present` |
-| `referral_result_view` | `result_id`, `persona_id` |
-| `invite_submit` | `entry_type` |
-| `invite_reserve_success` | `entry_type` |
-| `invite_reserve_failed` | `reason` |
-| `quiz_started` | `quiz_version`, `entry_type` |
-| `quiz_answered` | `question_id`, `option_id`, `elapsed_ms` |
-| `quiz_completed` | `result_id`, `persona_id`, `risk_score`, `basis_score`, `mode_score` |
-| `email_submitted` | `result_id` |
-| `email_verified` | `result_id` |
-| `result_viewed` | `result_id`, `persona_id` |
-| `community_clicked` | `channel` |
-| `result_shared` | `result_id`, `channel` |
-| `invite_link_copied` | `result_id` |
-| `invite_redeemed` | `source_result_id` |
-| `rank_reward_applied` | `result_id`, `reward_type` |
+| 事件 | 用人话说明监测什么 | 关键属性 |
+| --- | --- | --- |
+| `waitlist_landing_view` | 有多少人进入活动，以及来自官网直达还是朋友分享 | `entry_type: direct/referral`, `result_id_present`, `invite_present` |
+| `referral_result_view` | 朋友分享的真实结果有没有被打开，哪类人格最能带来访问 | `result_id`, `persona_id` |
+| `invite_submit` | 用户看到邀请码门槛后，是否愿意尝试进入 | `entry_type` |
+| `invite_reserve_success` | 有多少人持有效邀请码并真正通过入口 | `entry_type` |
+| `invite_reserve_failed` | 用户被挡在入口的主要原因是无效、已使用、被占用还是过期 | `reason` |
+| `quiz_started` | 通过邀请码的人里，有多少真正开始测试 | `quiz_version`, `entry_type` |
+| `quiz_answered` | 每道题的选择分布、作答耗时，以及用户最容易在哪一题流失 | `question_id`, `option_id`, `elapsed_ms` |
+| `quiz_completed` | 测试完成率、人格分布是否失衡，以及两套分数是否按预期产出 | `result_id`, `persona_id`, `risk_score`, `basis_score`, `mode_score`, `conviction_score`, `instinct_score`, `resilience_score` |
+| `email_submitted` | 看完“结果已生成”的提示后，有多少人愿意用邮箱换取保存和排名 | `result_id` |
+| `email_verified` | 有多少人完成真实邮箱验证并正式激活 waitlist 资格 | `result_id` |
+| `result_viewed` | 验证成功后，结果是否顺利揭示并被用户看到 | `result_id`, `persona_id` |
+| `community_clicked` | 用户对 Telegram 或 X 哪个后续承接渠道更感兴趣 | `channel` |
+| `share_clicked` | 用户是否产生分享意愿，以及选择了哪个渠道；只打开 X 分享窗口也记录在这里 | `result_id`, `channel` |
+| `result_shared` | 仅在渠道能够确认完成时，监测结果是否真的完成分享；X intent 不以此记成功 | `result_id`, `channel`, `confirmation_type` |
+| `invite_link_copied` | 用户是否把一次性邀请链接复制出去，代表更强的邀请意图 | `result_id` |
+| `invite_redeemed` | 复制或发送出去的邀请最终有没有带来一位完成准入的新用户 | `source_result_id` |
+| `rank_reward_applied` | 分享或有效邀请对应的排名奖励有没有正确且只发放一次 | `result_id`, `reward_type` |
 
 埋点不得上传邮箱、完整邀请码、验证码或自由输入文本。
 
@@ -313,8 +334,9 @@ Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture �
 
 - [ ] 直接入口与好友分享入口均按本 PRD 工作。
 - [ ] 分享链接使用真实 `result_id`，能恢复人格、属性、搭档和天敌。
-- [ ] 六题全部使用四档权重，题目与选项只测量声明的主维度。
-- [ ] 同一人格能够产生不同的三项属性值。
+- [ ] 六题全部使用四档判型权重，题目与选项只测量声明的主轴，并独立写入展示属性加点。
+- [ ] 结果卡展示信仰、嗅觉和复原力；判型轴只用于人格判定与标签解释。
+- [ ] 同一人格能够产生不同的信仰、嗅觉和复原力。
 - [ ] Risk Monk 只能由极度克制的风险答案生成。
 - [ ] 答题页为一张主图和四条纵向选项。
 - [ ] 邮箱、Telegram 和 X 不前置到答题前。
