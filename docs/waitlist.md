@@ -1,351 +1,330 @@
 # SmartX Waitlist PRD
 
-> 状态：2026-08-21 可评审原型版
-> 当前目标：先冻结内容结构、流程和信息层级；人格图片体系暂不冻结，原型统一使用中性 1:1 占位。
+> 状态：2026-08-21 产品规则收敛版
+> 当前目标：冻结入口、答题、计分、结果与传播规则；图片和最终视觉体系在方向稿选定后再冻结。
 
-## 1. 方案来源与优先级
+## 1. 产品目标与原则
 
-本 PRD 汇总以下来源。若细节冲突，以本文件的「当前决策」为准：
+Waitlist 是官网进入 SmartX 的第一段轻量产品体验，不是独立的娱乐测试站。
 
-1. 老板原始方案：[Google Docs · Waitlist 原始方案](https://docs.google.com/document/d/1WMWelasjt_FaDw1Eq6RyEfoFiATGIotFVrykRmhdQZg/edit?tab=t.0#heading=h.mmfzw89y7pj2)
-2. 产品补充与问题说明：[Lark · Waitlist 方案索引](https://wjpvbd3lg9kg.jp.larksuite.com/wiki/D6mGwhuBBiGzEtkS0pOjgEQKpmh)
-3. 运营改版稿：[Google Docs · 交易人格测试新方案](https://docs.google.com/document/d/1WTJraroBjYy4XgoXqjVePK7k0EmfM8TB/edit)
-4. 官网视觉意向：[Figma · 首页方向 21924:2](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=21924-2) / [Figma · 产品段 21929:2](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=21929-2)
-5. 官网实现约束：`docs/website-v4.md`
+它承担四个任务：
 
-## 2. 产品意图
+1. 用六道交易场景题让用户快速获得可自我投射的结果。
+2. 通过严格 invite-only 保持首发稀缺性和传播链路可控。
+3. 在答题后用邮箱保存结果并激活 waitlist 排名。
+4. 用可分享的人格、属性和关系结果吸引好友继续测试。
 
-Waitlist 不是独立的娱乐测试站，而是官网进入 SmartX 的第一段轻量产品体验。它同时承担四件事：
-
-1. 用低门槛测试让用户产生自我投射和分享动机。
-2. 用邀请码保持首发稀缺性和传播链路的可控性。
-3. 用邮箱绑定保存结果并激活 waitlist 排名。
-4. 用人格结果解释 SmartX 将如何逐步理解用户，而不是只发一张好玩的卡。
-
-完整因果链：
+核心链路：
 
 ```text
-交易习惯 → 人格结果 → 结果卡 → 邮箱与排名 → 分享结果 → 好友通过邀请进入
+邀请码 → 六道题 → 邮箱验证 → 人格与属性 → 排名 → 分享结果 → 好友使用邀请进入
 ```
 
-## 3. 当前决策摘要
+产品原则：
 
-- 首发严格 invite-only；没有有效邀请码不能答题或绑定邮箱。
-- 直接访问和分享访问使用两种 Landing 状态。
-- 邀请验证成功后直接答题，不在前置阶段要求邮箱、Telegram 或 X。
-- 6 道题完成后绑定邮箱；邮箱验证成功后生成并激活排名。
-- Join Telegram / Follow X 放在结果页，均不阻塞结果或排名。
-- 分享结果后前进 500 名并解锁一次性邀请链接；具体奖励规则上线前仍需后端确认。
-- 当前 9 种结果沿用现有答案到结果的对应关系，本轮只替换人格名称和解释，不重新审计算法。
-- 采用运营提出的自嘲人格方向；不再使用动物名作为公开主身份。
-- 不建设统一神兽世界观，也不借用 Harry Potter、Marvel 等受版权约束的角色体系。
-- 人格英文名采用“可理解的交易梗”，不逐字直译中文。
-- 当前 Owl / 像素插图方案不冻结。所有结果图和题目图先保留 1:1 占位，待官网和品牌资产方向确认后再替换。
-- 原塔罗资产只归档，不进入当前页面或构建引用。
+- 一屏只完成一个主要任务。
+- 邀请码是准入门槛，邮箱、Telegram 和 X 不前置。
+- 人格、属性、搭档和天敌必须来自同一套计分结果，不能互相矛盾。
+- 结果允许自嘲，但先让用户觉得“像我”，再让用户觉得“好笑”。
+- Waitlist 与官网共享品牌和产品承接，不复制官网的长页面结构与像素语法。
 
-## 4. 用户流程
+## 2. 用户流程
 
-### 4.1 直接入口
+### 2.1 直接入口
 
 ```text
 /waitlist
-  → Landing：解释测试价值
-  → 输入邀请码
-  → 服务端验证并短期保留邀请码
-  → 6 道题
-  → 绑定邮箱
-  → Double opt-in
-  → 人格结果 + 激活后的排名
+  → 输入并验证邀请码
+  → 六道题
+  → 绑定邮箱并验证
+  → 人格、三项属性、搭档/天敌和排名
   → 可选加入 Telegram / Follow X
-  → 分享结果并解锁邀请
+  → 分享结果并获得一次性邀请
 ```
 
-直接 Landing 工作文案：
+Landing 工作文案：
 
 - Kicker: `THE SMARTX TRADER TYPE TEST`
 - H1: `What kind of trader are you—really?`
 - Lede: `Six questions. Nine trading personas. One result your group chat may already know.`
 - CTA: `Reveal my type`
 
-### 4.2 分享入口
+### 2.2 好友分享入口
+
+生产链接：
 
 ```text
-/waitlist?result={persona_code}&invite={invite_code}
-  → 展示分享者的人格结果卡
-  → CTA：Find my trader type
-  → 使用 URL 中的邀请码开始答题
+/waitlist/r/{result_id}?invite={one_time_invite}
 ```
 
-分享入口必须先展示朋友结果，不能因 URL 中已有有效邀请码而直接跳到第一题。这个页面的主要传播张力是：
+进入后先展示朋友的真实结果，再邀请访问者测试。不得因为 URL 已带邀请码而直接跳题。
 
-> 朋友得到这个结果，你是否也是这样？
+页面顺序：
 
-若邀请码已经失效：
+```text
+朋友的结果海报与属性
+  → Best Match / Natural Rival
+  → Find my trader type
+  → 使用链接中的一次性邀请码开始答题
+```
 
-1. 仍可看到朋友结果。
-2. 点击 CTA 后明确提示邀请已失效。
-3. 保留页面，不丢失上下文；切换为输入另一个邀请码。
+若邀请码已失效，朋友结果仍然可见；CTA 切换为输入其他邀请码，不丢失当前页面。
 
-### 4.3 答题
+### 2.3 答题、邮箱与结果
 
-- 每屏只显示一道问题和四个选项。
-- 不显示 `Invite / Test / Result` 顶部步骤导航。
-- 不显示 `SIGNAL · 4 OF 6` 一类内部维度标签。
+- 每屏一道题、一张主图、四条纵向文本选项。
+- 桌面端建议图片与答题区左右排列；移动端图片在上、选项在下。
 - 只保留低存在感的返回按钮和六段进度线。
-- 问题标题需要明确的行距，标题与选项至少留出一个完整视觉段落。
-- 每个选项保留固定 1:1 图片位；当前只显示中性占位，不以临时图片反向决定未来资产比例。
-- 选择答案后自动进入下一题；允许返回上一题并覆盖答案。
+- 选择答案后进入下一题；返回时可以覆盖答案。
+- 六题完成后才要求邮箱；邮箱验证成功后生成并激活排名。
+- Telegram 和 X 始终为可选动作，不影响查看结果或排名。
 
-### 4.4 邮箱与验证
-
-完成答题后只说明一件事：绑定邮箱才能保存结果并激活排名。
-
-不再展示以下解释性清单：
-
-- `Your answers / Saved with your result`
-- `Your position / Created after verification`
-- `Community tasks / Optional until the end`
-
-邮箱页面工作文案：
+邮箱页只说明一件事：
 
 - Kicker: `YOUR RESULT IS READY`
 - H1: `Keep it.`
 - Lede: `Bind an email to save your result and activate your waitlist position.`
 
-### 4.5 结果、社群和分享
+## 3. 测试与计分
 
-结果页采用两栏：
+### 3.1 三条连续属性
 
-- 左侧：人格海报、人格解释、roast line、下载入口。
-- 右侧：排名、可选社群动作、分享 CTA；分享后原位切换为邀请链接。
+| 属性 | 低端 | 高端 | 表达的行为差异 |
+| --- | --- | --- | --- |
+| Risk posture | Sniper | Degen | 等待计划内机会，还是主动追逐高波动机会 |
+| Decision basis | Gut | Data | 更依赖直觉与叙事，还是证据、图表与链上数据 |
+| Trading mode | Lone | Pack | 独立决策，还是主动参考并影响社群 |
 
-结果一出现就展示激活后的排名。Telegram 和 X 是可选后续动作，不再作为查看结果、生成排名或分享结果的前置条件。
-
-## 5. 邀请码短租约
-
-“锁定 2 分钟”不能只用前端倒计时实现。生产方案使用可续约短租约：
-
-1. `POST /invite/reserve` 用原子 compare-and-set 把 `unused → reserved`。
-2. 返回不可猜的 `reservation_token` 和 `expires_at = now + 2 min`。
-3. 同一个邀请码只有一个有效 reservation；第二个并发请求必须失败。
-4. 用户答题期间，每次保存答案把租约续到「当前时间 + 2 分钟」。
-5. 设置总持有上限，例如 10 分钟，避免邀请码被无限占用。
-6. 邮箱提交时，在一个事务内保存答案并完成 `reserved → claimed_pending_verification`；验证码阶段不再依赖短租约。
-7. 页面关闭或租约过期后自动释放为 `unused`。
-8. 邮箱提交瞬间若租约刚过期，保留本地答案，先尝试重新获取原码；失败时只换邀请码，不要求重答。
-9. 多标签页只有持有 reservation token 的会话可以消费邀请码。
-10. 同一邮箱重复提交必须幂等恢复已有记录。
-
-前端不显示持续倒数，只显示：
-
-> Your invite is reserved for this session.
-
-## 6. 分享链接与状态契约
-
-生产分享 URL 需要把公开结果和一次性邀请码分开：
+每条属性由两道题测量。每道题的四个选项只测量一个主维度，并分别赋值：
 
 ```text
-/waitlist?result={immutable_result_id}&invite={one_time_invite}
+-2 / -1 / +1 / +2
 ```
 
-当前纯前端原型暂用人格代码代替 `result_id`：
+两题相加后，每条轴可获得 `-4` 到 `+4` 的九档结果。展示值统一换算为 `0–100`：
 
 ```text
-/waitlist?result=CND&invite=SMARTX-CND-7X2K
+display_score = (raw_score + 4) / 8 × 100
 ```
 
-上线要求：
+结果页可以显示整数，但不使用小数，也不把六道题包装成心理测量学结论。
 
-- 每次完成测试生成不可变 `result_id`。
-- 分享页根据 `result_id` 恢复人格、文案版本和 OG 图。
-- 重测生成新结果，不覆盖旧分享链接。
-- 邀请码一次性消费；普通传播 `ref` 不消耗邀请码。
-- 分享奖励、邀请兑换和排名变化全部幂等。
-- X intent 只证明分享窗口成功打开，不能证明帖子实际发布。
+人格由三条属性的方向决定；属性数值保留强弱差异。因此两位用户可以得到同一人格，但拥有不同的三项数值。
 
-必须持久化的状态：
+若某条轴恰好为 `0`，使用该轴第二道题的答案方向打破平局；规则固定且随 `quiz_version` 保存。
 
-- `quiz_in_progress / quiz_completed`
-- `reservation: active / expired / converted`
-- `invite: unused / reserved / claimed_pending_verification / claimed / expired`
-- `email: pending_verification / verified`
-- `rank: pending / active`
-- `community_clicked / x_follow_clicked`
-- `share_reward: none / pending / applied`
+### 3.2 六道题的建议结构
 
-## 7. 九种交易人格
+以下是逻辑基准，英文语气可以继续润色，但选项顺序在前端随机展示时必须保留权重映射。
 
-当前对照关系保持不变：
+#### Risk posture
 
-| 原结果 | 兼容旧代码 | 公开代码 | 中文人格 | 英文人格 | 三维组合 |
-| --- | --- | --- | --- | --- | --- |
-| Degen Ape | APE | LQD | 送钱者 | **The Liquidity Donor** | DEGEN · GUT · PACK |
-| Moon Wolf | WOLF | AIM | 梭哈仙人 | **The All-In Mystic** | DEGEN · GUT · LONE |
-| Echo Parrot | PARROT | SIG | 喊单军师 | **The Signal General** | DEGEN · DATA · PACK |
-| Chart Fox | FOX | CND | K线教主 | **The Candle Prophet** | DEGEN · DATA · LONE |
-| Diamond Turtle | TURTLE | DIP | 抄底带头大哥 | **The Dip Ringleader** | SNIPER · GUT · PACK |
-| Hibernating Bear | BEAR | DOC | 行情老中医 | **The Market Doctor** | SNIPER · GUT · LONE |
-| Whale Whisperer | WHALE | CHN | 链上侦探 | **The Onchain Detective** | SNIPER · DATA · PACK |
-| Shadow Cat | CAT | LMT | 潜伏狙击手 | **The Limit Sniper** | SNIPER · DATA · LONE |
-| The Owl | OWL | RSK | 风控大师 | **The Risk Monk** | 隐藏签名规则暂不变 |
+**R1 · A coin you do not own is up 40%. What do you do?**
 
-### 7.1 The Liquidity Donor / 送钱者
+| 选项方向 | 分值 |
+| --- | ---: |
+| Buy now. Momentum rarely waits. | +2 |
+| Start small now and add if it holds. | +1 |
+| Set my entry and wait. | -1 |
+| Pass. No setup, no trade. | -2 |
 
-> You chase heat, trust the vibe, and usually bring the group chat with you. Wherever the market needs liquidity, your wallet arrives first.
+**R2 · Your position moves 20% against you. What happens next?**
 
-Roast: `You’re not trading. You’re funding the ecosystem.`
+| 选项方向 | 分值 |
+| --- | ---: |
+| Add immediately. The market is improving my entry. | +2 |
+| Give it more room before deciding. | +1 |
+| Reduce the position according to plan. | -1 |
+| Exit at invalidation. No debate. | -2 |
 
-### 7.2 The All-In Mystic / 梭哈仙人
+#### Decision basis
 
-> You do not need a poll or a spreadsheet. You have a feeling—and right before every all-in, it feels like enlightenment.
+**D1 · Before entering a trade, what convinces you most?**
 
-Roast: `Every all-in starts with enlightenment and ends with reincarnation.`
+| 选项方向 | 分值 |
+| --- | ---: |
+| Wallet flows, data, and a clear invalidation level. | +2 |
+| Chart structure and price confirmation. | +1 |
+| The market’s mood and momentum. | -1 |
+| A strong thesis that simply feels early. | -2 |
 
-### 7.3 The Signal General / 喊单军师
+**D2 · A trader you trust posts a high-conviction call. What do you do?**
 
-> Charts checked. Wallets tracked. Three hours of analysis later, the strategy still comes down to two words: send it. Naturally, everyone must hear about it.
+| 选项方向 | 分值 |
+| --- | ---: |
+| Verify it with onchain data and market structure. | +2 |
+| Check the chart before taking a position. | +1 |
+| Open a small starter because I trust the source. | -1 |
+| Follow immediately. Conviction is contagious. | -2 |
 
-Roast: `Three hours of research. Two-word thesis: send it.`
+#### Trading mode
 
-### 7.4 The Candle Prophet / K线教主
+**S1 · You catch a 10×. Who hears first?**
 
-> You trust candles, structure, and support levels more than people. Your system explains almost everything—except, occasionally, your position size.
+| 选项方向 | 分值 |
+| --- | ---: |
+| Screenshot, group chat, X. | +2 |
+| My close trading group. | +1 |
+| One trusted friend, maybe. | -1 |
+| No one. I take profit and keep moving. | -2 |
 
-Roast: `You can chart every line except the one marking enough exposure.`
+**S2 · Your group chat strongly disagrees with your trade. What do you do?**
 
-### 7.5 The Dip Ringleader / 抄底带头大哥
+| 选项方向 | 分值 |
+| --- | ---: |
+| Debate it with the group and adjust if they have a point. | +2 |
+| Listen first, then decide. | +1 |
+| Note the feedback but keep my plan. | -1 |
+| Ignore the noise and execute alone. | -2 |
 
-> You do not chase; you wait for the pullback. Once your gut calls the bottom, the whole group chat gets recruited to buy it with you.
+### 3.3 九种人格
 
-Roast: `You’re not buying the dip. You’re giving the downtrend a demo.`
+八种常规人格来自三条轴的八种方向组合：
 
-### 7.6 The Market Doctor / 行情老中医
+| 代码 | 中文人格 | 英文人格 | 三维组合 |
+| --- | --- | --- | --- |
+| LQD | 送钱者 | The Liquidity Donor | DEGEN · GUT · PACK |
+| AIM | 梭哈仙人 | The All-In Mystic | DEGEN · GUT · LONE |
+| SIG | 喊单军师 | The Signal General | DEGEN · DATA · PACK |
+| CND | K线教主 | The Candle Prophet | DEGEN · DATA · LONE |
+| DIP | 抄底带头大哥 | The Dip Ringleader | SNIPER · GUT · PACK |
+| DOC | 行情老中医 | The Market Doctor | SNIPER · GUT · LONE |
+| CHN | 链上侦探 | The Onchain Detective | SNIPER · DATA · PACK |
+| LMT | 潜伏狙击手 | The Limit Sniper | SNIPER · DATA · LONE |
 
-> You do not rush and you do not need the crowd. Other traders read indicators; you take the market’s pulse and decide whether its complexion looks healthy.
+第九种 `RSK · The Risk Monk / 风控大师` 是克制型签名结果，仅在以下条件同时成立时覆盖常规人格：
 
-Roast: `Every symptom diagnosed. Every loss professionally explained.`
+1. Risk posture 原始分为 `-4`，即两道风险题都选择最克制答案。
+2. Decision basis 与 Trading mode 均未达到绝对极值 `4`。
 
-### 7.7 The Onchain Detective / 链上侦探
+这保证“风控大师”不会由明显 degen 的回答生成，也不会覆盖极端鲜明的 Data/Gut 或 Pack/Lone 行为。
 
-> Charts, flows, smart wallets—you inspect everything. You know who moved, what they bought, and where the money went before the group chat asks.
+每个人格必须包含：中文名、英文名、行为解释、roast line、视觉代码和内容版本。详细文案以代码内容源为准，PRD 不重复维护九段长文。
 
-Roast: `You know everyone’s position except, occasionally, your own.`
+### 3.4 搭档与天敌
 
-### 7.8 The Limit Sniper / 潜伏狙击手
+第一版采用人格级固定关系，保证文案稳定且可解释：
 
-> The thesis is ready and the entry is precise. You will wait as long as it takes—even when the market has no intention of coming back for you.
+| 人格 | Best Match | Natural Rival |
+| --- | --- | --- |
+| Liquidity Donor | Dip Ringleader | Limit Sniper |
+| All-In Mystic | Market Doctor | Onchain Detective |
+| Signal General | Onchain Detective | Market Doctor |
+| Candle Prophet | Limit Sniper | Dip Ringleader |
+| Dip Ringleader | Liquidity Donor | Candle Prophet |
+| Market Doctor | All-In Mystic | Signal General |
+| Onchain Detective | Signal General | All-In Mystic |
+| Limit Sniper | Candle Prophet | Liquidity Donor |
+| Risk Monk | Onchain Detective | Liquidity Donor |
 
-Roast: `The limit order was perfect. Shame you two never met again.`
+Best Match 通常共享 Decision basis 与 Trading mode，但在 Risk posture 上互补；Natural Rival 通常位于三个方向的对面。每组关系需要一条不超过两行的解释。
 
-### 7.9 The Risk Monk / 风控大师
+## 4. 邀请、结果、排名与分享
 
-> Low leverage. Clean exits. Profits taken without ceremony. While everyone hunts the next 10×, you make sure there is a next trade.
+### 4.1 邀请码保留
 
-Roast: `They study how to double once. You study how to stay in the game.`
+- 首发严格 invite-only。
+- 邀请码验证成功后原子保留 2 分钟，同一时间只能被一个会话持有。
+- 用户持续答题时续期，最长持有 10 分钟。
+- 邮箱提交后邀请码进入待验证状态，不再依赖短租约。
+- 页面关闭或保留过期后自动释放。
+- 若邀请码过期或被占用，用户已经完成的答案必须保留，只需更换邀请码，不得要求重答。
+- 前端不显示倒计时，只提示：`Your invite is reserved for this session.`
 
-## 8. 人格命名与翻译原则
+### 4.2 结果快照
 
-英文不是逐字翻译，而是需要同时满足：
+每次完成测试生成新的、不可枚举的 `result_id`。重测不会覆盖旧结果。
 
-1. 不看中文也能大致猜出行为特征。
-2. 是英语交易社群会自然使用的词，不像机器直译。
-3. 有自嘲感，但不能让用户觉得结果在单纯羞辱自己。
-4. 名称适合放在图片上，长度尽量控制在 2–4 个词。
-5. 结果解释先描述真实行为，再给一句 roast；不能只剩梗。
+结果快照冻结：
 
-上线前建议用 10–15 名中英文目标用户做命名快测：可理解度、接受度、复述率和分享意愿。
+- `quiz_version`
+- 六道答案及三条原始分、展示分
+- `persona_id`
+- `best_match_id` 与 `natural_rival_id`
+- `copy_version` 与 `card_version`
 
-## 9. 视觉与资产规则
+公开结果不包含邮箱、原始邀请码或其他用户身份信息。
 
-### 9.1 当前可执行部分
+### 4.3 结果页层级
 
-Waitlist 与官网保持同一品牌家族，但不复制官网长页面的章节动效：
+1. 人格名、三项属性和一句 roast。
+2. Best Match / Natural Rival 及简短解释。
+3. Waitlist 排名和一个主要分享 CTA。
+4. 可选 Telegram / X。
+5. 下载入口位于结果海报底部。
 
-- 使用官网 navy / teal / warm-white 色系。
-- 阅读文本使用 Inter，数据和邀请码使用 JetBrains Mono。
-- 低圆角或无圆角、1px 边线、teal 4px 强调边。
-- 一屏一个任务；答题页只保留题目、选项、返回和低存在感进度。
-- 动效只用于页面进入、答题推进、排名变化和邀请卡切换。
-- 支持 `prefers-reduced-motion`。
+结果分享支持 1200×630 和 1080×1920 两种卡片。动态 OG 图必须按 `result_id` 恢复该用户的真实属性，而不是只显示人格模板。
 
-### 9.2 暂不冻结部分
+分享奖励、邀请兑换和排名变化必须幂等。打开 X 分享窗口只能记录 `share_clicked`，不能伪装成已经成功发帖。
 
-- 人格插图不再默认采用 Owl、像素、塔罗、3D 或任何具体媒介。
-- 题目和结果统一使用 1:1 母版槽位；最终资产从母版裁切 1080×1920 与 1200×630。
-- 占位图必须明确是 `Artwork direction TBD`，不能伪装为最终资产。
-- 官网视觉更新后，再决定 waitlist 是共用品牌主资产、单独人格系列，还是二者的混合。
+## 5. 视觉边界
 
-### 9.3 旧资产
+当前冻结：
 
-原塔罗题目图、动物结果图和星图背景归档到：
+- 不使用像素 Owl、动物拟人、塔罗或旧神兽资产。
+- 每道题只使用一张主图，不为每个选项分别配图。
+- 图片使用 1:1 母版，桌面可以按构图裁成 4:5；移动端优先保留完整主体。
+- 问题标题使用展示型 Serif，正文和控件使用 Sans Serif；全页最多两套字体。
+- 允许较大圆角、开放式排版与克制的 Glassmorphism，不使用整页方框、卡片套卡片或无语义渐变。
+- Waitlist 与官网共享 navy、teal、正式 logo 和产品承接，但不沿用官网像素字体、切角容器和长页面动效。
+- 动效只解释状态变化：答题推进、结果揭示、排名变化和邀请解锁。
 
-```text
-archive/waitlist-tarot-v1/
-```
+待冻结：
 
-当前页面和分享卡不得继续引用该目录。
+- 明暗主题、最终字体和玻璃材质强度。
+- 问题图与人格图采用 3D、摄影、抽象图形或混合媒介。
+- 结果卡的最终插图与动效体系。
 
-## 10. 题目与结果一致性
+旧塔罗与动物资产继续保存在 `archive/waitlist-tarot-v1/`，不得被当前页面引用。
 
-本轮按产品决策不重新审查答案到人格的映射，因此原型继续沿用当前三维组合和隐藏人格规则。
+## 6. 埋点、隐私与验收
 
-但上线前仍需单独完成一次计分审计，至少验证：
+### 6.1 核心埋点
 
-1. 每道题确实影响它声称测量的维度。
-2. 结果解释与最终三维组合不矛盾。
-3. 隐藏人格不会覆盖与其文案相反的行为，例如明显 degen 的答案得到“极度冷静”的结果。
-4. 页面不展示无法从真实样本推导的稀有度百分比。
-5. 问题、答案、计分、人格和文案都带版本号，前后端使用同一映射。
-
-当前原型已经移除伪造的 `Rarer than X%` 和独立属性条，避免在算法未确认时继续制造额外矛盾。
-
-## 11. SmartX 产品承接
-
-测试结果不能永远停留在娱乐标签。后续生产结果页应补一段简短但具体的个性化说明，例如：
-
-> Your answers seed your first SmartX feed. We will start with fewer, evidence-heavy alerts and explicit invalidation levels. Your feed will adapt as you use SmartX.
-
-三条维度可以作为冷启动先验：
-
-| 维度 | 可影响的初始产品行为 |
+| 事件 | 关键属性 |
 | --- | --- |
-| Degen / Sniper | 提醒紧迫度、信号阈值、风险提示强度、候选数量 |
-| Gut / Data | 先展示叙事与动量，还是数据、钱包、历史证据与 invalidation |
-| Pack / Lone | 社区共识和 Smart Money 权重，或更私密简洁的工作流 |
+| `waitlist_landing_view` | `entry_type: direct/referral`, `result_id_present`, `invite_present` |
+| `referral_result_view` | `result_id`, `persona_id` |
+| `invite_submit` | `entry_type` |
+| `invite_reserve_success` | `entry_type` |
+| `invite_reserve_failed` | `reason` |
+| `quiz_started` | `quiz_version`, `entry_type` |
+| `quiz_answered` | `question_id`, `option_id`, `elapsed_ms` |
+| `quiz_completed` | `result_id`, `persona_id`, `risk_score`, `basis_score`, `mode_score` |
+| `email_submitted` | `result_id` |
+| `email_verified` | `result_id` |
+| `result_viewed` | `result_id`, `persona_id` |
+| `community_clicked` | `channel` |
+| `result_shared` | `result_id`, `channel` |
+| `invite_link_copied` | `result_id` |
+| `invite_redeemed` | `source_result_id` |
+| `rank_reward_applied` | `result_id`, `reward_type` |
 
-必须明确：人格只是初始偏好，不是永久定型；SmartX 会根据真实使用继续调整。
+埋点不得上传邮箱、完整邀请码、验证码或自由输入文本。
 
-## 12. 原型与生产边界
+### 6.2 最小隐私与风险规则
 
-当前原型允许：
+- 分享 URL、OG 图和公开接口不得暴露邮箱。
+- 结果仅作为娱乐化交易偏好表达，不宣称心理诊断、收益能力或投资建议。
+- 邮箱提交前说明用途，并提供退订与删除入口。
+- 邀请占用、领取、分享奖励和排名更新都必须原子且幂等。
 
-- 测试邀请码 `123456`。
-- 测试验证码 `824193`。
-- 浏览器内模拟排名、分享奖励、社群点击和邀请卡切换。
-- 用人格代码模拟公开 `result_id`。
+### 6.3 本轮验收
 
-生产环境必须补齐：
+- [ ] 直接入口与好友分享入口均按本 PRD 工作。
+- [ ] 分享链接使用真实 `result_id`，能恢复人格、属性、搭档和天敌。
+- [ ] 六题全部使用四档权重，题目与选项只测量声明的主维度。
+- [ ] 同一人格能够产生不同的三项属性值。
+- [ ] Risk Monk 只能由极度克制的风险答案生成。
+- [ ] 答题页为一张主图和四条纵向选项。
+- [ ] 邮箱、Telegram 和 X 不前置到答题前。
+- [ ] 结果页包含排名、分享、搭档/天敌和下载入口。
+- [ ] 核心漏斗事件可在分析平台中串成完整用户路径。
+- [ ] 最终视觉方向与官网新资产并排检查，确认属于同一品牌家族。
 
-- 服务端邀请码 reservation 和消费。
-- 邮箱发送、Double opt-in、状态恢复和跨设备继续。
-- 结果、排名、邀请码、奖励与事件持久化。
-- 反作弊、geoblock、隐私披露、退订与删除流程。
-- 1200×630 动态 OG 图和稳定的分享抓取。
-- 漏斗埋点：Landing 类型、邀请码验证、每题完成、邮箱提交、验证、结果、社群、分享、邀请兑换。
+## 参考来源
 
-## 13. 本轮验收清单
-
-- [x] 直接 Landing 使用新的简洁落地语。
-- [x] 分享链接能进入“朋友结果卡”第二 Landing。
-- [x] 分享 URL 同时包含人格和邀请码。
-- [x] 答题页移除顶部三阶段导航和维度文案。
-- [x] 题目、选项间距和 1:1 图片槽固定。
-- [x] 邮箱页面删除冗余说明清单。
-- [x] 结果页改为左侧人格海报、右侧排名和动作。
-- [x] 下载入口位于左侧海报底部。
-- [x] Telegram / X 位于最后且不阻塞结果或排名。
-- [x] 九种公开人格使用新的中英文名和解释。
-- [x] 当前图片只占位，视觉方向标记为 TBD。
-- [ ] 服务端锁、邮件、真实排名和动态 OG 图接入。
-- [ ] 九种英文名完成目标用户快测。
-- [ ] 题目与人格映射完成独立计分审计。
+- [Google Docs · 老板原始方案](https://docs.google.com/document/d/1WMWelasjt_FaDw1Eq6RyEfoFiATGIotFVrykRmhdQZg/edit?tab=t.0#heading=h.mmfzw89y7pj2)
+- [Lark · 产品补充与方案索引](https://wjpvbd3lg9kg.jp.larksuite.com/wiki/D6mGwhuBBiGzEtkS0pOjgEQKpmh)
+- [Google Docs · 运营交易人格方案](https://docs.google.com/document/d/1WTJraroBjYy4XgoXqjVePK7k0EmfM8TB/edit)
+- `docs/website-v4.md`
