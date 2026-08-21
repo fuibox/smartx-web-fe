@@ -2,7 +2,7 @@
 
 > 状态：Working draft，供产品/老板确认；未确认的命名不视为冻结
 >
-> 更新：2026-08-20
+> 更新：2026-08-21
 >
 > 范围：`/waitlist` 的产品意图、测试模型、结果体系、传播闭环与视觉方向。官网 V4 仍以 `docs/website-v4.md` 为唯一权威，本文件不改写 V4。
 
@@ -10,8 +10,9 @@
 
 1. 老板原始方案：[Google Doc · SmartX Waitlist / Trading Spirit Animal](https://docs.google.com/document/d/1WMWelasjt_FaDw1Eq6RyEfoFiATGIotFVrykRmhdQZg/edit?tab=t.0#heading=h.mmfzw89y7pj2)
 2. 产品优化说明：[Lark Wiki · Waitlist](https://wjpvbd3lg9kg.jp.larksuite.com/wiki/D6mGwhuBBiGzEtkS0pOjgEQKpmh)
-3. 讨论截图：只作为命名方向和老板反馈的决策证据，不作为独立需求来源。
-4. 本文件：对上述来源、当前实现和 2026-08-20 讨论的综合建议。后续确认的决策继续写回本文件。
+3. 运营新版提案：[Google Doc · SmartX Waitlist 方案修改汇总](https://docs.google.com/document/d/1WTJraroBjYy4XgoXqjVePK7k0EmfM8TB/edit)，包括九种自嘲人格、Landing hook 与两组视觉参考。
+4. 讨论截图：只作为命名方向和老板反馈的决策证据，不作为独立需求来源。
+5. 本文件：对上述来源、当前实现和 2026-08-20 至 2026-08-21 讨论的综合建议。后续确认的决策继续写回本文件。
 
 冲突处理原则：Google Doc 保留原始产品意图；Lark 负责补充和优化实现细节；若两者与最新明确讨论冲突，以最新确认结论为准，并在本文件留下变更原因。
 
@@ -38,14 +39,14 @@ Waitlist 不是一个独立的趣味测试。它同时完成四件事：
 
 ## 3. 当前原型的结论
 
-当前 `/waitlist` 已能演示以下路径：邀请码入口、邮箱、验证码、社群/X 点击门槛、6 道题、结果、结果卡、X 分享、排名变化和邀请码。
+当前 `/waitlist` 已按 2026-08-20 的最新流程决策调整为：邀请码验证、直接完成 6 道题、邮箱绑定与验证码、结果和排名、最后完成社群/X 任务，再分享结果和解锁邀请码。
 
 它适合内部演示，但不能作为生产逻辑直接上线。主要差距如下：
 
 | 优先级 | 当前问题 | 影响 | 建议 |
 | --- | --- | --- | --- |
-| P0 | 邀请码被做成首屏硬门槛 | 与原稿「邮箱 + 可选邀请码」冲突，阻断自然获客 | 默认开放注册；如需私域期，用服务端 `access_mode` 配置切换 invite-only |
-| P0 | 验证码阻塞测试 | 与 Lark 中「Double opt-in 异步、不阻塞测试」冲突 | 邮箱提交后直接继续；排名和奖励在验证前显示 pending |
+| P0 | 严格 invite-only 尚未接服务端原子锁 | 纯前端无法防止同一码被两个人同时占用 | 按 8.1 的 reservation lease 实现；只有服务端返回 reservation token 才能开始测试 |
+| P0 | 邮箱和验证码仍为浏览器模拟 | 无法真正保存答案、激活排名或恢复流程 | 答题后绑定邮箱并持久化结果；Double opt-in 完成后才激活排名 |
 | P0 | 排名、验证码、邀请码、分享奖励都只在浏览器内模拟 | 刷新丢失，可重复获奖，无法防刷 | 服务端持久化、幂等、原子兑换和状态恢复 |
 | P0 | 分享 URL 没有 `result_id` 和用户 `ref` | 分享出去的 OG 预览不能还原该用户结果，丢失最关键传播细节 | 每次结果生成不可变 `result_id`；分享页按 `result_id` 返回 1200×630 OG 图 |
 | P0 | 题目、计分和结果存在结构性矛盾 | 用户可能得到与答案相反的角色，失去信任 | 按第 4–6 节重做计分和类型映射 |
@@ -257,16 +258,29 @@ Owl 不再覆盖人格类型，也不再作为第九种“最优秀人格”。�
 
 如果保留 badge，触发条件必须与 badge 文案同义，并单独展示为「badge」，不能再把一个 BIC/MIS 用户强制改写成冷静的数据型 Owl。邀请码权益也不应依赖一个可被猜题刷出的“优等人格”；若要奖励稀有 badge，需单独做防刷和公平性确认。
 
+### 7.3 运营自嘲版评审（2026-08-21）
+
+运营稿把九种结果改成「送钱者、梭哈仙人、喊单军师、K 线教主、抄底带头大哥、行情老中医、链上侦探、潜伏狙击手、风控大师」。它比原动物名更容易一眼理解，且大部分解释能对应现有 `Risk / Signal / Social` 组合；但不建议直接冻结，原因如下：
+
+1. 九个名称混合了神话、江湖、职业和网络梗，还不是一个像 Hogwarts House 那样可被复述的共同体系。
+2. 两组视觉参考都以同一只品牌猫头鹰/猫形角色换道具，品牌一致，但类型辨识和用户投射较弱，也与最新「别都用 Owl」的反馈冲突。
+3. 「送钱者、梭完就圆寂、样样亏得明白」适合作为分享卡上的 roast line，不宜独自承担主身份；结果页仍需同时给出可认同的优势与行为解释。
+4. `风控大师` 被设置为隐藏且明显更优的第九人格，会重新制造“猜正确答案”的激励，不应覆盖基础三轴类型。
+5. `9 种交易人格，你是最特别的哪一种？` 信息完整但偏泛。更精炼的工作稿是：`6 questions. Your trading type.`；中文可用 `6 道题，测出你的交易人格。`。
+
+可取的折中是：保留运营稿中已经验证过的交易梗和解释素材，但把它们归入一个统一的公共语义体系（例如同一套「交易江湖角色」），每种人格使用不同轮廓、道具和徽记；SmartX Owl 只作引导者或签名。视觉资产统一以 1:1 为母版，再裁出结果分享所需的 1200×630 与 1080×1920。
+
 ## 8. 目标用户流程
 
 ```text
 Landing
   → 地区可用性检查
-  → 邮箱 + 可选邀请码
-  → Double opt-in 邮件异步发送（不阻塞）
-  → Join Community + Follow X 两次点击门槛
+  → 验证一次性邀请码并原子保留名额
   → 6 道题（逐题保存，可返回，可恢复）
-  → 即时结果 + SmartX 个性化预览
+  → 绑定邮箱，保存答案并正式消费邀请码
+  → Double opt-in
+  → 结果 + 激活后的排名 + SmartX 个性化预览
+  → Join Community + Follow X（不阻塞测试、结果或排名）
   → Share to X（result_id + ref + 专属 OG 图）
   → 分享奖励 pending/applied
   → 解锁一次性邀请码
@@ -274,18 +288,31 @@ Landing
   → 邀请奖励原子结算，排名更新
 ```
 
-### 8.1 必须定义的状态
+### 8.1 邀请码保留与绑定
+
+不能把「前端验证成功」当成锁定。生产实现应使用短租约，而不是一个从进入页面开始、无条件倒数的 2 分钟计时器：
+
+1. `POST /invite/reserve` 以原子 compare-and-set 将 `unused → reserved`，并返回不可猜的 `reservation_token` 与 `expires_at = now + 2 min`；同一邀请码的第二个请求必须失败。
+2. 用户答题时，每次保存答案都把租约续到「当前时间 + 2 分钟」，但设置合理的总上限，例如 10 分钟，避免长期占码。页面上只显示「Invite reserved for this session」，不持续制造倒计时焦虑。
+3. 邮箱提交时带上 `reservation_token`，在同一事务中完成 `reserved → claimed_pending_verification`、保存答案和创建 waitlist 记录。验证码阶段不再占用短租约。
+4. 页面关闭、长时间无操作或达到总上限后，租约自动过期并回到 `unused`。
+5. 如果用户在提交邮箱时租约刚好过期，保留本地答案，优先尝试重新获取原码；失败时只要求换码，不要求重答。
+6. 多标签页只有持有 reservation token 的会话能绑定；同一邮箱重复提交必须幂等恢复已有记录，不能重复消费邀请码。
+
+### 8.2 必须定义的状态
 
 - `pending_verification / verified`
-- `community_clicked / x_follow_clicked / social_gate_completed`
+- `invite: unused / reserved / claimed_pending_verification / claimed / expired`
+- `reservation: active / expired / converted`
+- `community_clicked / x_follow_clicked / social_setup_completed`
 - `quiz_in_progress / quiz_completed`
 - `share_reward: none / pending / applied`
 - `invite_code: unused / pending_redemption / redeemed / expired`
 - `rank: pending / active`
 
-邮箱确认可在任意后续阶段发生。确认链接打开后必须恢复到用户离开的步骤，不要求重做测试或社交点击。
+邀请码在邮箱绑定时正式消费；邮箱确认后激活排名。确认链接打开后必须恢复到用户的结果，不要求重做测试或社交点击。
 
-### 8.2 分享闭环的硬要求
+### 8.3 分享闭环的硬要求
 
 - 结果生成不可变 `result_id`；重测产生新结果，但不重复发奖励。
 - 分享 URL 同时带 `result_id` 和 `ref`。
@@ -318,13 +345,14 @@ Waitlist 跟随 V5 的消费级机构感，不继续当前塔罗网页方向：
 - IBM Plex Sans 承担标题和正文；不使用占星式 serif、金色边框和神秘学装饰。
 - 一屏一个任务，一个视觉主角；发丝线和留白建立层级，不用等权卡片墙。
 - 图腾改为统一系统的雕塑化徽记或编辑静物，每个类型一个明确符号；详细资产未定时使用标注清楚的占位槽。
+- 题目选项中的视觉槽固定为 1:1 母版比例，使当前塔罗图只是临时裁切，不反向限制后续角色/IP 资产。
 - 结果卡优先用大字类型代码、角色名、单一徽记和三条维度；确保 1200×630 与 1080×1920 都成立。
 - 运动只用于进度推进、结果揭晓、排名 old → new；阅读期间基本静止，并提供 reduced-motion 降级。
 - 不伪造实时人数、排名、稀有度或产品 UI。
 
 ## 11. 上线前仍需确认
 
-- [ ] 默认开放还是 invite-only；建议做服务端配置，公开获客默认开放。
+- [x] 首发严格 invite-only；邀请码是进入测试的硬门槛。
 - [ ] 八个角色名是否通过中英文目标用户快测。
 - [ ] Owl 仅作 guide，还是增加不覆盖人格的 badge。
 - [ ] 分享奖励与邀请码数量是否继续采用普通 5 / Owl 10；若 Owl 不再是人格，权益如何分配。
