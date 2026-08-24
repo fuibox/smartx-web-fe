@@ -259,70 +259,35 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           aria-labelledby="related-stories-title"
         >
           <header>
-            <p className={styles.relatedEyebrow}>Keep reading</p>
             <h2 id="related-stories-title">From the journal</h2>
           </header>
-          <div
-            className={styles.relatedLayout}
-            data-has-secondary={relatedPosts.length > 1 ? "true" : "false"}
-          >
-            {relatedPosts[0] ? (
-              <article className={styles.relatedLead}>
-                <Link href={`/blog/${relatedPosts[0].slug}`}>
+          <div className={styles.relatedGrid}>
+            {relatedPosts.slice(0, 3).map((related, index) => (
+              <article key={related.slug}>
+                <Link href={`/blog/${related.slug}`}>
                   <BlogVisual
-                    post={relatedPosts[0]}
+                    post={related}
                     showLabel={false}
-                    className={styles.relatedLeadVisual}
-                    sizes="(min-width: 901px) 650px, (min-width: 641px) calc(100vw - 64px), calc(100vw - 40px)"
+                    className={styles.relatedVisual}
+                    sizes="(min-width: 901px) 400px, (min-width: 641px) 46vw, calc(100vw - 40px)"
                   />
-                  <div className={styles.relatedLeadCopy}>
+                  <div className={styles.relatedCardCopy}>
                     <span className={styles.relatedIndex}>
-                      {formatBlogIndex(1)}
+                      {formatBlogIndex(index + 1)}
                     </span>
-                    <div className={styles.relatedMeta}>
-                      <span>{relatedPosts[0].category}</span>
-                      <time dateTime={relatedPosts[0].publishedAt}>
-                        {formatBlogDate(relatedPosts[0].publishedAt)}
-                      </time>
-                      <small>
-                        {formatBlogReadTime(relatedPosts[0].readingMinutes)}
-                      </small>
+                    <div>
+                      <div className={styles.relatedMeta}>
+                        <span>{related.category}</span>
+                        <time dateTime={related.publishedAt}>
+                          {formatBlogDate(related.publishedAt)}
+                        </time>
+                      </div>
+                      <h3>{related.title}</h3>
                     </div>
-                    <h3>{relatedPosts[0].title}</h3>
-                    <p>{relatedPosts[0].excerpt}</p>
-                    <span className={styles.relatedReadMore}>
-                      Read story <i aria-hidden="true">↗</i>
-                    </span>
                   </div>
                 </Link>
               </article>
-            ) : null}
-
-            {relatedPosts.length > 1 ? (
-              <div className={styles.relatedRows}>
-                {relatedPosts.slice(1).map((related, index) => (
-                  <article key={related.slug}>
-                    <Link href={`/blog/${related.slug}`}>
-                      <span className={styles.relatedIndex}>
-                        {formatBlogIndex(index + 2)}
-                      </span>
-                      <div className={styles.relatedRowCopy}>
-                        <div className={styles.relatedMeta}>
-                          <span>{related.category}</span>
-                          <time dateTime={related.publishedAt}>
-                            {formatBlogDate(related.publishedAt)}
-                          </time>
-                        </div>
-                        <h3>{related.title}</h3>
-                      </div>
-                      <i className={styles.relatedArrow} aria-hidden="true">
-                        ↗
-                      </i>
-                    </Link>
-                  </article>
-                ))}
-              </div>
-            ) : null}
+            ))}
           </div>
         </section>
       </main>

@@ -120,6 +120,40 @@ final result: passed
 
 ---
 
+# Blog masthead and related-story simplification · 2026-08-25
+
+## Scope and evidence
+
+- Routes: `/blog/` and `/blog/[slug]/` on `codex/blog-consumer-redesign`.
+- Required desktop check: `1440 × 900`; mobile check: `390 × 844`.
+- Evidence: `output/playwright/blog-typography-refinement/final-list-simplified-1440.png`, `final-related-grid-1440.png`, `final-list-simplified-390.png`, and `final-related-grid-390.png`.
+- The final pass used the in-app browser against the live local Next.js preview. Dark/light switching, console output, page overflow, and responsive card order were checked after the layout changes.
+
+## Findings and resolutions
+
+| Severity | Finding | Resolution |
+| --- | --- | --- |
+| P2 | The Blog masthead behaved like a second hero: Field notes, article count, update date, and a two-line display title delayed the first story. | Reduced it to one `SmartX Journal` line plus one short description. At `1440 × 900`, the masthead is about `173px` high and the featured story begins at about `238px`. |
+| P2 | The related-story area mixed one large lead with two text rows, creating unnecessary hierarchy and height. | Replaced it with three equal `394.7px` desktop columns at `1440px`; every card uses the same image, metadata, and title structure. |
+| P2 | `Keep reading`, lead excerpts, Read story, and arrow treatments repeated intent already communicated by `From the journal`. | Removed them. The section now has one left-aligned title and a single top rule. |
+| P2 | The simplified desktop grid could become too narrow on phones. | Kept three equal columns on desktop and switched to one ordered column at `640px`, preserving `01 / 02 / 03` and full-width images. |
+
+## Final QA
+
+- Typography: the list masthead remains the only large serif statement; related-card titles and metadata use IBM Plex Sans. No PixelOperatorMono or JetBrainsMono appears in public Blog UI.
+- Spacing: the list masthead is reduced to roughly two-thirds of its previous height; the related section is a compact `614px` including its bottom spacing and footer handoff.
+- Color and imagery: dark/light Blog tokens remain intact; all three related stories use their real semantic cover assets at a consistent `16:9` crop.
+- Copy: Field notes, story count, updated date, and Keep reading are absent. The masthead explanation is a single sentence.
+- Responsive behavior: no horizontal overflow was detected at `1440 × 900` or `390 × 844`; the three related cards keep their document order when stacked.
+- Interaction and accessibility: all card links retain visible focus states and restrained hover feedback; reduced-motion removes image scaling transitions; the Blog-only theme toggle remains available on both list and detail routes.
+- Runtime: the fresh final tab reported no console errors or warnings.
+
+Decision: **Approve**.
+
+final result: passed
+
+---
+
 # Consumer Network Blog redesign — design QA
 
 ## Scope

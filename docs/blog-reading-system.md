@@ -17,33 +17,35 @@ Blog 是官网的阅读层，不复刻首页章节动效。它需要同时做到
 
 | 层级 | 字体 | 桌面字号 / 行高 | 移动端 | 用途 |
 | --- | --- | --- | --- | --- |
-| 列表页主标题 | Playfair Display 600 | `64–88px / 1` | `46–62px` | SmartX Journal 品牌主命题 |
-| 详情页 H1 | Playfair Display 600 | `56–84px / 1.02` | `40–56px` | 文章标题，长标题自动收敛 |
-| 正文 H2 | IBM Plex Sans 600 | `27–35px / 1.18` | 同比例收缩 | 一级章节，由 `section.heading` 生成 |
-| 正文 H3 | IBM Plex Sans 600 | `21–25px / 1.28` | 同比例收缩 | 章节内子命题，由 `heading(level: 3)` block 生成 |
+| 列表页主标题 | Playfair Display 600 | `52–68px / 0.96` | `42–52px` | SmartX Journal 品牌主命题；保持单行，不再承担首页 Hero 功能 |
+| 详情页 H1 | IBM Plex Sans 520 | `44–56px / 1.08` | `35–40px` | 长标题优先形成稳定两到三行，不横向铺满也不制造孤行 |
+| 正文 H2 | IBM Plex Sans 500 | `27–32px / 1.22` | 同比例收缩 | 一级章节，由 `section.heading` 生成 |
+| 正文 H3 | IBM Plex Sans 550 | `20–23px / 1.34` | 同比例收缩 | 章节内子命题，由 `heading(level: 3)` block 生成 |
 | 正文 | IBM Plex Sans 400 | `17px / 1.78` | `16px / 1.78` | 段落与列表 |
 | 引用 | IBM Plex Sans 500 | `21px / 1.55` | `18px` | 关键判断，不作装饰金句墙 |
-| 目录章节名 | IBM Plex Sans 500 | `14px / 1.45` | `14px / 1.45` | `In this dispatch` 下的 H2 导航 |
-| 元信息 / 编号 | JetBrainsMono | `11–12px` | 不低于 `11px` | 日期、分类、阅读时长、目录编号 |
+| 目录章节名 | IBM Plex Sans 500 | `13px / 1.5` | `13px / 1.5` | `In this dispatch` 下的 H2 导航 |
+| 元信息 / 编号 | IBM Plex Sans 600 | `10–11px` | 不低于 `10px` | 日期、分类、阅读时长、目录编号，使用 tabular numerals |
 
-Lexend 只用于 SmartX 品牌字标。PixelOperatorMono 不再进入公开 Blog；正文 H2/H3
-继续使用 Sans，避免整篇变成宣传海报。
+Lexend 只用于 SmartX 品牌字标。Playfair Display 只保留在 `SmartX Journal`、相关文章
+分区标题与品牌 CTA 等编辑型标记；详情 H1 和正文标题统一使用 Sans，长标题不再因衬线体
+和过大的字阶变成宣传海报。PixelOperatorMono 与 JetBrainsMono 均不再进入公开 Blog。
 
 ### Consumer Network 视觉映射
 
 - Dark 画布使用 `#010101`，主文字 `#F5F5F5`，次文字 `#8A8F98`，边线 `#1B1C1D`。
 - teal 固定为 `#08DFB5`，只承担 CTA、状态、当前章节和短强调线。
-- 列表页固定 Dark；详情页保留 Blog 专属明暗阅读主题。
+- 列表页和详情页共享 Blog 专属明暗阅读主题；首页与其他公开路由不响应该主题状态。
 - Header 复用首页的品牌锁定、`Product / Blog` 导航与圆角 `Join the Waitlist`。
 - Footer 使用整块 teal 场域与 Lexend 大字标，同时保留 Product 与 Legal 导航契约。
 - 不使用旧 navy 网格、像素尘、玻璃卡片或首页章节型滚动动效。
+- 列表页 masthead 只保留 `SmartX Journal` 与一句用途说明；不展示 Field notes、总文章数或更新时间。`1440 × 900` 下 masthead 高度约 `173px`，首篇文章从约 `238px` 开始进入视口。
 
 ## 3. 正文宽度与间距
 
 - 正文列固定最大宽度：`680px`。
 - 桌面目录列：`246px`；目录吸顶偏移：`24px`。
 - 详情页封面与正文共用 `680px` 内容列，位于目录右侧、首个 H2 上方；不横跨目录与正文两列。
-- 详情页头部到「目录 + 封面」阅读区：`72px`；移动端：`56px`。
+- 详情页头部到「目录 + 封面」阅读区：`56px`；移动端：`48px`。
 - 封面到首个 H2：`60px`；移动端：`42px`。
 - H2 到首个内容块：`24px`。
 - 连续段落：`22px`。
@@ -53,6 +55,8 @@ Lexend 只用于 SmartX 品牌字标。PixelOperatorMono 不再进入公开 Blog
 - 章节分隔：上一章节内容到分隔线 `48px`，分隔线到下一 H2 `48px`；移动端均为 `42px`。
 
 目录的当前章节由滚动位置自动高亮；桌面端保持 sticky，窄屏改为正文前的静态目录。
+
+相关文章区只保留左对齐的 `From the journal` 标题。最多三篇文章在桌面端使用严格等宽三栏，按 `01 / 02 / 03` 横向排列；每栏只保留封面、分类、日期与标题，不再区分主推荐、次推荐，也不展示 `Keep reading`、摘要或额外的 Read story 链接。移动端降级为单列，保持同一阅读顺序。
 
 ## 4. 正文数据模型
 
@@ -90,8 +94,11 @@ type BlogSection = {
 ### 列表规则
 
 - `unordered-list`：teal 短横标记，表达并列属性或集合，没有先后关系。
-- `ordered-list`：JetBrainsMono 的 `01 / 02 / 03` 计数，表达步骤、优先级或顺序。
+- `ordered-list`：IBM Plex Sans 的 tabular `01 / 02 / 03` 计数，表达步骤、优先级或顺序。
 - 不允许仅为了视觉统一把两者渲染成同一种样式；列表语义由内容决定。
+
+公开列表不用 `No. 01 / No. 02` 给文章强行排序；主稿和文章行以发布日期作为左侧
+定位信息，分类和阅读时长留在正文元信息中，避免编号与日期重复竞争。
 
 ## 5. 摘要、SEO 与副标题
 

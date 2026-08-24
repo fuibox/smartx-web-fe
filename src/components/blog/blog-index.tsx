@@ -6,15 +6,12 @@ import styles from "@/components/blog/blog-list.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import type { BlogPostSummary } from "@/content/blog-types";
-import {
-  BLOG_PAGE_SIZE,
-  listAllPublishedBlogPosts,
-  listBlogPosts,
-} from "@/content/blog-repository";
+import { listBlogPosts } from "@/content/blog-repository";
 import {
   formatBlogDate,
   formatBlogIndex,
   formatBlogReadTime,
+  formatBlogShortDate,
 } from "@/lib/blog-format";
 
 type BlogIndexProps = {
@@ -29,61 +26,35 @@ function StoryMeta({ post }: { post: BlogPostSummary }) {
   return (
     <div className={styles.storyMeta}>
       <span>{post.category}</span>
-      <time dateTime={post.publishedAt}>{formatBlogDate(post.publishedAt)}</time>
       <small>{formatBlogReadTime(post.readingMinutes)}</small>
     </div>
   );
 }
 
 export async function BlogIndex({ pageNumber }: BlogIndexProps) {
-  const [archive, allPublishedPosts] = await Promise.all([
-    listBlogPosts({ page: pageNumber }),
-    listAllPublishedBlogPosts(),
-  ]);
+  const archive = await listBlogPosts({ page: pageNumber });
   const pagePosts = archive.items;
   const totalPages = archive.totalPages;
   const featuredPost = pagePosts[0];
   const remainingPosts = pagePosts.slice(1);
-  const latestPublishedPost = allPublishedPosts[0];
 
-  if (!featuredPost || !latestPublishedPost) notFound();
-
-  const firstStoryNumber = (pageNumber - 1) * BLOG_PAGE_SIZE + 1;
-  const archiveUpdatedAt =
-    latestPublishedPost.updatedAt ?? latestPublishedPost.publishedAt;
+  if (!featuredPost) notFound();
 
   return (
     <div className={styles.page}>
       <a className={styles.skipLink} href="#latest-stories">
         Skip to latest stories
       </a>
-      <SiteHeader active="blog" />
+      <SiteHeader active="blog" allowThemeToggle />
 
       <main>
         <section className={styles.masthead} aria-labelledby="journal-title">
-          <div className={styles.mastheadTitle}>
-            <p className={styles.mastheadKicker}>SmartX / Field notes</p>
-            <h1 id="journal-title">
-              SmartX <span>Journal.</span>
-            </h1>
-          </div>
+          <h1 id="journal-title">SmartX Journal.</h1>
 
           <div className={styles.mastheadIntro}>
             <p>
-              Product thinking and market intelligence for people who want to
-              understand how smarter trading systems take shape.
-            </p>
-            <p className={styles.archiveFolio}>
-              <span>
-                {formatBlogIndex(archive.total)}{" "}
-                {archive.total === 1 ? "story" : "stories"}
-              </span>
-              <span>
-                Updated{" "}
-                <time dateTime={archiveUpdatedAt}>
-                  {formatBlogDate(archiveUpdatedAt)}
-                </time>
-              </span>
+              Notes on product, markets, and the systems reshaping how people
+              trade.
             </p>
           </div>
         </section>
@@ -108,9 +79,13 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
               />
               <div className={styles.featuredStoryCopy}>
                 <div className={styles.leadLine}>
-                  <span className={styles.leadMarker}>
-                    No. {formatBlogIndex(firstStoryNumber)}
-                  </span>
+                  <time
+                    className={styles.leadDate}
+                    dateTime={featuredPost.publishedAt}
+                    aria-label={formatBlogDate(featuredPost.publishedAt)}
+                  >
+                    {formatBlogShortDate(featuredPost.publishedAt)}
+                  </time>
                   <StoryMeta post={featuredPost} />
                 </div>
                 <h2>{featuredPost.title}</h2>
@@ -121,43 +96,35 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
           </article>
 
           {remainingPosts.length > 0 ? (
-            <div className={styles.archiveSection}>
-              <h2 className={styles.archiveHeading} id="archive-heading">
-                <span>From the archive</span>
-                <i aria-hidden="true">
-                  {formatBlogIndex(remainingPosts.length)} dispatches
-                </i>
-              </h2>
-
-              <ol
-                className={styles.storyRows}
-                aria-labelledby="archive-heading"
-              >
-                {remainingPosts.map((post, index) => (
-                  <li key={post.slug}>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      aria-label={`Read ${post.title}`}
+            <ol className={styles.storyRows} aria-label="More stories">
+              {remainingPosts.map((post) => (
+                <li key={post.slug}>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    aria-label={`Read ${post.title}`}
+                  >
+                    <time
+                      className={styles.storyDate}
+                      dateTime={post.publishedAt}
+                      aria-label={formatBlogDate(post.publishedAt)}
                     >
-                      <span className={styles.storyNumber}>
-                        No. {formatBlogIndex(firstStoryNumber + index + 1)}
-                      </span>
-                      <div className={styles.storyCopy}>
-                        <StoryMeta post={post} />
-                        <h3>{post.title}</h3>
-                        <p>{post.excerpt}</p>
-                      </div>
-                      <BlogVisual
-                        post={post}
-                        showLabel={false}
-                        className={styles.storyThumbVisual}
-                        sizes="(min-width: 1180px) 232px, (min-width: 640px) 184px, calc(100vw - 72px)"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </div>
+                      {formatBlogShortDate(post.publishedAt)}
+                    </time>
+                    <div className={styles.storyCopy}>
+                      <StoryMeta post={post} />
+                      <h3>{post.title}</h3>
+                      <p>{post.excerpt}</p>
+                    </div>
+                    <BlogVisual
+                      post={post}
+                      showLabel={false}
+                      className={styles.storyThumbVisual}
+                      sizes="(min-width: 1180px) 232px, (min-width: 640px) 184px, calc(100vw - 72px)"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ol>
           ) : null}
 
           {totalPages > 1 ? (
