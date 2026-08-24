@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
@@ -83,6 +83,172 @@ function useSectionReveals() {
   }, []);
 }
 
+function ClosingOrbitField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let reducedMotion = motionQuery.matches;
+    let visible = false;
+    let animationFrame = 0;
+    let lastFrameAt = 0;
+    let width = 0;
+    let height = 0;
+
+    const rings = [
+      { radiusX: 0.168, radiusY: 0.25, markers: 64, period: 11 },
+      { radiusX: 0.323, radiusY: 0.475, markers: 92, period: 17 },
+      { radiusX: 0.5, radiusY: 0.855, markers: 128, period: 26 },
+    ] as const;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const nextWidth = Math.max(1, Math.round(rect.width));
+      const nextHeight = Math.max(1, Math.round(rect.height));
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+      if (
+        nextWidth === width &&
+        nextHeight === height &&
+        canvas.width === Math.round(nextWidth * pixelRatio)
+      ) {
+        return;
+      }
+
+      width = nextWidth;
+      height = nextHeight;
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    };
+
+    const draw = (time: number) => {
+      resize();
+      context.clearRect(0, 0, width, height);
+
+      if (reducedMotion) return;
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      context.lineCap = "round";
+
+      rings.forEach((ring, ringIndex) => {
+        const radiusX = width * ring.radiusX;
+        const radiusY = height * ring.radiusY;
+        const phase =
+          ((time / 1000) * Math.PI * 2) / ring.period + ringIndex * 1.65;
+        const sigma = 0.22 + ringIndex * 0.035;
+
+        for (let marker = 0; marker < ring.markers; marker += 1) {
+          const angle = (marker / ring.markers) * Math.PI * 2;
+          const delta = Math.atan2(
+            Math.sin(angle - phase),
+            Math.cos(angle - phase),
+          );
+          const highlight = Math.exp(
+            -(delta * delta) / (2 * sigma * sigma),
+          );
+
+          if (highlight < 0.025) continue;
+
+          const x = centerX + Math.cos(angle) * radiusX;
+          const y = centerY + Math.sin(angle) * radiusY;
+          const depth = 0.72 + ((Math.sin(angle) + 1) / 2) * 0.28;
+          const alpha = highlight * depth * (0.7 - ringIndex * 0.08);
+          const lineHeight = 18 + highlight * 12;
+
+          context.beginPath();
+          context.moveTo(x, y - lineHeight / 2);
+          context.lineTo(x, y + lineHeight / 2);
+          context.lineWidth = 3.2;
+          context.strokeStyle = `rgba(238, 238, 238, ${alpha})`;
+          context.stroke();
+        }
+      });
+    };
+
+    const tick = (time: number) => {
+      if (!visible || reducedMotion) {
+        animationFrame = 0;
+        return;
+      }
+
+      if (time - lastFrameAt >= 1000 / 30) {
+        draw(time);
+        lastFrameAt = time;
+      }
+      animationFrame = window.requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (animationFrame || reducedMotion || !visible) return;
+      animationFrame = window.requestAnimationFrame(tick);
+    };
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) {
+          draw(performance.now());
+          start();
+        } else if (animationFrame) {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = 0;
+        }
+      },
+      { threshold: 0.08 },
+    );
+
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      draw(reducedMotion ? 0 : performance.now());
+    });
+
+    const handleMotionChange = (event: MediaQueryListEvent) => {
+      reducedMotion = event.matches;
+      if (reducedMotion && animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      }
+      draw(performance.now());
+      start();
+    };
+
+    resize();
+    draw(performance.now());
+    visibilityObserver.observe(canvas);
+    resizeObserver.observe(canvas);
+    motionQuery.addEventListener("change", handleMotionChange);
+
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      visibilityObserver.disconnect();
+      resizeObserver.disconnect();
+      motionQuery.removeEventListener("change", handleMotionChange);
+    };
+  }, []);
+
+  return (
+    <>
+      <Image
+        className={styles.closingOrbitBase}
+        src={`${ASSET_ROOT}/be-early-orbit-base.png`}
+        alt=""
+        fill
+        sizes="100vw"
+      />
+      <canvas ref={canvasRef} className={styles.closingOrbitCanvas} />
+    </>
+  );
+}
+
 function Brand({ tone = "light" }: { tone?: "light" | "dark" }) {
   return (
     <span className={styles.brand} data-tone={tone}>
@@ -97,18 +263,38 @@ function Brand({ tone = "light" }: { tone?: "light" | "dark" }) {
   );
 }
 
-function WaitlistLink({ placement }: { placement: "hero" | "closing" }) {
+function LaunchAlphaLink() {
   return (
     <a
       className={styles.waitlistButton}
-      href={createSmartXAppHref(
-        placement === "hero" ? "hero_cta" : "closing_cta",
-      )}
+      href={createSmartXAppHref("hero_cta")}
       target="_blank"
       rel="noopener noreferrer"
     >
-      Join the Waitlist
+      Launch Alpha
     </a>
+  );
+}
+
+function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
+  const [comingSoon, setComingSoon] = useState(false);
+
+  useEffect(() => {
+    if (!comingSoon) return;
+    const timeout = window.setTimeout(() => setComingSoon(false), 2200);
+    return () => window.clearTimeout(timeout);
+  }, [comingSoon]);
+
+  return (
+    <button
+      className={styles.waitlistButton}
+      type="button"
+      onClick={() => setComingSoon(true)}
+      data-placement={placement}
+      aria-live="polite"
+    >
+      {comingSoon ? "Coming soon" : "Join the Waitlist"}
+    </button>
   );
 }
 
@@ -136,7 +322,7 @@ function Hero() {
             <a href="#product">Product</a>
             <Link href="/blog">Blog</Link>
           </nav>
-          <WaitlistLink placement="hero" />
+          <LaunchAlphaLink />
         </div>
       </header>
 
@@ -148,7 +334,7 @@ function Hero() {
           </span>
           <span>Follow verified traders and trade in one tap.</span>
         </p>
-        <WaitlistLink placement="hero" />
+        <WaitlistButton placement="hero" />
       </div>
     </section>
   );
@@ -262,7 +448,7 @@ function DiscoverySection() {
 
       <div className={`${styles.storyCopy} ${styles.discoveryCopy}`}>
         <div>
-          <span className={styles.eyebrow}>PERSONALIZED FOR YOU</span>
+          <span className={styles.eyebrow}>Personalized for you</span>
           <h2 id="discovery-title">The next opportunity finds you.</h2>
         </div>
         <p>
@@ -318,21 +504,14 @@ function ClosingSection() {
       data-reveal
     >
       <div className={styles.closingField} aria-hidden="true">
-        <Image
-          className={styles.closingDots}
-          src={`${ASSET_ROOT}/cta-dots.png`}
-          alt=""
-          width={1280}
-          height={1920}
-          sizes="1920px"
-        />
+        <ClosingOrbitField />
       </div>
       <div className={styles.closingCopy}>
         <div>
           <h2 id="closing-title">Be early</h2>
           <p>The Consumer Trading Network is taking shape.</p>
         </div>
-        <WaitlistLink placement="closing" />
+        <WaitlistButton placement="closing" />
       </div>
     </section>
   );

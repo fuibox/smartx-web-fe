@@ -154,6 +154,58 @@ final result: passed
 
 ---
 
+### Be early concentric-wave rebuild · 2026-08-25
+
+- Source visual truth: `/var/folders/jx/8lhk_zbj02d4hb48l_8_10940000gn/T/codex-clipboard-304fce69-316b-4be5-a921-a539ca719f4d.png` (`3840 × 2560`). The supplied Robinhood capture is a motion reference only; its lime palette, line primitives, and page composition are intentionally not copied.
+- Implementation: `http://localhost:3000/`, desktop viewport override `1440 × 900`, browser capture `1390 × 891`; the Closing section is `600 CSS px` high and its canvas backing store is `2850 × 1200` at DPR 2.
+- Normalized source: `output/playwright/consumer-closing-wave-reference.png` (`1390 × 594`). Implementation crop: `output/playwright/consumer-closing-wave-a.png` (`1390 × 594`). Side-by-side comparison: `output/playwright/consumer-closing-wave-comparison.png` (`2780 × 594`).
+- State: Closing section fully visible, live motion running when the tab is foregrounded. The focused comparison is also the full relevant surface because this pass changes only the Closing background.
+
+**Fidelity findings**
+
+- Typography/copy: `Be early`, supporting sentence, and CTA typography remain unchanged and centered; no reference text was rasterized into the effect.
+- Spacing/layout: all generated circles share the copy center; a gradual elliptical quiet zone protects the title and CTA without a visible rectangular mask.
+- Color/tokens: the field stays monochrome on `#010101`; teal remains exclusive to the CTA.
+- Image quality: the low-resolution bitmap is no longer rendered. Canvas is resolution-aware with DPR capped at 2, so dot edges remain clear at desktop and large-screen sizes.
+- Content: the effect communicates a signal radiating from `Be early`; no extra controls, labels, particles, or Robinhood-specific visual language were introduced.
+- No actionable P0/P1/P2 mismatch remains. Optional P3: the product/UI owner may tune wave contrast after viewing a full cycle.
+
+**Animation review**
+
+| Before | After | Why |
+| --- | --- | --- |
+| One low-resolution bitmap with offset circular paths | One mathematically centered point field with periodic radial wave distance | Removes geometry drift and keeps every visible wave tied to the title origin |
+| Multiple visual rings implied by one fixed raster | Every dot is evaluated once and assigned to one of 12 batched brightness paths | Avoids layered-image interference and reduces Canvas fill calls |
+| Static settle animation on the whole image | Continuous low-speed radial propagation plus restrained angular brightness circulation | Motion now explains outward network formation; the Robinhood influence stays secondary |
+| Full-resolution work regardless of visibility | DPR capped at 2, render capped at 40fps, and `requestAnimationFrame` stops offscreen | Controls main-thread painting without reducing foreground clarity |
+| No valid motion fallback for a redesigned field | Reduced motion draws one stable concentric state and never schedules movement | Preserves the visual meaning without positional animation |
+
+**Animation verdict**
+
+- Performance: Canvas painting is necessary for a responsive, non-layered point field; the 12-path batching, adaptive `14–20px` spacing, DPR cap, 40fps ceiling, and offscreen pause remove the obvious avoidable cost. There is no easy transform-only substitute that preserves per-dot radial behavior.
+- Interruptibility and timing: this is ambient explanatory motion rather than a user-triggered UI transition. It resumes from current time when visible and stops immediately offscreen.
+- Origin, physicality, and cohesion: the title center is the single origin; the angular component changes brightness only and never displaces the rings.
+- Accessibility: `prefers-reduced-motion` is handled in the component and produces a static final field.
+- Decision: **Approve**.
+- Engineering: `npm run typecheck`, `npm run lint`, `git diff --check`, and `npm run build` passed. The final browser tab reported no warnings or errors.
+
+final result: passed
+
+---
+
+### Consumer homepage CTA and casing pass · 2026-08-25
+
+- Source truth: current user instruction for the Consumer homepage header, waitlist behavior, and Discovery eyebrow casing. The One Account Figma frames `22160:8612`, `22160:8821`, and `22160:9028` were reviewed as proposal inputs only; no unapproved One Account redesign was implemented in this pass.
+- Implementation evidence: `output/playwright/consumer-hero-cta-v4.png`, captured in the in-app browser at `1440 × 900`, DPR 1. The screenshot shows the right-aligned `Launch Alpha` header action and the retained centered `Join the Waitlist` CTA without changing Hero composition.
+- Interaction check: clicking either `Join the Waitlist` button keeps the visitor on `/`, replaces that button label with `Coming soon` for 2.2 seconds, and then restores the original label. `Launch Alpha` remains a real link to the current Alpha.
+- Copy check: `Personalized for you` exists exactly once in sentence case; the previous all-caps string is absent.
+- Layout check: the header remains 65px high; the `Launch Alpha` CTA fits without collision or overflow. Browser console reported no warnings or errors.
+- Engineering: `npm run typecheck`, `npm run lint`, `git diff --check`, and `npm run build` passed.
+
+final result: passed
+
+---
+
 # Consumer Network Blog redesign — design QA
 
 ## Scope

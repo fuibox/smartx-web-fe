@@ -5,6 +5,8 @@
 > 目标：用可追溯的小步实验，找到 SmartX 官网首屏 10 秒品牌视频的最佳故事、关键帧与运动表达。  
 > 边界：本文件不会自动改变已冻结的 V4 Hero；只有明确评审通过后，候选方案才可进入正式页面。
 
+> **Current production contract:** [`Shooting Script V0.2`](../output/hero-brand-film-lab/shooting-script-v0.2.md). It supersedes the earlier SB-C `Shared Trace`／水面／脚步方案 for the first Seedance prototype. Older sections below remain as decision history.
+
 ## 1. 现在到底在验证什么
 
 目前的六个 Shot 只是 **Storyboard Hypothesis A**，不是已经确认的分镜；现有六张图只是 **Keyframe Hypothesis K1**，也不是定稿关键帧。
@@ -106,8 +108,8 @@
 
 ### Storyboard Hypothesis C：Follow-Camera Baseline
 
-> **Status: CONTENT BASELINE · STATE CONTRACT V0.1 · 2026-08-25**  
-> Current task: review each segment's start state, only change, end state and handoff before designing any actual first frame, last frame or Seedance prompt.
+> **Status: SUPERSEDED BY SHOOTING SCRIPT V0.2 · 2026-08-25**
+> This section remains as historical reasoning. The current S04 uses a SmartX Opinion Card rail and S05 is its deterministic focus／zoom continuation.
 
 SB-C 暂时借用 Robinhood 的注意力控制方法：多数镜头靠近人物，观众始终有一个可以 follow 的视觉对象；SmartX 的差异不靠大远景或炫技摄影，而靠每段清楚发生的品牌因果。
 
@@ -116,13 +118,19 @@ SB-C 暂时借用 Robinhood 的注意力控制方法：多数镜头靠近人物�
 1. 六段中至少四段使用人物／手／手机的近景或中近景；人物通常占画面高度约 35%–80%。
 2. 全片只允许一个强调空间纵深的环境镜头。它不必固定为背后仰拍建筑，但必须同时看见近处的人物起点与远处的明确标志物，建立一条可被 follow 的起点—终点轴线；人物仍留在近景或前景作为视觉锚点。
 3. 全片只允许一个完全没有人物的镜头：标的与 K 线／价格轨迹的微距抽象镜头，用来换气并明确“这是市场”。
-4. 当前版本不使用航拍、全景网络、地球尺度或人物缩成小点的大远景。Influence 通过路径、横向 rail 和出画传播表达。
+4. 当前版本不使用航拍、全景网络、地球尺度或人物缩成小点的大远景。S04／S05 的 social intelligence 暂时通过人物尺度内的 `shared trace` 实验，不使用横向产品 rail、多人主体切换或网络总览。
 5. 人物镜头默认侧面、侧后三分之四或背后跟拍；禁止正面站定、职业肖像、英雄仰视和时装走秀式步态。
 6. 人物镜头默认 35–50mm 的自然观察感；手／手机／曲线使用更紧的特写。具体焦段到首尾帧阶段再锁定。
 7. 主运动方向暂定由左向右；跨镜头继续沿同一方向，减少观众重新定位的成本。
 8. 每段只发生一个主要变化。相机以稳定跟拍、轻推或固定机位为主，不使用大幅环绕、快速变焦或持续拉远。
 9. Hero 标题所在的中央区域保持低对比；暗色人物轮廓可以短暂经过，但脸、手机高光和关键信号不得与标题争夺注意力。
-10. UI 感控制在全片 10% 以内，原则上只在 S03 出现一次：一个标的与一条 K 线／价格轨迹。不展示完整 App 页面、Feed、排行榜、交易卡、Rewards 或 Dashboard。
+10. 产品结构级 UI 只在 S03 出现一次：一个标的与一条 K 线／价格轨迹。S04／S05 当前不加入可读 opinion 或产品组件；S06 可以后期加入一次极简奖励提示，但不是完整产品界面。全片不展示 App 页面、排行榜、交易卡、Rewards Dashboard 或 Creator Dashboard。
+11. 每个镜头只有一个明确的注意力主体。镜头可以包含多人或环境变化，但不能在同一镜头里要求观众先追一个人、再切换到另一个人；如果主体必须改变，就通过明确切镜完成。Robinhood 在这里借用的是 attention discipline，而不是具体人物、建筑或产品意象。
+12. 手机只在 S01 与 S06 出现：S01 负责“拿起／打开 SmartX”，S06 负责“奖励／Logo 收尾”。S02–S05 手机完全不入镜，人物行走时双手自然摆动且不插兜。肩包只能作为松弛的生活方式锚点，必须轻、软、随意搭在身体侧后方，不得拉低肩膀、阻挡手臂或改变步态。
+
+#### Camera Angle Bible V0.1
+
+人物是被摄影机 follow 的移动视点，不是品牌发言人或肖像主体。全片暂停正面与侧前 3/4 人物构图，只使用纯侧面、侧后 3/4 和后肩／背面。六段机位、景别、焦段倾向与实际所需的四张人物视角资产记录在 [`camera-angle-bible-v0.1.md`](../output/hero-brand-film-lab/camera-angle-bible-v0.1.md)。在该表通过前，不继续生成 S01／S06 手机动作图。
 
 #### 六段内容骨架
 
@@ -131,11 +139,13 @@ SB-C 暂时借用 Robinhood 的注意力控制方法：多数镜头靠近人物�
 | 时间 | Segment | 这一段只讲什么 | 借用的镜头语法 | 交给下一段的实体 |
 | --- | --- | --- | --- | --- |
 | 0.0–1.3s | S01 Open SmartX | 20 出头的主人公在自然行走中拿起手机；周围原本略微失序的信息仍存在。只建立“打开 SmartX”这个触发，不急着解释功能。 | 侧面／侧前三分之四中近景，人物和手机都不正对镜头 | 手机抬起后的视线方向 |
-| 1.3–2.7s | S02 The World Sorts | 人物在近处继续前进，远处出现一个清楚但不过度抢眼的标志物。原本隐藏在建筑边缘、地面接缝、反射与光线中的方向被逐步抽取出来，形成从人物起点通向标志物的连续路径。 | 可用后肩、侧后或略低机位，但不固定复制 Robinhood；核心是同帧建立 `人物 → 路径 → 标志物` 的纵深关系 | 被抽取出来的 route axis |
-| 2.7–4.3s | S03 See the Market | 镜头贴近 S02 的 route axis；真实空间的路径逐渐脱离建筑材质，match cut 成一个标的和一条 K 线／价格轨迹。这是全片唯一明显带 UI 感的镜头，只负责让观众确认“这条路其实是市场”。 | 借用 Robinhood 的数据换气逻辑，但必须由上一段的真实路径自然转化而来，不能突然切到一张独立图表 | 同一条 market curve |
-| 4.3–5.7s | S04 Insight Becomes Action | K 线的一段从抽象画面延伸到人物与手机附近；主人公做一次很小的触碰／确认，曲线随即被锁定并继续向前。手机屏幕不展示具体页面。 | 手、手机边缘和动作特写；用曲线状态变化表达行动，不演示交易流程 | 被锁定的 action line |
-| 5.7–8.1s | S05 Action Becomes Influence | 回到侧面跟拍。action line 离开主人公，进入一条横向传播路径，点亮其他人的局部轮廓；随后一条更克制的 value pulse 沿路径回到主人公。表达分享、影响力与变现愿景，但不出现 copied count、排名、金额或收益卡片。 | 借用 Robinhood 横向 rail + 行走镜头；rail 在这里是传播空间，不是产品组件 | 一条继续向画外传播并回流的 path |
-| 8.1–10.0s | S06 SmartX | 手机近景收尾；上一段的 path 进入手机／品牌标记，SmartX Logo 后期精确叠加。背景回到近黑，为循环接回 S01 留接口。 | 手机与手的极近景，不再拉远展示网络 | 黑场与手机抬起动作，可循环回 S01 |
+| 1.3–2.7s | S02 The World Sorts | 人物双手空着在近处继续前进，远处出现一个清楚但不过度抢眼的标志物。原本隐藏在建筑边缘、地面接缝、反射与光线中的方向被逐步抽取出来，形成从人物起点通向标志物的连续路径。手机已经通过明确切镜退出，不展示收起动作。 | 可用后肩、侧后或略低机位，但不固定复制 Robinhood；核心是同帧建立 `人物 → 路径 → 标志物` 的纵深关系 | 被抽取出来的 route axis |
+| 2.7–4.3s | S03 See the Market | 镜头贴近 S02 的 route axis；真实空间的路径逐渐脱离建筑材质，match cut 成一个标的和一条 K 线／价格轨迹。这是全片唯一明显带 UI 感的镜头，只负责让观众确认“这条路其实是市场”。 | 借用 Robinhood 的数据换气逻辑，但必须由上一段的真实路径自然转化而来，不能突然切到一张独立图表 | 本镜可在 K 线稳定后完整结束；不向 S04 强交接 |
+| 4.3–5.8s | S04 Person × Environment（PARTIAL） | 确定主人公双手空着继续轻松行走，摄影机只 follow 他；环境中的一个局部媒介因他的经过产生可见关系或痕迹。具体媒介还未锁定，可以是浅反射水面、抛光湿地面、玻璃雾气或其他现实材质，但不能同时出现多个需要解读的 opinion 主体。 | 侧面／侧后三分之四中近景稳定跟拍；人物始终是唯一注意力主体，环境只做回应 | 一处被人物经过后留下状态变化的 shared trace（候选，不是定稿） |
+| 5.8–8.0s | S05 Social Proof（OPEN） | 这一段只证明“许多人曾经接触／经过／使用过同一个东西”，具体表达尚未锁定。当前实验族 `Shared Trace E1`：镜头固定观察 S04 留下的环境媒介，许多不同脚步依次进入并留下涟漪或痕迹；摄影机始终 follow 同一处环境，而不是切换到不同人物。 | 低机位或局部特写；环境痕迹是唯一视觉主体，人物只以脚步、影子或局部经过作为事件证据 | 多人参与已经发生这一事实；奖励结果留给 S06 |
+| 8.0–10.0s | S06 Reward → SmartX（PARTIAL） | 已确定回到主人公与手机，并把“获得奖励”和品牌落版合并在这里。手机先出现一条后期合成的极简奖励提示，再切换／收束为 SmartX Logo；精确金额、文案、时长和手机角度尚未锁定。 | 手机与手的极近景；手机是唯一注意力主体，Reward → Logo 是同一主体的状态变化 | 黑场与手机抬起动作，可循环回 S01 |
+
+S03 与 S04 之间不做物体变形或材质接力。两段可以是一次明确的 editorial cut：同一个人物、相近的前进方向、统一的色彩和声音节奏已经足够维持连续性。全片只在真正有叙事收益时使用 shared element；不为了“转场高级”强行让每个镜头都由上一镜的实体变形而来。
 
 #### 品牌片与 UI 的边界
 
@@ -146,12 +156,13 @@ SB-C 暂时借用 Robinhood 的注意力控制方法：多数镜头靠近人物�
 ```text
 noise becomes direction
 → direction becomes a market curve
-→ insight becomes action
-→ action travels to other people
-→ influence and value return
+→ the person leaves a visible relationship with the environment
+→ repeated traces prove that others participated
+→ reward returns to you
+→ SmartX closes the loop
 ```
 
-唯一允许的 UI-like moment 是 S03 的“一个标的 + 一条 K 线／价格轨迹”。S04 不演示交易票据，S05 不演示 Square、排行榜、copied count、Creator Revenue 或 Rewards Dashboard。
+唯一明确的市场 UI-like moment 是 S03 的“一个标的 + 一条 K 线／价格轨迹”。S04 与 S05 暂时停止用多个 opinion 或多人面孔直接解释社交，优先测试 `主人公与一个环境媒介发生关系 → 同一个环境媒介积累许多人经过的证据`。奖励结果统一延后到 S06 的手机近景，不再要求 S05 同时完成传播和价值回流。
 
 #### S02 → S03 的核心共享实体
 
@@ -167,37 +178,78 @@ noise becomes direction
 
 标志物可以是建筑开口、独特的光面、结构性立柱或其他现实空间中的方向锚点；暂时不使用 Logo、屏幕、悬浮图标或发光箭头。路径必须像原本就存在于空间中、只是被 SmartX 识别出来，而不是突然生成的游戏导航线。
 
-#### 六段状态合同 V0.1
+#### 六段状态合同 V0.5
 
 这张表只规定每段“发生什么”，不是关键帧构图，也不锁定具体建筑、标的、焦段或人物站位。
 
 | Segment | 起始状态 | 唯一主要变化 | 结束状态 | 交给下一段的实体 |
 | --- | --- | --- | --- | --- |
 | S01 Open SmartX | 近黑环境中，主人公以自然步态进入／经过画面；手机低垂在身侧，周围只有低对比、无法聚焦的现实信息噪音。 | 主人公在行走中自然拿起手机，同时视线从周围转向前方；这一段不让空间开始重组。 | 手机停在舒适但不遮脸的位置；主人公已经看向某个前方方向，环境仍处于变化前。 | 主人公的视线方向与手机抬起动作 |
-| S02 The World Sorts | 切到侧后／后肩方向。主人公在近处，远处标志物可辨认但尚未形成清楚路线；地面、建筑、反射和光线的方向彼此错开。 | 随着人物继续前进，原有现实结构通过视差和对齐逐步显露一条从起点通向标志物的连续轴线；不是新增发光导航。 | 起点、路径和标志物形成清楚纵深关系；主人公沿路线迈出下一步，镜头贴近路径中的一条真实接缝／边缘。 | route axis 的同一条接缝／边缘 |
-| S03 See the Market | 极近景延续 S02 的同一条接缝，保留相同方向、色彩和运动速度，开始时仍能看出真实材质。 | 建筑／地面材质逐渐退去，接缝脱离现实表面并转化为一个标的与一条 K 线／价格轨迹；曲线只完成一次明确绘制。 | 单一标的和曲线稳定；曲线最前端停在画面边缘并产生一次克制脉冲，不出现其他产品界面。 | market curve 的活动端点 |
-| S04 Insight Becomes Action | 活动端点 match cut 到手机边缘、手部或现实表面上的同一处细线反光；手机屏幕不提供可读 UI。 | 主人公只做一次很小的触碰／确认；略微游移的曲线迅速校准为被锁定的 action line，并向外发送一个窄脉冲。 | action line 离开手机／手部并沿人物前进方向出画；动作已经完成，没有成功面板或第二次点击。 | 被锁定并向外运动的 action line |
-| S05 Action Becomes Influence | 回到侧面中近景跟拍。主人公继续轻松前进，action line 从他附近进入画面；两位其他人物只以低对比局部轮廓存在。 | action line 完成一次清楚的传播—回应—回流循环：向外到达两人，他们以很小的动作／亮度变化回应；随后更细的 value pulse 沿同一路径回到主人公。 | 回流抵达主人公附近后稳定，传播路径仍继续向画外延伸；不拉远展示网络。 | 回到主人公并靠近手机的 value pulse |
-| S06 SmartX | 手机与手的近景接住 S05 的 value pulse，背景已回到近黑，人物其余部分只保留局部轮廓。 | pulse 收束进入手机屏幕／品牌位置，并转化为后期精确添加的 SmartX Symbol；相机只做轻微靠近。 | SmartX Logo 稳定短暂停留；其中一个点扩散成近黑渐变，与 S01 开头的黑场和手机抬起前状态相接。 | 近黑渐变与手机的下一次抬起动作 |
+| S02 The World Sorts | 切到侧后／后肩方向。主人公双手空着在近处继续行走，手机不入镜；远处标志物可辨认但尚未形成清楚路线，地面、建筑、反射和光线的方向彼此错开。 | 随着人物继续前进，原有现实结构通过视差和对齐逐步显露一条从起点通向标志物的连续轴线；不是新增发光导航。 | 起点、路径和标志物形成清楚纵深关系；主人公沿路线迈出下一步，镜头贴近路径中的一条真实接缝／边缘。 | route axis 的同一条接缝／边缘 |
+| S03 See the Market | 极近景延续 S02 的同一条接缝，保留相同方向、色彩和运动速度，开始时仍能看出真实材质。 | 建筑／地面材质逐渐退去，接缝脱离现实表面并转化为一个标的与一条 K 线／价格轨迹；曲线只完成一次明确绘制。 | 单一标的和曲线稳定，不出现其他产品界面。镜头可以在这里完整结束。 | 无强制交接；下一镜依靠人物、色彩与剪辑节奏重新建立连续性 |
+| S04 Person × Environment（PARTIAL） | 新的现实空间中，主人公双手空着、肩包松弛地落在身体侧后方，以自然步态从左向右行走；环境中只有一处局部媒介具备响应可能，其他元素保持安静。 | 人物经过这处媒介时只发生一种物理关系，例如踩过浅反射面形成一次涟漪，或经过玻璃留下短暂雾痕。摄影机与观众的注意力始终跟随主人公。 | 主人公继续前进；环境媒介中留下一个可被下一镜单独观察的状态变化。 | shared trace 的媒介与初始痕迹；具体材质仍未锁定 |
+| S05 Social Proof（OPEN） | 镜头切到 shared trace 的局部特写；主人公不再是主体，环境媒介成为唯一注意力锚点。 | 不同人物只以脚、影子或局部轮廓依次经过，痕迹／涟漪逐步叠加，让观众看出许多人曾经接触同一处媒介。镜头不追踪任何一个后来者。 | 环境留下累积后的多人参与证据；不显示人数、交易数字或回流脉冲。 | “多人参与已经发生”这一结果；S06 独立显示奖励 |
+| S06 Reward → SmartX（PARTIAL） | 主人公处于安静、近黑的终点／过渡空间，手机仍低垂；不要求接住 S05 的图形实体。 | 他自然拿起手机。后期先加入一条极简奖励提示，短暂停留后收束／切换为精确 SmartX Symbol；相机只做轻微靠近。 | SmartX Logo 稳定短暂停留；近黑渐变与 S01 开头的黑场和手机抬起前状态相接。 | 近黑渐变与手机的下一次抬起动作 |
+
+#### S05 传播机制候选
+
+S05 继续保持 Open。当前不需要证明它的最终隐喻，只记录一个符合“单镜头单注意力主体”原则的实验族：
+
+1. **Shared Trace E1 · Reflective Surface**：S04 里主人公经过一处浅反射水面／抛光湿地面，人物仍是唯一主体；S05 切到该表面的固定局部镜头，不同脚步依次进入并产生叠加涟漪或痕迹。观众始终看同一处表面，脚步只是证明“很多人经过”的事件。
+2. **Shared Trace E2 · Glass / Condensation**：主人公经过一块玻璃并留下一个局部状态变化；S05 固定观察同一块玻璃，越来越多经过者的影子或痕迹叠加。比水面更建筑化，但容易变成纯艺术隐喻。
+3. **Shared Trace E3 · Architectural Seam**：主人公经过一条真实地面／墙面接缝；S05 固定观察接缝被连续脚步激活。更干净、更接近 SmartX 的线性语言，但需要避免重新变成发光导航线。
+
+水洼本身暂不定稿。普通街边水洼容易产生雨天、脏污、鞋类广告或沉重情绪；若测试水的方向，优先使用现代建筑中的浅反射层或克制的湿润表面。这个建议只约束材质气质，不改变用户提出的“固定观察环境证据”的核心思路。
+
+上一版 `Same Take, Different People` 被撤回：虽然它避免了人物追赶，但仍要求观众在极短时间内连续更换人物主体，不符合当前 attention discipline。
+
+不采用“插旗”：旗帜更接近占领、闯关或个人成就，容易把品牌重新拉回艰难征服的山地隐喻，也没有直接解释别人如何看见并使用这个人的观点。
 
 #### 状态合同 Hard Fails
 
 - S01 提前开始空间重组，导致“拿起手机”与“世界变清楚”没有两个可辨认阶段。
 - S02 生成霓虹箭头、悬浮路线、游戏导航或凭空出现的道路，而不是从真实空间结构中抽取方向。
 - S03 变成完整交易页面、多标的 Dashboard、蜡烛图墙或大量数字。
-- S04 演示具体 App 流程、按钮、订单票据、成功页面或连续多次操作。
-- S05 拉成网络全景、地球视角、社交卡片墙，或用金额／Revenue Dashboard 代替传播与回流。
-- S06 让生成模型绘制近似 Logo；精确 Symbol 与字标只能后期合成。
+- S04 在同一镜头里同时要求观众跟随人物、opinion 和多个环境响应；当前只允许人物是主体、环境发生一次局部回应。
+- S05 拉成网络全景、地球视角、社交卡片墙，让人物在同一条路上前后追赶，或通过 match cut 连续更换人物主体；也不使用插旗、奖杯或登顶来表达影响力。
+- S06 让生成模型绘制奖励文字、金额或近似 Logo。奖励提示、精确数字、SmartX Symbol 与字标全部后期合成；Seedance 只生成干净手机与表演。
 
 #### 暂时故意不决定的内容
 
 - 远处标志物的具体形态；
 - S02 的最终机位和镜头高度；
 - S03 的具体标的、曲线数据与后期文字；
-- S05 两位下游人物的身份、距离和回应动作；
+- S04／S05 的 shared trace 最终使用浅反射水面、玻璃、建筑接缝还是其他现实媒介；
+- S05 是否真的需要展示多人，还是由 S06 的奖励提示独立证明传播结果；
+- S06 奖励提示的精确文案、数字和停留时长；
 - SmartX Symbol 如何与最后黑场精确衔接。
 
 这些内容进入下一阶段的首尾帧设计后，每轮仍只改变一个变量。
+
+#### Lock Matrix V0.5
+
+`Locked` 表示可以开始制作依赖资产，不表示以后永远不能替换；只有新方案明显更好时才按本文件的贪婪规则替换。
+
+| 层级／段落 | 状态 | 现在可以做什么 | 仍然不做什么 |
+| --- | --- | --- | --- |
+| 人物 C4 brief | LOCKED FOR ANCHOR | 生成同一位 21–24 岁东亚男性的脸部身份锚点与全身行走锚点，固定发型、服装、软质肩包和松弛表演 | 不直接生成成片镜头，不在不同 Shot 重选人物 |
+| 全局注意力规则 | LOCKED | 每镜只设一个 attention anchor；固定近景／中近景优先、中央 Hero 安全区、近黑开合、少 UI | 不在同镜切换人物主体，不做网络远景或地球尺度 |
+| 空间语言 | ROUND R01 REVIEWING · A RECOMMENDED | A 已解决走廊拓扑，作为开放式 undercroft 的当前贪婪最优；B 只保留庭院人尺度参考。用户选择 A 后，下一轮只调整 A 的色温与体感尺度 | 尚不把 A／B 当作最终 Seedance 空间图；暂不锁定 S04／S05 的 shared trace 材质 |
+| S01 Open SmartX | CONTENT LOCKED | 在人物与空间锚点通过后制作首帧／尾帧；只验证拿起手机与前方视线 | 不加入空间重组、意见、K 线或奖励 |
+| S02 The World Sorts | CONTENT LOCKED | 制作人物近处、远方标志物与中间路径的首帧／尾帧 | 不生成游戏导航、霓虹箭头或多人社交 |
+| S03 See the Market | CONTENT LOCKED | 制作单一标的与单一 K 线的干净数据镜头；所有文字后期合成 | 不承接 S04，不制作完整产品 UI |
+| S04 Person × Environment | PARTIAL | 只做低成本构图／材质实验，不进入最终关键帧队列 | 不锁定水面、玻璃或接缝，不写最终 Seedance Prompt |
+| S05 Social Proof | OPEN | 并行讨论与制作灰度／低保真 `Shared Trace` 测试 | 不生成正式成片资产，不让它阻塞 S01–S03 |
+| S06 Reward → SmartX | PARTIAL | 可以先生成干净的主人公＋黑屏手机 plate；奖励文案和 Logo 后期单独制作 | 不让生成模型绘制文字、金额或 Logo |
+
+#### 并行生产流程
+
+1. **Wave A · 全局锚点**：先生成 `C4_FACE_ANCHOR`、`C4_BODY_WALK_ANCHOR` 与一张无信息叠加的 `SPACE_ANCHOR`。这三项一旦通过，后面所有 Shot 都引用它们，不再各自发明人物和空间。
+2. **Wave B · 已锁镜头静帧**：制作 S01、S02、S03 的首帧／尾帧。先生成静帧，不急着生成视频；每对只检查一个状态变化。
+3. **Wave C · 可提前做的收尾 plate**：生成 S06 的手、手机与近黑环境干净镜头。奖励提示和 Logo 暂时用后期占位，不写进 ComfyUI／Seedance 画面。
+4. **Experiment Track · 不阻塞主线**：在 Wave A–C 渲染期间，继续讨论 S04／S05；只用灰度分镜、简单合成或低成本图测试 `Shared Trace`。只有注意力路径成立后才升级为正式关键帧。
+5. **Assembly Gate**：S01–S03、S06 plate 与 S04／S05 方案全部通过后，再组成完整 storyboard board，检查人物一致、中心安全、黑场开合和节奏。
+6. **Motion Gate**：最后才写 15 秒 Seedance 2.0 mini 总 Prompt 并使用一次限免；生成结果用于验证整体，再剪成约 10 秒官网版本。生成模型只负责真人、空间、相机和物理变化，K 线文字、opinion、奖励提示与 SmartX Logo统一后期合成。
 
 ### Opening Trigger Exploration V1
 
@@ -266,7 +318,7 @@ Working rules:
 - The environment adapts to the person; it does not test the person.
 - Movement is an unhurried walk with curiosity, not a march, sprint or heroic ascent.
 - Dark architecture may remain for Hero contrast, but the destination light and body language must feel open, fresh and inviting.
-- Reward is expressed as fluency, participation and expanding agency before any explicit financial value.
+- Reward 在前五段先表现为轻松参与、判断被他人采用和影响力；如果需要明确金额，只在 S06 的最终手机提示中出现一次。
 
 ### Protagonist Identity Candidates
 
@@ -332,7 +384,7 @@ Prompt record: [`characters/generation-prompts.md`](../output/hero-brand-film-la
 
 #### Character C4 · Early-Twenties Reset Brief
 
-> **Status: BRIEF ONLY · NOT GENERATED · 2026-08-25**  
+> **Status: C04 FACE + BODY + A／B CAMERA VIEWS PROMOTED · 2026-08-25**
 > Goal: perceived age 21–24, ideally around 22–23; ordinary, contemporary and relaxed without becoming a student costume or streetwear caricature.
 
 Working definition:
@@ -340,11 +392,11 @@ Working definition:
 - East Asian male, perceived age 21–24, lean-average everyday build, softer jaw and younger open face, natural short hair with imperfect texture.
 - Curious and easygoing rather than composed, successful, authoritative or aspirationally elite.
 - Replace the knit polo and technical-wool trousers with a washed deep-navy open-collar overshirt over a plain dark crew-neck tee, relaxed charcoal cotton trousers and slightly worn everyday sneakers.
-- Keep one soft unstructured charcoal crescent／shoulder bag as the lifestyle anchor.
+- Keep one lightweight soft charcoal crescent／shoulder bag as the lifestyle anchor. It hangs casually toward the side-back and never changes shoulder level, arm swing, torso rotation or gait.
 - Remove the watch, pleats, leather shoes, tailored crease and any luxury-looking accessory.
-- Performance is caught mid-action and unaware of the camera; no fixed gaze, commercial smile, hands-in-pocket pose or upright executive posture.
+- Performance is caught mid-action and unaware of the camera; no fixed gaze, commercial smile, hands-in-pocket pose or upright executive posture. The neutral walking anchor has two empty hands; phone performance is created separately for S01 and S06 only.
 
-Do not generate C4 until SB-C's content and shot-scale rules are approved. The next C4 asset should first be a neutral identity card, not another finished Hero scene.
+The user promoted C04 from Face Round 00, approved R02-C02 as the body-performance anchor, and then promoted the revised side／rear camera views. Stable references: [`face`](../output/hero-brand-film-lab/characters/c4-face-anchor/C4_FACE_ANCHOR_SELECTED_C04.png) · [`body`](../output/hero-brand-film-lab/characters/c4-body-walk-anchor/C4_BODY_WALK_ANCHOR_SELECTED.png) · [`side A`](../output/hero-brand-film-lab/characters/c4-camera-view-anchors/C4_VIEW_A_SIDE_PHONE_FREE_SELECTED.png) · [`rear B`](../output/hero-brand-film-lab/characters/c4-camera-view-anchors/C4_VIEW_B_REAR_3Q_PHONE_FREE_SELECTED.png). These lock identity, age, wardrobe, bag behavior, relaxed movement and legal camera territory; they do not lock exact crop or stride phase. Final person frames follow [`Camera Angle Bible V0.1`](../output/hero-brand-film-lab/camera-angle-bible-v0.1.md). Reviews: [`face`](../output/hero-brand-film-lab/characters/c4-face-anchor/review.md) · [`body`](../output/hero-brand-film-lab/characters/c4-body-walk-anchor/review.md) · [`camera views`](../output/hero-brand-film-lab/characters/c4-camera-view-anchors/review.md) · [`phone camera tests`](../output/hero-brand-film-lab/characters/c4-phone-performance-anchor/review.md).
 
 ### 外部策略参考
 
@@ -358,14 +410,16 @@ Robinhood 截图仅用于分析“10 秒、少 UI、真人与抽象图形交接�
 - `/Users/wuxiuchen/Downloads/同步空间/SmartX/剪辑/robinhood_6.png`
 - `/Users/wuxiuchen/Downloads/同步空间/SmartX/剪辑/robinhood_7.png`
 
-## 4. 当前执行策略：先冻结 SB-C 内容，再设计首尾帧
+## 4. 当前执行策略：最小参考包 → 一次 10 秒全片测试
 
 由于当前只有一次即梦 Seedance 2.0 mini 限免，继续暂停所有视频生成。执行顺序改为：
 
-1. ✅ 已确认 SB-C 六段的职责、顺序和镜头尺度原则。
-2. 🟡 已建立六段 `起始状态 → 唯一变化 → 结束状态` V0.1，当前待评审，不生成。
-3. 确认人物 C4 身份卡与服装后，再制作六段首尾帧。
-4. 首尾帧整体通过后，才重写 15 秒 Seedance 长 Prompt 和参考图投喂包。
+1. ✅ [`Shooting Script V0.2`](../output/hero-brand-film-lab/shooting-script-v0.2.md) 已接受为当前六段内容与摄影调度基线。
+2. ✅ C04 face、body R02-C02、Camera View A R01 与 B R02 均已由用户晋级。
+3. ✅ 制作边界已锁定：Seedance 只生成真人、建筑、手机 clean plate 和抽象数据空间；规则标记场、K 线／数字、Opinion Rail、弱选择、奖励与 Logo 全部确定性后期合成。
+4. ✅ `3840×2160` 六格 shooting-script review board 已由用户确认：[`PNG`](../output/hero-brand-film-lab/boards/SHOOTING_SCRIPT_BOARD_V02.png) · [`SVG`](../output/hero-brand-film-lab/boards/SHOOTING_SCRIPT_BOARD_V02.svg)。
+5. ✅ 已从评审板派生实际投喂用 [`Clean-Plate Board`](../output/hero-brand-film-lab/boards/SEEDANCE_CLEAN_PLATE_BOARD_V01.png)：删除所有后期图形，并将 S04／S05 合并为一段连续生成底片。
+6. 🟢 [`Seedance Run Package V0.2`](../output/hero-brand-film-lab/seedance-run-package-v0.2.md) 已包含四张上传素材的顺序、即梦设置、可直接粘贴的 10 秒总 Prompt、生成前检查和原始输出命名规则。下一步是用户在即梦终检后触发唯一一次限免。
 
 SB-B 的 K2、九图投喂包和长 Prompt 骨架全部暂停，不直接复用。
 
@@ -561,9 +615,9 @@ S{Shot}_R{Round}_C{Candidate}_{Model}_{Duration}.{ext}
 | S01 Open SmartX | SB-C baseline | — | — | — | — | 评审状态合同：只建立手机与视线触发 |
 | S02 The World Sorts | SB-C baseline | — | — | — | — | 评审状态合同：真实空间结构抽取为路径 |
 | S03 See the Market | SB-C baseline | — | — | — | — | 评审状态合同：同一路径转为单一标的与 K 线 |
-| S04 Insight Becomes Action | SB-C baseline | — | — | — | — | 评审状态合同：曲线被一次动作锁定 |
-| S05 Action Becomes Influence | SB-C baseline | — | — | — | — | 评审状态合同：一次传播—回应—回流循环 |
-| S06 SmartX | SB-C baseline | — | — | — | — | 评审状态合同：pulse 收束为后期 Logo 并回到黑场 |
+| S04 Person × Environment | PARTIAL | — | — | — | — | 低成本测试一种环境响应；人物始终是唯一注意力主体 |
+| S05 Social Proof | OPEN | — | — | — | — | 测试 `Shared Trace`，固定观察环境证据；不制作正式成片资产 |
+| S06 Reward → SmartX | PARTIAL · role locked | — | — | — | — | 可先生成干净手机 plate；奖励提示与 Logo 后期合成 |
 
 ## 11. Change Log
 
@@ -593,3 +647,33 @@ S{Shot}_R{Round}_C{Candidate}_{Model}_{Duration}.{ext}
 - 收紧 UI 边界：全片只有 S03 一次 UI-like moment，仅包含一个标的与一条 K 线／价格轨迹；S04、S05 的行动、传播、影响力与 value return 全部用 cinematic motion identity 表达。
 - 将 S02 从固定的“背后仰拍建筑”改为更通用的起点—终点空间关系：近处人物、远处标志物与中间路径必须在同一纵深中成立；S03 由这条真实路径 match cut 成 K 线。
 - SB-C 六段内容与镜头原则被接受为当前 Baseline；新增状态合同 V0.1，逐段锁定起始状态、唯一变化、结束状态和共享交接实体，仍未制作任何关键帧或 Prompt。
+- 删除 SB-C 原 S04 的手机触碰／交易职责。S04 改为 `Follow the Path`：S03 的 K 线重新获得现实材质，人物沿同一条路径前进；传播与 value return 统一延后到 S05 `Your Path Travels`。
+- S04 被定义为可合并的 bridge beat，而非必须独立存在的第六段功能；最终可采用六个叙事 beat、五次切镜。
+- 根据最新评审撤销 S03 → S04 的强制材质 morph：S03 可独立结束，S04 改为新的 `Opinions in Motion` 行走镜头，以不同景深里的半透明 opinion 残影表达 social intelligence。
+- 将“每个镜头必须共享实体”降级为局部工具：S02 → S03 可保留路径 match cut；S03 → S04、S05 → S06 允许依靠人物、方向、色彩、声音和节奏完成 editorial cut。
+- S05 重新开放，不再假定 personal trace 网络或 value pulse。记录三个传播候选，当前优先 `The Camera Stays with the Opinion`；明确不采用插旗、横向 rail、网络总览和收益卡。
+- S05 进一步排除“前后人物在同一路径追赶”的空间隐喻，避免排队、领袖跟随或赶路误读。新增领先方向 `Same Take, Different People`：同一 opinion 保持在画面中，人物与现实环境通过 match cut 变化。
+- 将奖励结果从 S05 移到 S06：S05 只负责“被不同的人接收并回应”；S06 手机近景先显示一次后期合成的奖励提示，再落 SmartX Logo。Seedance 不负责生成任何文字、数字或 Logo。
+- 撤回 `Same Take, Different People`：它仍在一个短段落中连续切换人物主体，不符合最新 attention discipline。新增硬规则：每镜只有一个注意力锚点，若主体改变必须明确切镜。
+- S04 改为 Partial `Person × Environment`，S05 保持 Open。记录 `Shared Trace` 实验族：S04 只 follow 主人公与一个环境媒介产生关系；S05 固定观察同一媒介，通过连续脚步、涟漪或痕迹证明许多人参与。
+- 新增 Lock Matrix V0.5 与并行生产队列：C4 人物／空间锚点和 S01–S03 先进入生成，S06 只生成干净 phone plate；S04／S05 在渲染等待期间继续低成本实验，不阻塞一次性 Seedance 长片。
+- 完成 Wave A 工具无关提示词包：C4 face anchor → C4 body／walk anchor → clean space anchor。附独立验收条件、负向约束与可选 ComfyUI 工作流记录要求；尚未实际生成图片。
+- 完成 C4 face anchor Round 00 四位候选并保存项目资产。初步判断：C01 综合品牌表现最好但年龄处于上沿；C03 年龄最明确但略偶像化；C04 最普通但表情偏平；C02 重新落入成熟精英感。尚未晋级 Current Best，等待人物选择后再生成 full-body anchor。
+- 完成 space anchor Round 00 四张候选。C03 的尺度／黑位和 C04 的 teal／城市感可作为参考，但四张都因 `passage／route／opening` 提示词收敛成走廊，且输出为 3:2 而非 16:9；本轮无晋级，下一轮只改变空间拓扑。
+- 用户选择并晋级 C04 face anchor；复制为稳定 identity reference，Round 00 原图保留。下一步只生成同一人物的 full-body／walk／wardrobe anchor，不重开选角。
+- 完成 C4 body／walk anchor Round 00 四张同身份候选并归档。C02 的表情、肩颈和整体步态最好；C04 的月牙包与双手状态最好；C03 因手插口袋淘汰。暂不整张晋级，Round 01 只把 C04 包型与更短步幅替换进 C02，继续以已选 C04 portrait 作为最高优先级身份锚点。
+- 用户确认 Round 00 C02 是最佳身体／表演方向，并新增三条硬规则：行走时绝不插兜、S02–S05 不拿手机、肩包不得影响姿势或行动；手机只在 S01 与 S06 出现。
+- 完成 body Round 02：R02-C01 移除手机并清空双手；R02-C02 只把软包移动到身体侧后方，释放右臂摆动。R02-C02 成为 phone-free walking 的 Provisional Current Best，等待用户确认。
+- 用户确认 R02-C02 成立，复制为稳定 `C4_BODY_WALK_ANCHOR_SELECTED.png`；人物 face 与 body 均正式晋级。
+- 生成的 S01／S06 手机动作测试因侧前／正面视角被降级为 Rejected as Camera Direction。新增 Camera Angle Bible V0.1：只使用纯侧面、侧后 3/4、后肩／背面；正面与侧前 3/4 不进入最终分镜。下一步先审核四张实际需要的人物视角资产，再生成关键帧。
+- 完成基础人物视角 A／B：A R01 为严格纯侧面并缩短到日常步幅；B R02 保留用户认可的步幅，只将脊柱、肩颈和头部调整得更自然挺拔。用户确认两张均成立，已复制为稳定 `SELECTED` 参考。
+- 根据 Seedance 2.0 官方全能参考能力，撤销“六段都做首尾帧”的重资产方案。新增 Seedance Reference Plan V0.1：使用 face、side、rear 3/4、space、单张 shooting-script board 与 signal language 六件最小素材，直接测试 10 秒多镜头；首尾帧只作为失败后的局部修复工具。
+- 完成空间 Round 01：A 为开放式 undercroft，解决 Round 00 的走廊拓扑并提供稳定 Hero 暗场，当前推荐为贪婪最优；B 为下沉庭院，只保留人尺度参考。两张均未晋级最终空间锚点，等待用户选择后再做单变量精修。
+- 用户否决把 Round 01 A 当作 S02 画面基础：它只有开放空间，没有可读的近点—远点路线。S02 改为一个连续的后方跟随 → 升高 → 轻微拉远／俯倾揭示镜头，发现现实硬质铺装道路与偏侧建筑开口。
+- S01 取消杂乱信息场，改为干净的短竖线／方形标记场；场本身固定，只有局部清晰波面跟随人物，以区别 Robinhood 的整片规则点阵平移。
+- S04 改用当前 Consumer Network `Picked for you` 的真实 Opinion Card 原子组成半透明横向 Rail；S05 不再发明 Shared Trace，而是同一目标卡的弱选择与整组画面推进。二者均以后期合成，不让 Seedance 重绘文字和卡片。
+- 新增并接受 [`Shooting Script V0.2`](../output/hero-brand-film-lab/shooting-script-v0.2.md)：六段时长、机位、Seedance clean plate 与确定性后期职责已分离。下一步只制作一张六格摄影调度板。
+- 完成六格摄影调度板 R00 的确定性 SVG／PNG 导出：逐格标出 Hero 安全区、摄影机箭头、图形运动、Seedance clean plate 与后期职责；不使用写实生成图，也不写入未确认标的、数字、奖励声明或近似 Logo。当前进入视觉评审。
+- 用户确认六格摄影调度板成立，正式晋级为 review board。派生 `SEEDANCE_CLEAN_PLATE_BOARD_V01`：只保留五个实际生成场景、摄影机、人物和负空间，删除点阵、K 线、Opinion Rail、选择状态、奖励和 Logo；S04／S05 共用一个连续三秒人物底片。
+- 完成 `Seedance Run Package V0.2`：实际只上传 face、side、rear 和 clean-plate board 四张图；Prompt 明确五场景时间、角色／服装锁定、S02 升高揭示、S04 连续跟拍、S06 黑屏手机，以及全部 Hard Fails。等待用户在即梦使用一次限免。
+- 将 R00 实际投喂素材复制到 `/Users/wuxiuchen/Downloads/同步空间/SmartX/剪辑/SmartX_Hero_Seedance_R00/`：`01_上传即梦` 仅含按顺序编号的四张上传图与 Prompt；评审板／SVG／脚本隔离在 `02_制作参考_不要上传`；原始视频应保存到 `03_生成结果放这里`。

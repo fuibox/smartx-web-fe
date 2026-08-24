@@ -33,10 +33,22 @@
 
 - Hero 描述分两行：第一行结束于 `prediction markets.`，第二行是 `Follow verified traders and trade in one tap.`。
 - 顶部导航整体靠右，不做视觉居中；官网不显示 Login。
+- Hero 右上角主入口使用 `Launch Alpha` 并进入当前 Alpha；Hero 与 Closing 的 `Join the Waitlist` 暂不提交表单，点击后原位提示 `Coming soon`。
 - Docs/GitBook 入口暂时移除。
+- Discovery eyebrow 使用句式大小写 `Personalized for you`，不使用全大写。
 - 第二屏三列标题和说明文字保持紧密关系，当前间距为 `4px`；三列标题使用同一顶部基线。
 - 第四屏在大屏构图中，产品 UI 需要上移以修正视觉重心。
-- `Be early` 不强行基于非同心圆底图制作同心波浪；除非更换底图或视频素材，否则不继续叠加无语义波纹。
+- `Be early` 已停止使用低清晰度的整张点阵底图，改为代码生成的单层同心点阵场。所有波面共享 `Be early` 的视觉中心，不能回退到多个错位圆形或多张图片叠加。
+
+### Be early 同心波纹
+
+- 视觉来源：用户提供的黑白点阵圆环截图；Robinhood 参考只用于“亮度沿环缓慢流动”的动势，不复制雨丝构图或荧光绿色。
+- 实现方式：`ClosingWaveField` 使用一个 Retina Canvas 实时绘制。圆点只绘制一次；每个圆点的大小与明暗由它到当前同心波面的距离决定，因此不是多层图片互相覆盖。
+- 主运动是波面从标题中心持续向外推进；环向亮度只作低幅度、低速度流动，不能抢过径向扩散的主语义。
+- 标题与 CTA 周围保留椭圆形安静区，圆点在此逐渐淡出，避免文字上方形成噪点或明显遮罩边缘。
+- 性能合同：DPR 上限为 `2`，点距随宽度在 `14–20px` 之间调整，绘制上限 `40fps`；按 12 个亮度层批量填充，离屏时停止 `requestAnimationFrame`。
+- `prefers-reduced-motion` 下保留静态同心场，停止径向推进与环向流动。
+- 旧 `cta-dots.png` 只作为历史风格参考保留，不再进入页面渲染。
 
 ## 4. 第二屏产品叙事
 
@@ -95,7 +107,18 @@
 - A：Rowdy / `Fed Decision in September?` / `No change` / Entry `61¢` → Current `64¢`。
 - B：Quarterty / `Will Bitcoin reach $150K before 2027?` / `Yes` / Entry `34¢` → Current `38¢`。
 
-## 5. 素材来源表
+## 5. One Account 候选方案（待视觉确认）
+
+这一屏只讲一条连续链路：`Apple Pay / Bank card / Exchange → SmartX balance → Gasless trade`。不把三种入金方式、统一账户和交易分别做成三张等权功能卡。
+
+- 三个 Figma 替代稿中，优先采用 `22160:8821` 的交叉路由场作为空间基础。它最容易解释多入口汇入同一余额；`22160:8612` 的立方体更像多市场网络，`22160:9028` 的 Owl 节点品牌感强，但单独使用都会弱化真实产品证据。
+- 左侧视觉主角应是一块来自当前产品结构的单一账户面板，参考 `../smartx-fe-dev/src/sections/dapp/deposit/Deposit.tsx` 的 `SmartX balance`、Deposit 与交易确认字段，不使用旧产品整屏截图，也不重新画一套与产品无关的通用钱包 UI。
+- 入金入口只作为面板内的来源状态出现：Apple Pay、Bank card、Exchange。三者共用同一笔资金 packet，汇入后只更新一次 `SmartX balance`，避免三组卡片轮播。
+- 同一面板随后从资金确认切到交易确认，保留同一个余额与金额；交易状态明确显示 `Gas fee $0`，完成后用产品 toast 收尾。共享实体是同一笔资金，而不是装饰性光线。
+- 动效顺序建议：来源选中（约 `400ms`）→ 资金汇入与余额更新（约 `600ms`）→ 稳定阅读（约 `1.4s`）→ 同面板进入交易确认（约 `300ms`）→ 一次点击与成功 toast（toast 完整可见至少 `2s`）。阅读窗口基本静止，不做无限滚动或无终点粒子。
+- Figma 路由底图只作低对比空间和过渡，不与产品面板争夺层级；文案仍位于右侧并保持当前对齐。`prefers-reduced-motion` 下直接显示“统一余额 + Gas $0 + 成功”最终状态。
+
+## 6. 素材来源表
 
 | 站内素材 | 原始来源 | 类型 | 说明 |
 | --- | --- | --- | --- |
@@ -118,17 +141,17 @@
 - 不改变产品图宽高比来强行填满；市场图在固定方形槽位中使用 `object-fit: cover`。
 - 不从 FOMO 或其他第三方官网直接复制素材；第三方只用于构图和动效参考。
 
-## 6. 实现位置
+## 7. 实现位置
 
 | 文件 | 职责 |
 | --- | --- |
-| `src/components/consumer-network/consumer-home.tsx` | 页面结构、滚动进入与离屏暂停 |
+| `src/components/consumer-network/consumer-home.tsx` | 页面结构、滚动进入与离屏暂停；`ClosingWaveField` 负责 Be early 同心点阵场 |
 | `src/components/consumer-network/network-product-previews.tsx` | 第二屏三个真实产品切片及字段 |
 | `src/components/consumer-network/consumer-home.module.css` | 第二屏布局、循环关键帧、Signal underlay 与 reduced-motion |
 | `public/assets/consumer-network/product-ui/` | 第二屏产品素材 |
 | `design-qa.md` | 每轮设计与动效自检结果 |
 
-## 7. 验收清单
+## 8. 验收清单
 
 每轮修改第二屏后至少检查：
 
@@ -144,7 +167,7 @@
 - reduced-motion 下不存在位移循环，也不会凭空显示成功 toast。
 - TypeScript、ESLint、生产构建和 `git diff --check` 全部通过。
 
-## 8. 禁止回退的方向
+## 9. 禁止回退的方向
 
 - 不把第二屏恢复成三张模糊静态截图。
 - 不用同一个市场图和同一组字段伪装三种资产。
