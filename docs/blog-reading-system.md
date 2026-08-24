@@ -1,14 +1,14 @@
 # SmartX Blog 阅读系统与内容契约
 
-> 状态：V1 已实施
-> 更新日期：2026-08-05
+> 状态：Consumer Network 视觉迁移已完成，首版待签字
+> 更新日期：2026-08-25
 > 适用路由：`/blog`、`/blog/page/[page]`、`/blog/[slug]`
 
 ## 1. 目标
 
 Blog 是官网的阅读层，不复刻首页章节动效。它需要同时做到：
 
-1. 保留 SmartX 的 Pixel 标题、navy / teal 与精确索引语言。
+1. 继承 Consumer Network 首页的 black / white / teal、编辑型衬线标题与精确索引语言。
 2. 正文优先保证长时间阅读，不让品牌字体侵入段落。
 3. 内容结构能够从本地数据平滑迁移到 CMS / 后端。
 4. 明暗主题只改变阅读环境，不改变信息层级、图片和品牌语义。
@@ -17,16 +17,26 @@ Blog 是官网的阅读层，不复刻首页章节动效。它需要同时做到
 
 | 层级 | 字体 | 桌面字号 / 行高 | 移动端 | 用途 |
 | --- | --- | --- | --- | --- |
-| 列表页主标题 | PixelOperatorMono 700 | `56–88px / .9` | `46–62px` | SmartX Journal 品牌主命题 |
-| 详情页 H1 | PixelOperatorMono 700 | `44–70px / .98` | `38–54px` | 文章标题 |
-| 正文 H2 | UI / Inter 类系统字体 600 | `27–35px / 1.18` | 同比例收缩 | 一级章节，由 `section.heading` 生成 |
-| 正文 H3 | UI / Inter 类系统字体 620 | `21–25px / 1.28` | 同比例收缩 | 章节内子命题，由 `heading(level: 3)` block 生成 |
-| 正文 | UI / Inter 类系统字体 | `17px / 1.78` | `16px / 1.78` | 段落与列表 |
-| 引用 | UI / Inter 类系统字体 520 | `21px / 1.55` | `18px` | 关键判断，不作装饰金句墙 |
-| 目录章节名 | UI / Inter 类系统字体 520 | `14px / 1.45` | `14px / 1.45` | `In this dispatch` 下的 H2 导航 |
+| 列表页主标题 | Playfair Display 600 | `64–88px / 1` | `46–62px` | SmartX Journal 品牌主命题 |
+| 详情页 H1 | Playfair Display 600 | `56–84px / 1.02` | `40–56px` | 文章标题，长标题自动收敛 |
+| 正文 H2 | IBM Plex Sans 600 | `27–35px / 1.18` | 同比例收缩 | 一级章节，由 `section.heading` 生成 |
+| 正文 H3 | IBM Plex Sans 600 | `21–25px / 1.28` | 同比例收缩 | 章节内子命题，由 `heading(level: 3)` block 生成 |
+| 正文 | IBM Plex Sans 400 | `17px / 1.78` | `16px / 1.78` | 段落与列表 |
+| 引用 | IBM Plex Sans 500 | `21px / 1.55` | `18px` | 关键判断，不作装饰金句墙 |
+| 目录章节名 | IBM Plex Sans 500 | `14px / 1.45` | `14px / 1.45` | `In this dispatch` 下的 H2 导航 |
 | 元信息 / 编号 | JetBrainsMono | `11–12px` | 不低于 `11px` | 日期、分类、阅读时长、目录编号 |
 
-Pixel 只承担品牌级标题；正文 H2/H3 不使用 Pixel，以免长文出现海报感。
+Lexend 只用于 SmartX 品牌字标。PixelOperatorMono 不再进入公开 Blog；正文 H2/H3
+继续使用 Sans，避免整篇变成宣传海报。
+
+### Consumer Network 视觉映射
+
+- Dark 画布使用 `#010101`，主文字 `#F5F5F5`，次文字 `#8A8F98`，边线 `#1B1C1D`。
+- teal 固定为 `#08DFB5`，只承担 CTA、状态、当前章节和短强调线。
+- 列表页固定 Dark；详情页保留 Blog 专属明暗阅读主题。
+- Header 复用首页的品牌锁定、`Product / Blog` 导航与圆角 `Join the Waitlist`。
+- Footer 使用整块 teal 场域与 Lexend 大字标，同时保留 Product 与 Legal 导航契约。
+- 不使用旧 navy 网格、像素尘、玻璃卡片或首页章节型滚动动效。
 
 ## 3. 正文宽度与间距
 
@@ -174,7 +184,7 @@ CMS 接入时只替换 repository 的数据适配层；`/blog`、详情、首页
 `sitemap.xml` 不应改变数据读取方式。仓储只向公开页面返回 `published` 内容。
 
 静态导出在只有一页文章时会生成 `/blog/page/1/` 作为到 `/blog/` 的规范跳转，
-不会伪造 `/blog/page/2/`。当前二十一篇已发布文章已生成真实第二、三、四页，后续页数继续由
+不会伪造 `/blog/page/2/`。当前七篇已发布文章只生成真实第二页，后续页数继续由
 统一仓储中的 published 数量自动推导。同一天发布的文章按编辑源中的排列顺序展示，
 确保首页最新三篇与运营的实际发布顺序一致。
 

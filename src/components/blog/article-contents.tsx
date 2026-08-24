@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { formatBlogIndex } from "@/lib/blog-format";
 
-import styles from "./blog.module.css";
+import styles from "./blog-article.module.css";
 
 type ArticleContentsProps = {
   sections: readonly {

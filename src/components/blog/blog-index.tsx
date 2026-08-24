@@ -2,10 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BlogVisual } from "@/components/blog/blog-visual";
-import styles from "@/components/blog/blog.module.css";
+import styles from "@/components/blog/blog-list.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import type { BlogCategory, BlogPostSummary } from "@/content/blog-types";
+import type { BlogPostSummary } from "@/content/blog-types";
 import {
   BLOG_PAGE_SIZE,
   listAllPublishedBlogPosts,
@@ -23,21 +23,6 @@ type BlogIndexProps = {
 
 function getPageHref(pageNumber: number) {
   return pageNumber === 1 ? "/blog" : `/blog/page/${pageNumber}`;
-}
-
-/**
- * What the archive is made of, counted rather than asserted. A publication
- * states its desks; this one had five categories that only ever appeared one
- * story at a time, so the shape of the coverage was invisible from the index.
- */
-function countDesks(posts: readonly BlogPostSummary[]) {
-  const counts = new Map<BlogCategory, number>();
-  for (const post of posts) {
-    counts.set(post.category, (counts.get(post.category) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([category, count]) => ({ category, count }));
 }
 
 function StoryMeta({ post }: { post: BlogPostSummary }) {
@@ -63,8 +48,9 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
 
   if (!featuredPost || !latestPublishedPost) notFound();
 
-  const desks = countDesks(allPublishedPosts);
-  const isFirstPage = pageNumber === 1;
+  const firstStoryNumber = (pageNumber - 1) * BLOG_PAGE_SIZE + 1;
+  const archiveUpdatedAt =
+    latestPublishedPost.updatedAt ?? latestPublishedPost.publishedAt;
 
   return (
     <div className={styles.page}>
@@ -75,25 +61,31 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
 
       <main>
         <section className={styles.masthead} aria-labelledby="journal-title">
-          <h1 id="journal-title">SmartX Journal.</h1>
+          <div className={styles.mastheadTitle}>
+            <p className={styles.mastheadKicker}>SmartX / Field notes</p>
+            <h1 id="journal-title">
+              SmartX <span>Journal.</span>
+            </h1>
+          </div>
 
-          <p className={styles.mastheadLede}>
-            Product thinking and market intelligence.{" "}
-            <span>How smart money moves, and what we build from it.</span>
-          </p>
-
-          <dl className={styles.deskIndex} aria-label="Desks in this archive">
-            {desks.map(({ category, count }) => (
-              <div key={category}>
-                <dt>{category}</dt>
-                <dd>{formatBlogIndex(count)}</dd>
-              </div>
-            ))}
-            <div className={styles.deskTotal}>
-              <dt>Published</dt>
-              <dd>{formatBlogIndex(archive.total)}</dd>
-            </div>
-          </dl>
+          <div className={styles.mastheadIntro}>
+            <p>
+              Product thinking and market intelligence for people who want to
+              understand how smarter trading systems take shape.
+            </p>
+            <p className={styles.archiveFolio}>
+              <span>
+                {formatBlogIndex(archive.total)}{" "}
+                {archive.total === 1 ? "story" : "stories"}
+              </span>
+              <span>
+                Updated{" "}
+                <time dateTime={archiveUpdatedAt}>
+                  {formatBlogDate(archiveUpdatedAt)}
+                </time>
+              </span>
+            </p>
+          </div>
         </section>
 
         <section
@@ -103,6 +95,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
         >
           <article className={styles.featuredStory}>
             <Link
+              className={styles.featuredLink}
               href={`/blog/${featuredPost.slug}`}
               aria-label={`Read ${featuredPost.title}`}
             >
@@ -110,70 +103,65 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
                 post={featuredPost}
                 priority
                 showLabel={false}
+                className={styles.featuredVisual}
                 sizes="(min-width: 1180px) 660px, (min-width: 760px) 55vw, 100vw"
               />
               <div className={styles.featuredStoryCopy}>
                 <div className={styles.leadLine}>
                   <span className={styles.leadMarker}>
-                    {isFirstPage
-                      ? "Lead story"
-                      : `Page ${formatBlogIndex(pageNumber)}`}
+                    No. {formatBlogIndex(firstStoryNumber)}
                   </span>
                   <StoryMeta post={featuredPost} />
                 </div>
                 <h2>{featuredPost.title}</h2>
-                {featuredPost.dek ? (
-                  <p className={styles.featuredDek}>{featuredPost.dek}</p>
-                ) : null}
                 <p>{featuredPost.excerpt}</p>
-                <span className={styles.readStory}>
-                  Read story <i aria-hidden="true">↗</i>
-                </span>
+                <span className={styles.readStory}>Read the dispatch</span>
               </div>
             </Link>
           </article>
 
-          <h2 className={styles.archiveHeading} id="archive-heading">
-            <span>More from the archive</span>
-            <i aria-hidden="true">
-              {formatBlogIndex(remainingPosts.length)} / {formatBlogIndex(archive.total)}
-            </i>
-          </h2>
+          {remainingPosts.length > 0 ? (
+            <div className={styles.archiveSection}>
+              <h2 className={styles.archiveHeading} id="archive-heading">
+                <span>From the archive</span>
+                <i aria-hidden="true">
+                  {formatBlogIndex(remainingPosts.length)} dispatches
+                </i>
+              </h2>
 
-          <ol className={styles.storyRows} aria-labelledby="archive-heading">
-            {remainingPosts.map((post, index) => (
-              <li key={post.slug}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  aria-label={`Read ${post.title}`}
-                >
-                  <span className={styles.storyNumber}>
-                    {formatBlogIndex(
-                      (pageNumber - 1) * BLOG_PAGE_SIZE + index + 2,
-                    )}
-                  </span>
-                  <div className={styles.storyThumb}>
-                    <BlogVisual
-                      post={post}
-                      showLabel={false}
-                      sizes="(min-width: 1180px) 224px, 160px"
-                    />
-                  </div>
-                  <div className={styles.storyCopy}>
-                    <StoryMeta post={post} />
-                    <h3>{post.title}</h3>
-                    <p>{post.excerpt}</p>
-                  </div>
-                  <i className={styles.storyArrow} aria-hidden="true">
-                    ↗
-                  </i>
-                </Link>
-              </li>
-            ))}
-          </ol>
+              <ol
+                className={styles.storyRows}
+                aria-labelledby="archive-heading"
+              >
+                {remainingPosts.map((post, index) => (
+                  <li key={post.slug}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      aria-label={`Read ${post.title}`}
+                    >
+                      <span className={styles.storyNumber}>
+                        No. {formatBlogIndex(firstStoryNumber + index + 1)}
+                      </span>
+                      <div className={styles.storyCopy}>
+                        <StoryMeta post={post} />
+                        <h3>{post.title}</h3>
+                        <p>{post.excerpt}</p>
+                      </div>
+                      <BlogVisual
+                        post={post}
+                        showLabel={false}
+                        className={styles.storyThumbVisual}
+                        sizes="(min-width: 1180px) 232px, (min-width: 640px) 184px, calc(100vw - 72px)"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
 
           {totalPages > 1 ? (
-            <nav className={styles.pagination} aria-label="Blog pages">
+            <nav className={styles.pagination} aria-label="Journal pages">
               {pageNumber > 1 ? (
                 <Link href={getPageHref(pageNumber - 1)}>
                   <i aria-hidden="true">←</i> Newer

@@ -62,6 +62,55 @@
   src: url("/assets/fonts/PixelOperatorMono-Bold.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url("/assets/fonts/IBMPlexSans-Variable.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Serif";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/IBMPlexSerif-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Serif";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/IBMPlexSerif-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: Lexend;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/Lexend-700.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/PlayfairDisplay-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/PlayfairDisplay-600.ttf") format("truetype");
+}
+
 :root {
   --font-jb: JetBrainsMono, monospace;
   --font-pixel: PixelOperatorMono, monospace;

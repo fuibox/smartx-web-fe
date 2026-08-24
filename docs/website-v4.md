@@ -5,6 +5,7 @@
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
 > **与旧方案的关系**：V2 太空叙事与 V3 编辑化原型均为已废弃探索，只保留在 Git 历史与历史文档中，不进入生产源码和构建产物。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
+> Consumer Network 官网改版分支的当前实现与素材交接见 `docs/consumer-network-homepage-handoff.md`；该文档只补充当前分支，不覆盖本文件的事实准确性与反 Demo 约束。
 
 ## 1. 定位与叙事（已签字）
 
@@ -118,8 +119,8 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 - Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch Alpha`，次入口 `Read the docs`。
 - Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；即使 Blog 文章数继续增长，首页也只读取最新三篇。数据接口固定为 `category / date / title / excerpt / cover / slug / sourceUrl`。当前内容从 SmartX 官方 Medium 迁入，但首页标题与 `See all` 均进入站内 `/blog`；`sourceUrl` 只作内部溯源，不在公开页面为 Medium 导流。
-- Blog 使用独立的编辑化阅读系统：`/blog` 为列表首页，采用一篇主稿 + 文本文章行，不增加无意义分类筛选；每页固定 6 篇，文章超过 6 篇后生成 `/blog/page/[page]/` 静态分页，禁止无限滚动。`/blog/[slug]` 为详情页，使用大标题、真实封面或语义化产品视觉、约 680px 的窄正文、桌面端吸顶目录与三篇相关文章。Blog 延续 V4 navy/teal 与像素索引语言；品牌级标题使用 Pixel，长正文使用 UI 字体，禁止把首页章节动效搬进阅读页。详情页支持 Blog 专属明暗阅读主题，阅读时长必须从正文自动计算；正文排版和内容接口以 `docs/blog-reading-system.md` 为准。
-- Footer 将信息拆为三组：左侧品牌与 X / Telegram 社交入口；`Product` 包含 App / Blog / Docs；`Legal` 包含 Terms of Service / Privacy Policy。底部继续以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
+- Blog 使用独立的编辑化阅读系统：`/blog` 为列表首页，采用一篇主稿 + 文本文章行，不增加无意义分类筛选；每页固定 6 篇，文章超过 6 篇后生成 `/blog/page/[page]/` 静态分页，禁止无限滚动。`/blog/[slug]` 为详情页，使用大标题、真实封面或语义化产品视觉、约 680px 的窄正文、桌面端吸顶目录与三篇相关文章。Consumer Network 主线下，Blog 继承首页的 black / white / teal、Playfair Display、IBM Plex Sans 与开放索引语言；Lexend 只用于品牌字标，JetBrainsMono 只用于序号和元信息，公开 Blog 不再使用 PixelOperatorMono。禁止把首页章节动效搬进阅读页。详情页支持 Blog 专属明暗阅读主题，阅读时长必须从正文自动计算；正文排版和内容接口以 `docs/blog-reading-system.md` 为准。
+- Footer 将信息拆为三组：左侧品牌与 X / Telegram 社交入口；`Product` 包含 App / Blog / Docs；`Legal` 包含 Terms of Service / Privacy Policy。Consumer Network 主线使用整块 teal 场域与黑色 Lexend `SmartX` 大字标；移除无叙事价值的通用风险句。
 - Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
 - Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期并使用真实文章链接，hover 只做封面轻微收紧、标题与分类短线响应，不额外增加卡片箭头。
 
@@ -152,7 +153,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
 | **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；Footer 已按 Product / Legal 分组 |
-| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 二十一篇 `/blog/[slug]` 详情；已迁入截至 2026-08-03 的官方 Medium 全部文章，Medium 地址只作内部溯源 |
+| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 七篇已发布 `/blog/[slug]` 详情；另有二十一篇按 2026-08-24 内容盘点撤下公开站点，Medium 地址只作内部溯源 |
 
 桌面首版已在 `1440 × 900` 浏览器逐屏验收；大屏舞台已在 `1920 × 1080` 与约 `2500 × 1280` 浏览器逐屏回归，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
@@ -168,7 +169,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 SEO 上线验收顺序：
 
-1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前二十一篇文章时应为 26 条 URL。
+1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前七篇文章时应为 10 条 URL。
 2. 在 Search Console 重新提交或刷新 `sitemap.xml`。Search Console 的 discovered pages 可能延迟更新，不以提交当下的数字判断失败。
 3. 用 Google Rich Results Test 检查首页的 Organization / WebSite / SoftwareApplication，以及文章页的 BlogPosting。
 4. Terms of Service 与 Privacy Policy 必须返回 200，不允许发布带 404 的 Legal 导航。
@@ -204,7 +205,7 @@ src/components/v4/
   v4.module.css                  Hero 与共享 tokens
 src/components/blog/             Blog 编辑化页面组件与样式
 src/components/site/             Blog 页眉与全站共享 Footer
-src/content/blog-posts.ts        当前二十一篇本地编辑源（不被页面直接导入）
+src/content/blog-posts.ts        当前二十八篇本地编辑记录（七篇发布、二十一篇撤下；不被页面直接导入）
 src/content/blog-types.ts        Blog 摘要、详情与正文块契约
 src/content/blog-core.ts         内容验证、规范化、分页与阅读时长
 src/content/blog-repository.ts   首页/Blog/sitemap 的统一发布数据入口

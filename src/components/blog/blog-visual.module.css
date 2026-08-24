@@ -1,0 +1,26 @@
+.coverVisual {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #07120f;
+}
+
+.coverVisual img {
+  object-fit: cover;
+}
+
+.coverVisual > span {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  padding: 5px 9px;
+  border: 1px solid rgb(245 245 245 / 20%);
+  border-radius: 999px;
+  background: rgb(1 1 1 / 68%);
+  color: #f5f5f5;
+  font-family: "IBM Plex Sans", var(--font-inter);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}

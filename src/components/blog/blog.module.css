@@ -481,7 +481,7 @@
    each entry ran 185-241px, so six stories filled two and a half screens and
    no two headlines could be compared without scrolling. The thumbnail earns
    its column: every post already ships its own cover, and the list had been
-   throwing all twenty-one of them away. */
+   throwing every one of them away. */
 .storyRows a {
   display: grid;
   align-items: center;

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 
-import { V4Hero } from "@/components/v4/hero";
-import { V4StoryPage } from "@/components/v4/story-page";
-import styles from "@/components/v4/v4.module.css";
-import { getLatestBlogPosts } from "@/content/blog-repository";
+import { ConsumerHome } from "@/components/consumer-network/consumer-home";
 import {
   SMARTX_DEFAULT_SOCIAL_IMAGE,
   SMARTX_INDEXABLE_ROBOTS,
@@ -14,9 +11,9 @@ import {
   SMARTX_WEBSITE_ID,
 } from "@/lib/site-metadata";
 
-const title = "SmartX | The first AI trading terminal that understands you";
+const title = "SmartX | Trade your edge";
 const description =
-  "SmartX watches every market, learns how you trade, and surfaces the next opportunity before the crowd sees it.";
+  "The social trading app for memes, perps, stocks and prediction markets. Follow verified traders and trade in one tap.";
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -37,7 +34,6 @@ const structuredData = {
       sameAs: [
         "https://x.com/SmartXTerminal",
         "https://t.me/SmartX_Community",
-        "https://smartx.gitbook.io/smartx.docs.io",
       ],
     },
     {
@@ -46,7 +42,7 @@ const structuredData = {
       url: "https://smartx.io/",
       name: "SmartX",
       inLanguage: "en",
-      description: "The first AI trading terminal that understands you",
+      description,
       publisher: { "@id": SMARTX_ORGANIZATION_ID },
     },
     {
@@ -59,7 +55,7 @@ const structuredData = {
       url: "https://app.smartx.io/",
       image: "https://smartx.io/opengraph-image.png",
       description:
-        "The AI trading terminal that watches every market, learns how you trade, and surfaces the next opportunity before the crowd.",
+        "Follow verified traders and trade memes, perps, stocks, and prediction markets in one tap.",
       offers: {
         "@type": "Offer",
         price: "0",
@@ -92,22 +88,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Home() {
-  const homepageUpdates = await getLatestBlogPosts(3);
-
+export default function Home() {
   return (
-    <main className={styles.page}>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
         }}
       />
-      <a className={styles.skipLink} href="#v4-index">
-        Skip to product story
-      </a>
-      <V4Hero />
-      <V4StoryPage updates={homepageUpdates} />
-    </main>
+      <ConsumerHome />
+    </>
   );
 }

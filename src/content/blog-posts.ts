@@ -7,7 +7,7 @@ import type { BlogPostSource } from "./blog-types";
 export const BLOG_POST_SOURCES = [
   {
     slug: "how-to-build-a-polymarket-trading-strategy-that-actually-works",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-17",
     title: "How to Build a Polymarket Trading Strategy That Actually Works",
@@ -130,7 +130,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-win-on-polymarket-the-systems-that-separate-consistent-traders-from-the-rest",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-15",
     title: "How to Win on Polymarket: The Systems That Separate Consistent Traders from the Rest",
@@ -245,7 +245,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "skill-in-prediction-markets-is-real-copying-it-still-loses-money",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-14",
     title: "Skill in prediction markets is real. Copying it still loses money.",
@@ -450,7 +450,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "polymarket-liquidity-why-it-matters-more-than-most-traders-realize",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-13",
     title: "Polymarket Liquidity: Why It Matters More Than Most Traders Realize",
@@ -551,7 +551,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-track-and-measure-your-prediction-market-returns",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-13",
     title: "How to Track and Measure Your Prediction Market Returns",
@@ -656,7 +656,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-review-is-this-ai-terminal-worth-it-for-polymarket-traders",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-08-12",
     title: "SmartX Review: Is This AI Terminal Worth It for Polymarket Traders?",
@@ -761,7 +761,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "what-makes-prediction-markets-on-chain-the-technical-foundation-that-changes-everything",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-10",
     title: "What Makes Prediction Markets On-Chain: The Technical Foundation That Changes Everything",
@@ -872,7 +872,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-read-a-polymarket-wallet-and-what-the-data-actually-tells-you",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-03",
     title: "How to Read a Polymarket Wallet (And What the Data Actually Tells You)",
@@ -988,7 +988,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-think-about-probability-on-prediction-markets",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-03",
     title: "How to Think About Probability on Prediction Markets",
@@ -1108,7 +1108,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "the-psychology-of-trading-prediction-markets-and-why-most-traders-lose-more-than-they-should",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-01",
     title: "The Psychology of Trading Prediction Markets (And Why Most Traders Lose More Than They Should)",
@@ -1224,7 +1224,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "prediction-markets-vs-traditional-sports-betting-whats-actually-different",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-01",
     title: "Prediction Markets vs Traditional Sports Betting: What’s Actually Different",
@@ -1348,7 +1348,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-terminal-a-complete-guide-for-prediction-market-traders",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-31",
     title: "SmartX Terminal: A Complete Guide for Prediction Market Traders",
@@ -1626,7 +1626,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "why-sports-markets-dominate-polymarket-volume-and-what-that-means-for-traders",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-07-29",
     title: "Why Sports Markets Dominate Polymarket Volume (And What That Means for Traders)",
@@ -1874,7 +1874,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "polymarket-for-beginners-7-things-experienced-traders-know-that-you-dont",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-28",
     title: "Polymarket for Beginners: 7 Things Experienced Traders Know That You Don’t",
@@ -2026,7 +2026,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-on-polymarket-what-it-does-who-its-for-and-how-it-works",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-28",
     title: "SmartX on Polymarket: What It Does, Who It’s For, and How It Works",
@@ -2156,7 +2156,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-analyze-prediction-markets-with-ai-a-step-by-step-guide",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-27",
     title: "How to Analyze Prediction Markets with AI: A Step-by-Step Guide",
@@ -2654,7 +2654,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "best-polymarket-analytics-tools-in-2026-ranked-and-reviewed",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-24",
     title: "Best Polymarket Analytics Tools in 2026 — Ranked and Reviewed",
@@ -2927,7 +2927,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-boost-trade-alongside-the-smart-money",
-    status: "published",
+    status: "draft",
     category: "Campaign",
     publishedAt: "2026-07-17",
     title: "SmartX Boost: Trade Alongside the Smart Money",
@@ -2998,7 +2998,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "introducing-smart-points-get-rewarded-for-being-early",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-16",
     title: "Introducing Smart Points: Get Rewarded for Being Early",
@@ -3067,7 +3067,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smart-money-decoded-what-top-prediction-market-traders-actually-read",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-07-13",
     title:
@@ -3230,7 +3230,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-signal-bot-guide",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-06-02",
     title: "SmartX Signal Bot Guide",

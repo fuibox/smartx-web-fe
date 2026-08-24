@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ArticleContents } from "@/components/blog/article-contents";
 import { ArticleCta } from "@/components/blog/article-cta";
 import { BlogVisual } from "@/components/blog/blog-visual";
-import styles from "@/components/blog/blog.module.css";
+import styles from "@/components/blog/blog-article.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { getBlogReadingStats } from "@/content/blog-core";
@@ -196,7 +196,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <a className={styles.skipLink} href="#article-body">
         Skip to article
       </a>
-      <SiteHeader active="blog" />
+      <SiteHeader active="blog" allowThemeToggle />
 
       <main>
         <article>
@@ -206,11 +206,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <i aria-hidden="true">←</i>
                 Journal
               </Link>
-              <span>{post.category}</span>
+              <span className={styles.articleCategory}>{post.category}</span>
               <time dateTime={post.publishedAt}>
                 {formatBlogDate(post.publishedAt)}
               </time>
-              <small>{readTime}</small>
+              <span className={styles.articleReadTime}>{readTime}</span>
             </div>
             <h1>{post.title}</h1>
             {post.dek ? <p>{post.dek}</p> : null}
@@ -218,7 +218,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div id="article-body" className={styles.articleLayout}>
             <aside className={styles.articleRail}>
-              <p>In this dispatch</p>
+              <p className={styles.articleRailLabel}>In this dispatch</p>
               <ArticleContents
                 sections={post.sections.map(({ id, heading }) => ({
                   id,
@@ -233,6 +233,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   post={post}
                   priority
                   showLabel={false}
+                  className={styles.articleCover}
                   sizes="(min-width: 901px) 680px, (min-width: 641px) calc(100vw - 64px), calc(100vw - 40px)"
                 />
               </div>
@@ -258,20 +259,70 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           aria-labelledby="related-stories-title"
         >
           <header>
-            <p className={styles.eyebrow}>KEEP READING</p>
+            <p className={styles.relatedEyebrow}>Keep reading</p>
             <h2 id="related-stories-title">From the journal</h2>
           </header>
-          <div>
-            {relatedPosts.map((related, index) => (
-              <article key={related.slug}>
-                <Link href={`/blog/${related.slug}`}>
-                  <span>{formatBlogIndex(index + 1)}</span>
-                  <small>{related.category}</small>
-                  <h3>{related.title}</h3>
-                  <i aria-hidden="true">↗</i>
+          <div
+            className={styles.relatedLayout}
+            data-has-secondary={relatedPosts.length > 1 ? "true" : "false"}
+          >
+            {relatedPosts[0] ? (
+              <article className={styles.relatedLead}>
+                <Link href={`/blog/${relatedPosts[0].slug}`}>
+                  <BlogVisual
+                    post={relatedPosts[0]}
+                    showLabel={false}
+                    className={styles.relatedLeadVisual}
+                    sizes="(min-width: 901px) 650px, (min-width: 641px) calc(100vw - 64px), calc(100vw - 40px)"
+                  />
+                  <div className={styles.relatedLeadCopy}>
+                    <span className={styles.relatedIndex}>
+                      {formatBlogIndex(1)}
+                    </span>
+                    <div className={styles.relatedMeta}>
+                      <span>{relatedPosts[0].category}</span>
+                      <time dateTime={relatedPosts[0].publishedAt}>
+                        {formatBlogDate(relatedPosts[0].publishedAt)}
+                      </time>
+                      <small>
+                        {formatBlogReadTime(relatedPosts[0].readingMinutes)}
+                      </small>
+                    </div>
+                    <h3>{relatedPosts[0].title}</h3>
+                    <p>{relatedPosts[0].excerpt}</p>
+                    <span className={styles.relatedReadMore}>
+                      Read story <i aria-hidden="true">↗</i>
+                    </span>
+                  </div>
                 </Link>
               </article>
-            ))}
+            ) : null}
+
+            {relatedPosts.length > 1 ? (
+              <div className={styles.relatedRows}>
+                {relatedPosts.slice(1).map((related, index) => (
+                  <article key={related.slug}>
+                    <Link href={`/blog/${related.slug}`}>
+                      <span className={styles.relatedIndex}>
+                        {formatBlogIndex(index + 2)}
+                      </span>
+                      <div className={styles.relatedRowCopy}>
+                        <div className={styles.relatedMeta}>
+                          <span>{related.category}</span>
+                          <time dateTime={related.publishedAt}>
+                            {formatBlogDate(related.publishedAt)}
+                          </time>
+                        </div>
+                        <h3>{related.title}</h3>
+                      </div>
+                      <i className={styles.relatedArrow} aria-hidden="true">
+                        ↗
+                      </i>
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
       </main>
