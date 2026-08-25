@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
@@ -34,7 +34,7 @@ const networkFeatures = [
   {
     number: "No. 03",
     title: "One tap to trade",
-    description: "Trade as smooth as shopping.",
+    description: "Trade as smoothly as shopping.",
     preview: "trade" satisfies NetworkPreviewKind,
     motion: "account",
   },
@@ -83,169 +83,15 @@ function useSectionReveals() {
   }, []);
 }
 
-function ClosingOrbitField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d", { alpha: true });
-    if (!context) return;
-
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let reducedMotion = motionQuery.matches;
-    let visible = false;
-    let animationFrame = 0;
-    let lastFrameAt = 0;
-    let width = 0;
-    let height = 0;
-
-    const rings = [
-      { radiusX: 0.168, radiusY: 0.25, markers: 64, period: 11 },
-      { radiusX: 0.323, radiusY: 0.475, markers: 92, period: 17 },
-      { radiusX: 0.5, radiusY: 0.855, markers: 128, period: 26 },
-    ] as const;
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const nextWidth = Math.max(1, Math.round(rect.width));
-      const nextHeight = Math.max(1, Math.round(rect.height));
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-
-      if (
-        nextWidth === width &&
-        nextHeight === height &&
-        canvas.width === Math.round(nextWidth * pixelRatio)
-      ) {
-        return;
-      }
-
-      width = nextWidth;
-      height = nextHeight;
-      canvas.width = Math.round(width * pixelRatio);
-      canvas.height = Math.round(height * pixelRatio);
-      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    };
-
-    const draw = (time: number) => {
-      resize();
-      context.clearRect(0, 0, width, height);
-
-      if (reducedMotion) return;
-
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      context.lineCap = "round";
-
-      rings.forEach((ring, ringIndex) => {
-        const radiusX = width * ring.radiusX;
-        const radiusY = height * ring.radiusY;
-        const phase =
-          ((time / 1000) * Math.PI * 2) / ring.period + ringIndex * 1.65;
-        const sigma = 0.22 + ringIndex * 0.035;
-
-        for (let marker = 0; marker < ring.markers; marker += 1) {
-          const angle = (marker / ring.markers) * Math.PI * 2;
-          const delta = Math.atan2(
-            Math.sin(angle - phase),
-            Math.cos(angle - phase),
-          );
-          const highlight = Math.exp(
-            -(delta * delta) / (2 * sigma * sigma),
-          );
-
-          if (highlight < 0.025) continue;
-
-          const x = centerX + Math.cos(angle) * radiusX;
-          const y = centerY + Math.sin(angle) * radiusY;
-          const depth = 0.72 + ((Math.sin(angle) + 1) / 2) * 0.28;
-          const alpha = highlight * depth * (0.7 - ringIndex * 0.08);
-          const lineHeight = 18 + highlight * 12;
-
-          context.beginPath();
-          context.moveTo(x, y - lineHeight / 2);
-          context.lineTo(x, y + lineHeight / 2);
-          context.lineWidth = 3.2;
-          context.strokeStyle = `rgba(238, 238, 238, ${alpha})`;
-          context.stroke();
-        }
-      });
-    };
-
-    const tick = (time: number) => {
-      if (!visible || reducedMotion) {
-        animationFrame = 0;
-        return;
-      }
-
-      if (time - lastFrameAt >= 1000 / 30) {
-        draw(time);
-        lastFrameAt = time;
-      }
-      animationFrame = window.requestAnimationFrame(tick);
-    };
-
-    const start = () => {
-      if (animationFrame || reducedMotion || !visible) return;
-      animationFrame = window.requestAnimationFrame(tick);
-    };
-
-    const visibilityObserver = new IntersectionObserver(
-      ([entry]) => {
-        visible = entry.isIntersecting;
-        if (visible) {
-          draw(performance.now());
-          start();
-        } else if (animationFrame) {
-          window.cancelAnimationFrame(animationFrame);
-          animationFrame = 0;
-        }
-      },
-      { threshold: 0.08 },
-    );
-
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      draw(reducedMotion ? 0 : performance.now());
-    });
-
-    const handleMotionChange = (event: MediaQueryListEvent) => {
-      reducedMotion = event.matches;
-      if (reducedMotion && animationFrame) {
-        window.cancelAnimationFrame(animationFrame);
-        animationFrame = 0;
-      }
-      draw(performance.now());
-      start();
-    };
-
-    resize();
-    draw(performance.now());
-    visibilityObserver.observe(canvas);
-    resizeObserver.observe(canvas);
-    motionQuery.addEventListener("change", handleMotionChange);
-
-    return () => {
-      if (animationFrame) window.cancelAnimationFrame(animationFrame);
-      visibilityObserver.disconnect();
-      resizeObserver.disconnect();
-      motionQuery.removeEventListener("change", handleMotionChange);
-    };
-  }, []);
-
+function ClosingGlowField() {
   return (
-    <>
-      <Image
-        className={styles.closingOrbitBase}
-        src={`${ASSET_ROOT}/be-early-orbit-base.png`}
-        alt=""
-        fill
-        sizes="100vw"
-      />
-      <canvas ref={canvasRef} className={styles.closingOrbitCanvas} />
-    </>
+    <Image
+      className={styles.closingGlowImage}
+      src={`${ASSET_ROOT}/closing-dot-waves.webp`}
+      alt=""
+      fill
+      sizes="100vw"
+    />
   );
 }
 
@@ -299,11 +145,13 @@ function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
 }
 
 function Hero() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
     <section className={styles.hero} aria-labelledby="consumer-hero-title">
       <div className={styles.heroImage} aria-hidden="true">
         <Image
-          src={`${ASSET_ROOT}/hero-product.png`}
+          src={`${ASSET_ROOT}/hero-product.webp`}
           alt=""
           fill
           sizes="(min-width: 1440px) 1425px, 100vw"
@@ -319,11 +167,64 @@ function Hero() {
 
         <div className={styles.headerActions}>
           <nav className={styles.primaryNav} aria-label="Site navigation">
-            <a href="#product">Product</a>
+            <a
+              href="https://x.com/SmartXTerminal"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              X
+            </a>
+            <a
+              href="https://t.me/+CTeuBkpOxSNkN2Y0"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Community
+            </a>
             <Link href="/blog">Blog</Link>
           </nav>
+          <button
+            className={styles.mobileMenuButton}
+            type="button"
+            aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-site-navigation"
+            data-open={mobileNavOpen ? "true" : "false"}
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
           <LaunchAlphaLink />
         </div>
+
+        <nav
+          id="mobile-site-navigation"
+          className={styles.mobileNav}
+          aria-label="Mobile site navigation"
+          hidden={!mobileNavOpen}
+        >
+          <a
+            href="https://x.com/SmartXTerminal"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileNavOpen(false)}
+          >
+            X
+          </a>
+          <a
+            href="https://t.me/+CTeuBkpOxSNkN2Y0"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileNavOpen(false)}
+          >
+            Community
+          </a>
+          <Link href="/blog" onClick={() => setMobileNavOpen(false)}>
+            Blog
+          </Link>
+        </nav>
       </header>
 
       <div className={styles.heroCopy}>
@@ -385,11 +286,11 @@ function PerformanceSection() {
     >
       <div className={styles.performanceProduct}>
         <Image
-          src={`${ASSET_ROOT}/performance-product.png`}
-          alt="Two SmartX mobile product screens showing a personalized trade idea and live markets"
-          width={910}
-          height={895}
-          sizes="(min-width: 1440px) 910px, 58vw"
+          src={`${ASSET_ROOT}/performance-product-latest.webp`}
+          alt="SmartX Square and People screens showing a verified social feed and trader leaderboard"
+          width={2894}
+          height={3943}
+          sizes="(max-width: 620px) 100vw, (min-width: 1440px) 678px, 47vw"
         />
       </div>
 
@@ -430,20 +331,12 @@ function DiscoverySection() {
       data-reveal
     >
       <Image
-        className={styles.discoveryLandscape}
-        src={`${ASSET_ROOT}/discovery-landscape.png`}
-        alt=""
-        fill
-        sizes="100vw"
-      />
-      <div className={styles.discoveryShade} aria-hidden="true" />
-      <Image
-        className={styles.discoveryProduct}
-        src={`${ASSET_ROOT}/discovery-product.png`}
-        alt="SmartX personalized account screen"
-        width={888}
-        height={857}
-        sizes="(min-width: 1440px) 888px, 68vw"
+        className={styles.discoveryScene}
+        src={`${ASSET_ROOT}/discovery-scene-latest.webp`}
+        alt="SmartX mobile signals feed on a dark trading console"
+        width={2492}
+        height={1600}
+        sizes="1246px"
       />
 
       <div className={`${styles.storyCopy} ${styles.discoveryCopy}`}>
@@ -470,7 +363,7 @@ function AccountSection() {
     >
       <Image
         className={styles.accountImage}
-        src={`${ASSET_ROOT}/account-network.png`}
+        src={`${ASSET_ROOT}/account-hub-network-brand-teal.webp`}
         alt=""
         fill
         sizes="100vw"
@@ -504,7 +397,7 @@ function ClosingSection() {
       data-reveal
     >
       <div className={styles.closingField} aria-hidden="true">
-        <ClosingOrbitField />
+        <ClosingGlowField />
       </div>
       <div className={styles.closingCopy}>
         <div>

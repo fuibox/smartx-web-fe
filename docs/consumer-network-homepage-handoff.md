@@ -1,7 +1,7 @@
 # SmartX Consumer Network 官网改版交接说明
 
 > 状态：桌面版持续视觉评审中  
-> 分支：`codex/consumer-network-redesign`  
+> 分支：`codex/consumer-network-stage-20260825`
 > 更新日期：2026-08-25  
 > 适用范围：`src/components/consumer-network/` 与 `public/assets/consumer-network/`
 
@@ -24,6 +24,7 @@
 | --- | --- | --- |
 | [SmartX 对接文档 · Figma 主稿](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=22134-8148) | 官网总体构图、各屏文字与产品图比例 | 不合理项允许按产品事实修正，例如导航靠右、移除 Login |
 | [第三、第四屏产品 UI · Figma](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=22160-8894) | 第三、第四屏产品 UI 图 | 产品/UI 负责人持续替换素材 |
+| [2026-08-25 最新第 3–6 屏 · Figma](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=22228-636) | 第三、第四、第六屏当前视觉基准 | 本轮采用 `22228:727`、`22228:758`、`22228:783`；第五屏采用独立生成并确认的 SmartX Hub 构图 |
 | [Signal Card 产品参考 · Figma](https://www.figma.com/design/t38RJ52jEzew2IHUY4EwTA/SmartX-%E5%AF%B9%E6%8E%A5%E6%96%87%E6%A1%A3?node-id=22148-30) | 第二屏第三列的 Signal Card 排版、deck rail 与 Quick Copy 语义 | 卡片紧凑比例约为 `398 × 230`；官网按列宽适配，不改变内部信息层级 |
 | [官网文案 · Google Docs](https://docs.google.com/document/d/16n07df30yycBf43UopOtqErBdMOdtUfgEoqwi4XL4Lc/edit?tab=t.0) | 当前英文文案来源 | Docs/GitBook 公开入口暂时移除 |
 | `../smartx-mobile-v2-demo/` | 第二屏真实移动端 UI、字段、交互和演示数据 | 第二屏产品结构的主要事实来源 |
@@ -32,23 +33,25 @@
 ## 3. 全站已确认判断
 
 - Hero 描述分两行：第一行结束于 `prediction markets.`，第二行是 `Follow verified traders and trade in one tap.`。
-- 顶部导航整体靠右，不做视觉居中；官网不显示 Login。
+- 顶部导航整体靠右，不做视觉居中；官网不显示 Login。当前入口为 `X / Community / Blog`，不保留含义模糊的 `Product`。
 - Hero 右上角主入口使用 `Launch Alpha` 并进入当前 Alpha；Hero 与 Closing 的 `Join the Waitlist` 暂不提交表单，点击后原位提示 `Coming soon`。
 - Docs/GitBook 入口暂时移除。
 - Discovery eyebrow 使用句式大小写 `Personalized for you`，不使用全大写。
+- 第二屏所有演示身份统一使用 `Trader 01–04`，不显示 `@handle`；副信息只写 `Verified profile / Demo profile`。社交推荐用 `A trader you follow liked this` 等中性关系文案，不暗示任何真实账号参与或背书。
 - 第二屏三列标题和说明文字保持紧密关系，当前间距为 `4px`；三列标题使用同一顶部基线。
+- H5 第二屏不沿用桌面三列构图；每项按“标题 → 说明 → 产品局部”纵向阅读，隐藏 `No. 01–03` 编号。
+- H5 第三屏隐藏桌面流程标签，先显示标题与说明，再接透明底的 Square + People 双手机图；产品图允许横向满幅，但不能出现不透明矩形接缝。
 - 第四屏在大屏构图中，产品 UI 需要上移以修正视觉重心。
-- `Be early` 已停止使用低清晰度的整张点阵底图，改为代码生成的单层同心点阵场。所有波面共享 `Be early` 的视觉中心，不能回退到多个错位圆形或多张图片叠加。
+- `Be early` 使用 Figma `22228:784` 的高清点阵波纹。几何位置保持静止，只做低幅度亮度呼吸；不能回退到竖线轨道、连续位移的波面、多个错位圆形或多张图片叠加。
 
 ### Be early 同心波纹
 
-- 视觉来源：用户提供的黑白点阵圆环截图；Robinhood 参考只用于“亮度沿环缓慢流动”的动势，不复制雨丝构图或荧光绿色。
-- 实现方式：`ClosingWaveField` 使用一个 Retina Canvas 实时绘制。圆点只绘制一次；每个圆点的大小与明暗由它到当前同心波面的距离决定，因此不是多层图片互相覆盖。
-- 主运动是波面从标题中心持续向外推进；环向亮度只作低幅度、低速度流动，不能抢过径向扩散的主语义。
-- 标题与 CTA 周围保留椭圆形安静区，圆点在此逐渐淡出，避免文字上方形成噪点或明显遮罩边缘。
-- 性能合同：DPR 上限为 `2`，点距随宽度在 `14–20px` 之间调整，绘制上限 `40fps`；按 12 个亮度层批量填充，离屏时停止 `requestAnimationFrame`。
-- `prefers-reduced-motion` 下保留静态同心场，停止径向推进与环向流动。
-- 旧 `cta-dots.png` 只作为历史风格参考保留，不再进入页面渲染。
+- 视觉来源：Figma `22228:783 / 22228:784`。Robinhood 参考不再进入画面；不复制雨丝构图、旋转轨道或荧光绿色。
+- 实现方式：`ClosingGlowField` 只渲染一张 `closing-dot-waves.webp`，不使用 Canvas、位移、缩放或多层叠图。
+- 动效只在 `12s` 周期内把图片透明度从 `0.72` 缓慢过渡到 `0.84`，形成温和的发光呼吸；圆点和波纹的几何位置不变，避免持续径向位移引起眩晕。
+- 标题与 CTA 周围沿用原图的安静区，不增加额外光晕或随机粒子。
+- `prefers-reduced-motion` 下停止呼吸，固定为 `0.78` 透明度。
+- 旧点阵与轨道方案只保留在 Git 历史和阶段分支中，不进入 main 的公开素材目录。
 
 ## 4. 第二屏产品叙事
 
@@ -57,8 +60,8 @@
 目的：证明排行榜来自真实 P&L，而不是自我声明。
 
 - 使用开放式四行排行榜，不显示局部 `Leaderboard` 标题、范围切换器或轮播点。
-- Rowdy 的 `30D P&L` 先从 `+$118.6K` 递增到 `+$164.2K`，再到 `+$219.8K`。
-- P&L 完成变化后，Rowdy 从 02 平滑移动到 01；Quarterty 同时下移。
+- Trader 01 的 `30D P&L` 先从 `+$118.6K` 递增到 `+$164.2K`，再到 `+$219.8K`。
+- P&L 完成变化后，Trader 01 从 02 平滑移动到 01；Trader 02 同时下移。
 - 数值变化必须先于排名变化，建立清楚因果。
 - 循环复位时不整块淡出；只让数值和行位置回到起始状态。
 
@@ -68,7 +71,7 @@
 
 - 保留真实 Square 顶栏和独立的 `For You / Newest / Friends` lanes。
 - Feed 只做纵向移动，不与排行榜换位或 Signal 横滑重复。
-- 必须保留社交推荐来源，例如 `Quarterty also liked this` 和 `3 people you follow liked this`。
+- 必须保留中性的社交推荐关系，例如 `A trader you follow liked this` 和 `3 traders you follow liked this`，不得出现未经授权的真实姓名或 handle。
 - 三类仓位卡的右侧固定为 `Position value` 数值与下方 PnL；不得根据标的类型把右侧替换成市值、买入价或交易事件。
 - Prediction 左侧显示市场、用户实际持有的 `Yes/No` side 与 average entry，不得使用市场 short name 代替交易 side。
 - Token 左侧直接写标的，例如 `PUMP token`，第二行写以 market cap 表达的 average entry；不增加 `Position · Open` 或 `Bought` 前置标签。
@@ -104,24 +107,27 @@
 
 当前两张演示卡：
 
-- A：Rowdy / `Fed Decision in September?` / `No change` / Entry `61¢` → Current `64¢`。
-- B：Quarterty / `Will Bitcoin reach $150K before 2027?` / `Yes` / Entry `34¢` → Current `38¢`。
+- A：Trader 01 / `Fed Decision in September?` / `No change` / Entry `61¢` → Current `64¢`。
+- B：Trader 02 / `Will Bitcoin reach $150K before 2027?` / `Yes` / Entry `34¢` → Current `38¢`。
 
-## 5. One Account 候选方案（待视觉确认）
+## 5. One Account 当前方案
 
-这一屏只讲一条连续链路：`Apple Pay / Bank card / Exchange → SmartX balance → Gasless trade`。不把三种入金方式、统一账户和交易分别做成三张等权功能卡。
+这一屏只讲一条连续链路：`Apple / Google / Bank / Exchange → SmartX → supported markets and chains`。不把登录、入金、统一账户和交易拆成三张等权功能卡。
 
-- 三个 Figma 替代稿中，优先采用 `22160:8821` 的交叉路由场作为空间基础。它最容易解释多入口汇入同一余额；`22160:8612` 的立方体更像多市场网络，`22160:9028` 的 Owl 节点品牌感强，但单独使用都会弱化真实产品证据。
-- 左侧视觉主角应是一块来自当前产品结构的单一账户面板，参考 `../smartx-fe-dev/src/sections/dapp/deposit/Deposit.tsx` 的 `SmartX balance`、Deposit 与交易确认字段，不使用旧产品整屏截图，也不重新画一套与产品无关的通用钱包 UI。
-- 入金入口只作为面板内的来源状态出现：Apple Pay、Bank card、Exchange。三者共用同一笔资金 packet，汇入后只更新一次 `SmartX balance`，避免三组卡片轮播。
-- 同一面板随后从资金确认切到交易确认，保留同一个余额与金额；交易状态明确显示 `Gas fee $0`，完成后用产品 toast 收尾。共享实体是同一笔资金，而不是装饰性光线。
-- 动效顺序建议：来源选中（约 `400ms`）→ 资金汇入与余额更新（约 `600ms`）→ 稳定阅读（约 `1.4s`）→ 同面板进入交易确认（约 `300ms`）→ 一次点击与成功 toast（toast 完整可见至少 `2s`）。阅读窗口基本静止，不做无限滚动或无终点粒子。
-- Figma 路由底图只作低对比空间和过渡，不与产品面板争夺层级；文案仍位于右侧并保持当前对齐。`prefers-reduced-motion` 下直接显示“统一余额 + Gas $0 + 成功”最终状态。
+- 当前视觉主角为单一 SmartX Owl Hub。左侧 Apple、Google、Bank、Coinbase 与 Binance 作为账户和资金入口，右侧 Solana、Robinhood、Base 与 BNB Chain 作为明确的市场/链锚点。SmartX Hub 与线路使用品牌主色 `#08DFB5`；第三方 Logo 保持各自原始品牌色。
+- 右侧同时保留少量无标签线路，并在画面边缘自然衰减，表达支持范围可以继续扩展；不加入 Polygon 或未经确认的具体链 Logo。
+- 背景素材不含任何文案，`One Account. Every Market.` 及说明始终由 HTML 渲染，确保清晰度、可访问性和响应式排版。
+- 桌面端保持图片自然方向，不翻转；素材缩至约 `94%`，SmartX Hub 位于左侧视觉区，右侧暗场留给文案。四周用短距离透明遮罩融入页面暗场；文案区另用一块椭圆软遮罩让线路在文字背后消失，不形成硬边矩形，也不覆盖 Hub 和主要链 Logo。
+- 动效只在进入视口时做一次约 `1.4s` 的轻微位移与显现，阅读期间保持静止。`prefers-reduced-motion` 下直接显示最终状态。
 
 ## 6. 素材来源表
 
 | 站内素材 | 原始来源 | 类型 | 说明 |
 | --- | --- | --- | --- |
+| `performance-product-latest.webp` | Figma `22228:728` | Figma 原始透明 PNG 的高质量 WebP 交付版 | 第三屏 Square + People 双手机组合；文件 `2894 × 3943`，页面按 Figma 节点 `678 × 923` 的比例显示；透明底避免 H5 出现矩形接缝 |
+| `discovery-scene-latest.webp` | Figma `22228:761` | Figma 节点 `2×` PNG 的高质量 WebP 交付版 | 第四屏手机与暗色交易台场景；文件 `2492 × 1600`，页面按 `1246 × 800` 显示并对左边缘做渐隐融合 |
+| `closing-dot-waves.webp` | Figma `22228:784` | Figma 节点原始 PNG 的高质量 WebP 交付版 | 第六屏 `1920 × 600` 点阵主视觉；几何静止，仅做低幅度透明度呼吸 |
+| `account-hub-network-brand-teal.webp` | Figma `22160:9028` SmartX Hub 方向、产品/UI 反馈与 SmartX 品牌色 `#08DFB5` | ImageGen 精准调色图的高质量 WebP 交付版 | 第五屏 `1920 × 800` 背景；只把 Hub、线路与 SmartX 边缘光校正为品牌 teal，第三方 Logo 保持原色，无内嵌文案 |
 | `product-ui/avatar-rowdy.png` | `../smartx-mobile-v2-demo/public/assets/avatars/7.png` | 原文件复制 | Rowdy 头像，哈希一致 |
 | `product-ui/avatar-quarterty.png` | `../smartx-mobile-v2-demo/public/assets/avatars/2.png` | 原文件复制 | Quarterty 头像，哈希一致 |
 | `product-ui/avatar-smartx.png` | `../smartx-mobile-v2-demo/public/assets/avatars/1.png` | 原文件复制 | SmartX Owl 头像，哈希一致 |
@@ -145,7 +151,7 @@
 
 | 文件 | 职责 |
 | --- | --- |
-| `src/components/consumer-network/consumer-home.tsx` | 页面结构、滚动进入与离屏暂停；`ClosingWaveField` 负责 Be early 同心点阵场 |
+| `src/components/consumer-network/consumer-home.tsx` | 页面结构、H5 导航与滚动进入；`ClosingGlowField` 负责 Be early 静态点阵的柔和呼吸 |
 | `src/components/consumer-network/network-product-previews.tsx` | 第二屏三个真实产品切片及字段 |
 | `src/components/consumer-network/consumer-home.module.css` | 第二屏布局、循环关键帧、Signal underlay 与 reduced-motion |
 | `public/assets/consumer-network/product-ui/` | 第二屏产品素材 |

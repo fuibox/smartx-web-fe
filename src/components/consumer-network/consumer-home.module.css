@@ -124,6 +124,58 @@
   line-height: 1.3;
 }
 
+.mobileMenuButton,
+.mobileNav {
+  display: none;
+}
+
+.mobileMenuButton {
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  background: rgb(1 1 1 / 72%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.mobileMenuButton span {
+  display: block;
+  width: 17px;
+  height: 1.5px;
+  margin: 2px 0;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.mobileNav {
+  position: absolute;
+  z-index: 6;
+  top: calc(100% + 10px);
+  right: 24px;
+  min-width: 164px;
+  flex-direction: column;
+  padding: 8px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 16px;
+  background: rgb(9 11 11 / 96%);
+  box-shadow: 0 18px 48px rgb(0 0 0 / 38%);
+}
+
+.mobileNav[hidden] {
+  display: none;
+}
+
+.mobileNav a {
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
 .primaryNav a,
 .footerLinks a {
   position: relative;
@@ -176,6 +228,8 @@
 }
 
 .primaryNav a:focus-visible,
+.mobileMenuButton:focus-visible,
+.mobileNav a:focus-visible,
 .waitlistButton:focus-visible,
 .footer a:focus-visible {
   outline: 2px solid currentColor;
@@ -1303,147 +1357,6 @@
 
 .tradeSignalCard footer strong {
   color: #7dc7b3;
-}
-
-.network[data-visible="true"] .rankingRow[data-movement="up"] {
-  animation: leaderboard-row-up 10s linear infinite;
-}
-
-.network[data-visible="true"] .rankingRow[data-movement="down"] {
-  animation: leaderboard-row-down 10s linear infinite;
-}
-
-.network[data-visible="true"] .rankingValueBefore {
-  animation: leaderboard-value-before 10s linear infinite;
-}
-
-.network[data-visible="true"] .rankingValueAfter {
-  animation: leaderboard-value-after 10s linear infinite;
-}
-
-.network[data-visible="true"] .squarePostPrimary {
-  animation: square-post-primary-loop 10s linear infinite;
-}
-
-.network[data-visible="true"] .squarePostSecondary {
-  animation: square-post-secondary-loop 10s linear infinite;
-}
-
-@keyframes leaderboard-row-up {
-  0%,
-  18% {
-    transform: translate3d(0, 64px, 0);
-  }
-  18% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  25%,
-  92% {
-    transform: translate3d(0, 0, 0);
-  }
-  93%,
-  100% {
-    transform: translate3d(0, 64px, 0);
-  }
-}
-
-@keyframes leaderboard-row-down {
-  0%,
-  18% {
-    transform: translate3d(0, 0, 0);
-  }
-  18% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  25%,
-  92% {
-    transform: translate3d(0, 64px, 0);
-  }
-  93%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes leaderboard-value-before {
-  0%,
-  12% {
-    opacity: 1;
-  }
-  15%,
-  92% {
-    opacity: 0;
-  }
-  93%,
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes leaderboard-value-after {
-  0%,
-  12% {
-    opacity: 0;
-  }
-  15%,
-  92% {
-    opacity: 1;
-  }
-  93%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes square-post-primary-loop {
-  0%,
-  31% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-  31% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  39%,
-  88% {
-    opacity: 0;
-    transform: translate3d(0, -107%, 0);
-  }
-  89%,
-  92% {
-    opacity: 0.72;
-    transform: translate3d(0, 107%, 0);
-  }
-  92% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes square-post-secondary-loop {
-  0%,
-  31% {
-    opacity: 0.72;
-    transform: translate3d(0, 107%, 0);
-  }
-  31% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  39%,
-  92% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-  92% {
-    animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(0, -107%, 0);
-  }
 }
 
 /* Refined second-screen product crops. */
@@ -2582,11 +2495,11 @@
 
 .performanceProduct {
   position: absolute;
-  top: 180px;
-  left: 12.24%;
-  width: min(47.4vw, 910px);
+  top: 73px;
+  left: 17.24%;
+  width: min(47.1vw, 678px);
   opacity: 0;
-  transform: translate3d(-34px, 20px, 0) rotate(-1.5deg);
+  transform: translate3d(-28px, 16px, 0);
 }
 
 .performanceProduct img {
@@ -2602,7 +2515,7 @@
 @keyframes product-enter-left {
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -2668,6 +2581,7 @@
 
 .performanceStep {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   margin-right: -1px;
 }
@@ -2692,48 +2606,41 @@
   margin: 0 -2px;
 }
 
-.discovery,
-.account {
-  background: linear-gradient(296.85deg, #484f5a 22.11%, #959aa6 98.54%);
+.discovery {
+  background: #252626;
 }
 
-.discoveryLandscape,
+.account {
+  background: #080e0f;
+}
+
 .accountImage {
   z-index: -3;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.discoveryShade {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 42% 55% at 48% 88%,
-    rgb(1 1 1 / 0%) 0%,
-    rgb(17 17 17 / 82%) 100%
-  );
-}
-
-.discoveryProduct {
+.discoveryScene {
   position: absolute;
   z-index: -1;
-  top: 97px;
-  left: 53.75%;
-  width: min(46.25vw, 888px);
+  top: 50%;
+  right: 0;
+  width: 1246px;
   max-width: none;
-  height: auto;
+  height: 800px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 100%);
   opacity: 0;
-  transform: translate3d(34px, 0, 0);
+  transform: translate3d(28px, -50%, 0);
 }
 
-.discovery[data-visible="true"] .discoveryProduct {
+.discovery[data-visible="true"] .discoveryScene {
   animation: product-enter-right 1150ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 @keyframes product-enter-right {
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, -50%, 0);
   }
 }
 
@@ -2747,15 +2654,33 @@
 }
 
 .accountImage {
-  transform: scaleX(-1) scale(1.015);
-  opacity: 0.76;
+  object-position: center;
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-image:
+    linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  opacity: 0.92;
+  transform: scale(0.94);
 }
 
 .accountShade {
   position: absolute;
   z-index: -2;
   inset: 0;
-  background: linear-gradient(90deg, #010101 15.5%, rgb(1 1 1 / 0%) 83.8%);
+  background:
+    radial-gradient(
+      ellipse 25% 48% at 76% 49%,
+      rgb(8 14 15 / 96%) 0%,
+      rgb(8 14 15 / 90%) 52%,
+      rgb(8 14 15 / 38%) 78%,
+      transparent 100%
+    ),
+    linear-gradient(90deg, transparent 48%, rgb(1 1 1 / 5%) 67%, rgb(1 1 1 / 34%) 100%),
+    linear-gradient(180deg, rgb(1 1 1 / 9%) 0%, transparent 18%, transparent 82%, rgb(1 1 1 / 12%) 100%);
 }
 
 .account[data-visible="true"] .accountImage {
@@ -2764,12 +2689,12 @@
 
 @keyframes account-settle {
   from {
-    opacity: 0.44;
-    transform: scaleX(-1) scale(1.035) translate3d(-18px, 0, 0);
+    opacity: 0.64;
+    transform: scale(0.955) translate3d(-8px, 0, 0);
   }
   to {
-    opacity: 1;
-    transform: scaleX(-1) scale(1.015) translate3d(0, 0, 0);
+    opacity: 0.92;
+    transform: scale(0.94) translate3d(0, 0, 0);
   }
 }
 
@@ -2789,17 +2714,16 @@
   overflow: hidden;
 }
 
-.closingOrbitBase {
+.closingGlowImage {
   object-fit: cover;
-  opacity: 0.64;
+  opacity: 0.72;
+  animation: closing-wave-glow 12s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 
-.closingOrbitCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+@keyframes closing-wave-glow {
+  to {
+    opacity: 0.84;
+  }
 }
 
 .closingCopy {
@@ -2974,14 +2898,23 @@
     left: 28px;
   }
 
-  .performanceFlow {
-    transform: scale(0.9);
-    transform-origin: left center;
-  }
-
   .footerDirectory {
     right: 64px;
     left: 64px;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1300px) {
+  .performanceFlow {
+    width: max-content;
+    display: grid;
+    grid-template-columns: max-content max-content;
+    gap: 8px 0;
+    transform: none;
+  }
+
+  .performanceStep:nth-child(2) img {
+    display: none;
   }
 }
 
@@ -2998,6 +2931,15 @@
 
   .primaryNav {
     display: none;
+  }
+
+  .mobileMenuButton {
+    display: grid;
+    order: 2;
+  }
+
+  .mobileNav {
+    display: flex;
   }
 
   .heroImage {
@@ -3060,18 +3002,33 @@
     width: 84%;
   }
 
-  .discoveryProduct {
-    top: 168px;
-    left: 47%;
-    width: min(68vw, 612px);
+  .performanceFlow {
+    width: auto;
+    transform: none;
+  }
+
+  .discoveryScene {
+    top: 50%;
+    right: -38%;
+    width: auto;
+    height: 100%;
   }
 
   .accountImage {
-    object-position: 35% center;
+    object-fit: cover;
+    object-position: 38% center;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .accountShade {
-    background: linear-gradient(180deg, #010101 6%, rgb(1 1 1 / 10%) 70%);
+    background: linear-gradient(
+      180deg,
+      #080e0f 0%,
+      rgb(8 14 15 / 88%) 25%,
+      rgb(8 14 15 / 18%) 58%,
+      rgb(8 14 15 / 34%) 100%
+    );
   }
 
   .footerDirectory {
@@ -3126,40 +3083,94 @@
   }
 
   .networkFeature {
-    min-height: 490px;
-    padding: 24px 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: 0 0 56px;
   }
 
-  .featureCopy {
-    right: 0;
-    left: 0;
+  .networkGrid {
+    row-gap: 0;
   }
 
-  .featureCopy h3 {
-    font-size: 32px;
+  .networkFeature + .networkFeature {
+    padding-top: 56px;
   }
 
-  .performanceFlow {
-    max-width: 100%;
-    flex-wrap: wrap;
-    gap: 8px;
-    transform: none;
+  .networkFeature:last-child {
+    padding-bottom: 0;
   }
 
-  .performanceStep img {
+  .featureNumber {
     display: none;
   }
 
-  .performanceProduct {
-    top: 370px;
-    left: -22%;
-    width: 118vw;
+  .featureCopy {
+    position: static;
+    order: 1;
+    right: 0;
+    left: 0;
+    gap: 6px;
   }
 
-  .discoveryProduct {
-    top: 250px;
-    left: 22%;
-    width: 96%;
+  .featureCopy h3 {
+    font-size: 30px;
+  }
+
+  .featureCopy p {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .featureArt {
+    position: relative;
+    top: auto;
+    left: auto;
+    order: 2;
+    width: 100%;
+    height: 320px;
+    margin-top: 24px;
+    transform: none;
+  }
+
+  .featureArt[data-motion="account"] {
+    width: calc(100% + 24px);
+    margin-left: -12px;
+  }
+
+  .performanceFlow {
+    display: none;
+  }
+
+  .performance {
+    min-height: 860px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 72px 24px 0;
+  }
+
+  .performance .storyCopy {
+    position: relative;
+    top: auto;
+    left: auto;
+    order: 1;
+    width: 100%;
+    gap: 24px;
+  }
+
+  .performanceProduct {
+    position: relative;
+    top: auto;
+    left: auto;
+    order: 2;
+    width: calc(100% + 48px);
+    margin: 40px -24px 0;
+  }
+
+  .discoveryScene {
+    right: -74%;
   }
 
   .storySection {
@@ -3183,9 +3194,9 @@
   }
 
   .footerDirectory {
-    height: 330px;
+    height: auto;
     flex-direction: column;
-    gap: 48px;
+    gap: 40px;
   }
 
   .footerBrand {
@@ -3194,8 +3205,8 @@
   }
 
   .footerBrand small {
-    position: absolute;
-    top: 300px;
+    position: static;
+    margin-top: 0;
   }
 
   .footerLinks {
@@ -3207,9 +3218,11 @@
   }
 
   .footerWordmark {
-    top: 420px;
+    top: auto;
+    bottom: 20px;
     left: 50%;
-    font-size: 190px;
+    font-size: min(26vw, 150px);
+    line-height: 1;
   }
 }
 
@@ -3224,7 +3237,8 @@
 
   .featureProduct,
   .performanceProduct,
-  .discoveryProduct,
+  .discoveryScene,
+  .closingGlowImage,
   .accountImage,
   .leaderboardStage,
   .rankingRow,
@@ -3242,11 +3256,23 @@
     animation: none !important;
   }
 
+  .closingGlowImage {
+    opacity: 0.78;
+  }
+
   .featureProduct,
   .performanceProduct,
-  .discoveryProduct {
+  .discoveryScene {
     opacity: 1;
+  }
+
+  .featureProduct,
+  .performanceProduct {
     transform: none;
+  }
+
+  .discoveryScene {
+    transform: translate3d(0, -50%, 0);
   }
 
   .leaderboardStage .rankingRow[data-trader="quarterty"] {
@@ -3302,7 +3328,7 @@
   }
 
   .accountImage {
-    transform: scaleX(-1) scale(1.015);
+    transform: scale(1);
   }
 
 }

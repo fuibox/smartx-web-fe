@@ -118,6 +118,22 @@ Scope: only `03 / Learn`. The supplied 1280×720 concept image is the visual sou
 
 final result: passed
 
+### Consumer homepage · Screen 5 SmartX Hub and demo identity pass · 2026-08-25
+
+- Source asset: `public/assets/consumer-network/account-hub-network-brand-teal.webp` (`1920 × 800`). The SmartX-owned glow and circuit traces use the website brand teal `#08DFB5`; Apple, Google, bank, Coinbase, Binance, Solana, Robinhood, Base, and BNB Chain retain their distinct colors.
+- Desktop implementation evidence: `output/playwright/consumer-screen5-final-1440.png`, captured in the in-app browser at `1440 × 900` with the 800px section aligned to the viewport top.
+- Required combined comparison: `output/playwright/consumer-screen5-source-implementation-comparison.png`. The source is normalized to the same 1440 × 800 section frame and shown beside the implementation in one comparison input.
+- The image is rendered at approximately 94% on desktop to avoid amplifying the deliberately soft texture. A short four-edge mask blends the bitmap into the page background, and a separate elliptical matte removes circuit detail directly behind the copy without creating a rectangular panel.
+- The hub, confirmed logos, and major routes remain readable; the copy column has a stable dark reading field. The HTML copy remains outside the bitmap, so line wrapping, contrast, and accessibility do not depend on generated text.
+- The section has a single 1400ms entry settle using only opacity and transform. `prefers-reduced-motion` removes the entry animation and keeps the final image state.
+- Mobile was checked at `390 × 844`; it uses a dedicated cover crop and vertical copy shade rather than mechanically applying the desktop mask.
+- Second-screen public identities now use `Trader 01–04` plus `Verified profile / Demo profile`. No `@handle` remains in the rendered component. Named endorsement copy is replaced with neutral relationship text such as `A trader you follow liked this`.
+- TypeScript, ESLint, `git diff --check`, and the production build passed. The development server was restarted after the production build so the local preview no longer shares stale build output.
+
+Decision: **Approve**.
+
+final result: passed
+
 ---
 
 # Blog masthead and related-story simplification · 2026-08-25
