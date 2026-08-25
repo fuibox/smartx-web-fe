@@ -18,6 +18,7 @@ const eslintConfig = [
       ".claude/**",
       ".impeccable/**",
       ".playwright-cli/**",
+      ".vercel/**",
       "audit/**",
       "node_modules/**",
       "out/**",

@@ -9,7 +9,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { renderResultCard, type RenderedResultCard, type ResultCardFormat } from "./result-card-export";
 import styles from "./waitlist.module.css";
 
-type Stage = "gate" | "quiz" | "email" | "verify" | "result";
+type Stage = "gate" | "quiz" | "email" | "verify" | "unlock" | "result";
 type Dimension = "risk" | "basis" | "mode";
 type Stat = "conviction" | "instinct" | "resilience";
 type Pole = "DEGEN" | "SNIPER" | "GUT" | "DATA" | "PACK" | "LONE";
@@ -28,7 +28,15 @@ type Question = {
   artAlt: string;
   options: readonly QuizOption[];
 };
-type Persona = { name: string; cn: string; code: string; mark: string; description: string; roast: string };
+type Persona = {
+  name: string;
+  cn: string;
+  code: string;
+  mark: string;
+  roast: string;
+  artSrc: string;
+  artAlt: string;
+};
 type Scores = Record<Dimension, number>;
 type StatScores = Record<Stat, number>;
 type Outcome = {
@@ -125,48 +133,57 @@ const QUESTIONS: readonly Question[] = [
 const PERSONAS: Record<string, Persona> = {
   "DEGEN|GUT|PACK": {
     name: "The Liquidity Donor", cn: "送钱者", code: "APE", mark: "LQD",
-    description: "You chase heat, trust the vibe, and bring the group chat with you. Wherever the market needs liquidity, your wallet arrives first.",
     roast: "You’re not trading. You’re funding the ecosystem.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/lqd-liquidity-donor.png",
+    artAlt: "The Liquidity Donor handing cash to a rising candlestick market",
   },
   "DEGEN|GUT|LONE": {
     name: "The All-In Mystic", cn: "梭哈仙人", code: "WOLF", mark: "AIM",
-    description: "You do not need a poll or a spreadsheet. You have a feeling—and right before every all-in, it feels like enlightenment.",
     roast: "Every all-in starts with enlightenment and ends with reincarnation.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/aim-all-in-mystic.png",
+    artAlt: "The All-In Mystic meditating beside an all-in stack of chips",
   },
   "DEGEN|DATA|PACK": {
     name: "The Signal General", cn: "喊单军师", code: "PARROT", mark: "SIG",
-    description: "Charts checked. Wallets tracked. Three hours of analysis later, the strategy still comes down to two words: send it.",
     roast: "Three hours of research. Two-word thesis: send it.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/sig-signal-general.png",
+    artAlt: "The Signal General directing followers from a chart-covered strategy table",
   },
   "DEGEN|DATA|LONE": {
     name: "The Candle Prophet", cn: "K线教主", code: "FOX", mark: "CND",
-    description: "You trust candles, structure, and support levels more than people. Your system explains almost everything—except your position size.",
     roast: "You can chart every line except the one marking enough exposure.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/cnd-candle-prophet.png",
+    artAlt: "The Candle Prophet explaining charts beside an oversized position lever",
   },
   "SNIPER|GUT|PACK": {
     name: "The Dip Ringleader", cn: "抄底带头大哥", code: "TURTLE", mark: "DIP",
-    description: "You wait for the pullback. Once your gut calls the bottom, the whole group chat gets recruited to buy it with you.",
     roast: "You’re not buying the dip. You’re giving the downtrend a demo.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/dip-dip-ringleader.png",
+    artAlt: "The Dip Ringleader leading followers down a falling candlestick chart",
   },
   "SNIPER|GUT|LONE": {
     name: "The Market Doctor", cn: "行情老中医", code: "BEAR", mark: "DOC",
-    description: "You do not rush and you do not need the crowd. You take the market’s pulse and decide whether its complexion looks healthy.",
     roast: "Every symptom diagnosed. Every loss professionally explained.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/doc-market-doctor.png",
+    artAlt: "The Market Doctor listening to a candlestick chart with a stethoscope",
   },
   "SNIPER|DATA|PACK": {
     name: "The Onchain Detective", cn: "链上侦探", code: "WHALE", mark: "CHN",
-    description: "Charts, flows, smart wallets—you inspect everything. You know who moved and where the money went before the group chat asks.",
     roast: "You know everyone’s position except, occasionally, your own.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/chn-onchain-detective.png",
+    artAlt: "The Onchain Detective tracing wallets while ignoring its own losing trade",
   },
   "SNIPER|DATA|LONE": {
     name: "The Limit Sniper", cn: "潜伏狙击手", code: "CAT", mark: "LMT",
-    description: "The thesis is ready and the entry is precise. You will wait as long as it takes—even when the market has no intention of returning.",
     roast: "The limit order was perfect. Shame you two never met again.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/lmt-limit-sniper.png",
+    artAlt: "The Limit Sniper watching price turn just before reaching an entry line",
   },
   OWL: {
     name: "The Risk Monk", cn: "风控大师", code: "OWL", mark: "RSK",
-    description: "Low leverage. Clean exits. Profits taken without ceremony. While everyone hunts the next 10×, you make sure there is a next trade.",
     roast: "They study how to double once. You study how to stay in the game.",
+    artSrc: "/assets/waitlist/personas/ops-meme-v1/rsk-risk-monk.png",
+    artAlt: "The Risk Monk meditating safely inside a shield during market chaos",
   },
 };
 
@@ -193,6 +210,8 @@ const DEFAULT_ANSWERS = ["C", "D", "A", "A", "B", "B"] as const;
 const WAITLIST_URL = "https://smartx.io/waitlist/";
 const OTP_CODE = "824193";
 const SNAPSHOT_PREFIX = "smartx:waitlist-result:";
+const INVITES_PER_PAGE = 5;
+const PROTOTYPE_USED_INVITE_FRAGMENT = "N4Q8";
 const USED_INVITE_CODES = new Set(["SMARTX-RSK-USED"]);
 const LOCKED_INVITE_CODES = new Set(["SMARTX-RSK-LOCKED"]);
 
@@ -254,7 +273,7 @@ function resolveOutcome(answerIds: readonly string[], identity = ""): Outcome {
   return { persona, poles, rawScores, stats, resultId: makeResultId(answerIds, identity) };
 }
 
-function makePosition(email: string) {
+function makeRank(email: string) {
   const seed = [...email].reduce((sum, character) => sum + character.charCodeAt(0), 0);
   return 7_900 + (seed % 1_800);
 }
@@ -274,11 +293,24 @@ function createSnapshot(outcome: Outcome): ResultSnapshot {
   };
 }
 
+function Brand() {
+  return (
+    <span className={styles.brand}>
+      <Image
+        src="/assets/consumer-network/logo-white.svg"
+        alt=""
+        width={34}
+        height={28}
+      />
+      <span>SmartX</span>
+    </span>
+  );
+}
+
 function QuestionArtwork({ question }: { question: Question }) {
   return (
     <div className={styles.questionArtwork}>
       <Image src={question.artSrc} alt={question.artAlt} fill sizes="(max-width: 860px) 90vw, 540px" priority />
-      <span>Concept artwork</span>
     </div>
   );
 }
@@ -300,30 +332,43 @@ function ScoreAxis({ label, score }: { label: string; score: number }) {
 }
 
 function PersonaPoster({ outcome, preparedCards, exportError, preview = false }: PersonaPosterProps) {
+  const chemistry = CHEMISTRY[outcome.persona.mark];
+  const bestMatch = PERSONAS_BY_CODE[chemistry.best];
+  const rival = PERSONAS_BY_CODE[chemistry.rival];
+
   return (
     <article className={styles.personaPoster} data-preview={preview}>
-      <header>
-        <Link href="/" aria-label="SmartX home" className={styles.posterLogo}>
-          <Image src="/assets/smartx-logo.svg" alt="" width={218} height={42} />
-        </Link>
-        <span>{outcome.resultId}</span>
-      </header>
+      {preview && (
+        <header>
+          <Link href="/" aria-label="SmartX home" className={styles.posterLogo}>
+            <Brand />
+          </Link>
+        </header>
+      )}
       <div className={styles.posterIdentity}>
         <span>{outcome.poles.join(" · ")}</span>
         <h2>{outcome.persona.name}</h2>
         <p>{outcome.persona.cn}</p>
       </div>
-      <div className={styles.personaArt} aria-label="Final persona artwork placeholder">
-        <b>{outcome.persona.mark}</b>
-        <small>Persona artwork in progress</small>
+      <div className={styles.personaArt}>
+        <Image
+          src={outcome.persona.artSrc}
+          alt={outcome.persona.artAlt}
+          fill
+          sizes={preview ? "(max-width: 880px) 90vw, 520px" : "(max-width: 880px) 90vw, 610px"}
+          priority={!preview}
+        />
       </div>
       <div className={styles.posterScores}>
         <ScoreAxis label="Conviction" score={outcome.stats.conviction} />
         <ScoreAxis label="Instinct" score={outcome.stats.instinct} />
         <ScoreAxis label="Resilience" score={outcome.stats.resilience} />
       </div>
-      <p className={styles.posterDescription}>{outcome.persona.description}</p>
       <blockquote>“{outcome.persona.roast}”</blockquote>
+      <section className={styles.chemistryBlock} aria-label="Persona chemistry">
+        <div><span>Best match</span><strong>{bestMatch.name}</strong><small>{bestMatch.cn}</small></div>
+        <div><span>Natural rival</span><strong>{rival.name}</strong><small>{rival.cn}</small></div>
+      </section>
       {!preview && (
         <section className={styles.cardDownloads} aria-label="Download result card">
           <span>Download result</span>
@@ -353,7 +398,7 @@ export function WaitlistExperience() {
   const [answerIds, setAnswerIds] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [shared, setShared] = useState(false);
-  const [inviteIndex, setInviteIndex] = useState(0);
+  const [invitePage, setInvitePage] = useState(0);
   const [preparedCards, setPreparedCards] = useState<Partial<Record<ResultCardFormat, RenderedResultCard>>>({});
   const [exportError, setExportError] = useState(false);
 
@@ -369,9 +414,13 @@ export function WaitlistExperience() {
   }, [referralSnapshot]);
 
   const codes = useMemo(() => makeCodes(outcome.persona), [outcome.persona]);
-  const basePosition = useMemo(() => makePosition(email), [email]);
-  const position = Math.max(1, basePosition - (shared ? 500 : 0));
-  const selectedCode = codes.at(inviteIndex);
+  const invitations = useMemo(() => codes
+    .map((code, index) => ({ code, index, used: code.endsWith(`-${PROTOTYPE_USED_INVITE_FRAGMENT}`) }))
+    .sort((left, right) => Number(left.used) - Number(right.used)), [codes]);
+  const invitePageCount = Math.ceil(invitations.length / INVITES_PER_PAGE);
+  const visibleInvitations = invitations.slice(invitePage * INVITES_PER_PAGE, (invitePage + 1) * INVITES_PER_PAGE);
+  const baseRank = useMemo(() => makeRank(email), [email]);
+  const rank = Math.max(1, baseRank - (shared ? 137 : 0));
   const chemistry = CHEMISTRY[outcome.persona.mark];
   const bestMatch = PERSONAS_BY_CODE[chemistry.best];
   const rival = PERSONAS_BY_CODE[chemistry.rival];
@@ -417,7 +466,14 @@ export function WaitlistExperience() {
     let rendered: RenderedResultCard[] = [];
     setPreparedCards({});
     setExportError(false);
-    const data = { ...outcome.persona, code: outcome.persona.mark, poles: outcome.poles, scores: outcome.stats };
+    const data = {
+      ...outcome.persona,
+      code: outcome.persona.mark,
+      poles: outcome.poles,
+      scores: outcome.stats,
+      bestMatch: { name: bestMatch.name, cn: bestMatch.cn },
+      rival: { name: rival.name, cn: rival.cn },
+    };
     Promise.all([renderResultCard(data, "story"), renderResultCard(data, "og")])
       .then((cards) => {
         rendered = cards;
@@ -426,7 +482,7 @@ export function WaitlistExperience() {
       })
       .catch(() => { if (!disposed) setExportError(true); });
     return () => { disposed = true; rendered.forEach((card) => URL.revokeObjectURL(card.href)); };
-  }, [stage, outcome]);
+  }, [stage, outcome, bestMatch, rival]);
 
   const beginQuiz = () => { setGateError(""); setQuestionIndex(0); setAnswerIds([]); setStage("quiz"); };
   const submitGate = (event: FormEvent<HTMLFormElement>) => {
@@ -448,7 +504,7 @@ export function WaitlistExperience() {
   const submitOtp = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (otp !== OTP_CODE) { setOtpError("That code does not match. Check the six digits and try again."); return; }
-    setOtpError(""); setTelegramOpened(false); setXOpened(false); setCopiedCode(null); setShared(false); setInviteIndex(0); setEmailVerified(true); setStage("result");
+    setOtpError(""); setTelegramOpened(false); setXOpened(false); setCopiedCode(null); setShared(false); setInvitePage(0); setEmailVerified(true); setStage("unlock");
   };
   const openCommunity = (network: "telegram" | "x") => {
     window.open(network === "telegram" ? "https://t.me/+CTeuBkpOxSNkN2Y0" : "https://x.com/SmartXTerminal", "_blank", "noopener,noreferrer");
@@ -457,7 +513,7 @@ export function WaitlistExperience() {
   const answerQuestion = (option: QuizOption) => {
     const nextAnswers = [...answerIds.slice(0, questionIndex), option.id];
     setAnswerIds(nextAnswers);
-    if (questionIndex === QUESTIONS.length - 1) { setShared(false); setInviteIndex(0); setStage(emailVerified ? "result" : "email"); return; }
+    if (questionIndex === QUESTIONS.length - 1) { setShared(false); setInvitePage(0); setStage(emailVerified ? "unlock" : "email"); return; }
     setQuestionIndex((current) => current + 1);
   };
   const goBack = () => { if (questionIndex === 0) return; setAnswerIds((current) => current.slice(0, -1)); setQuestionIndex((current) => current - 1); };
@@ -468,27 +524,27 @@ export function WaitlistExperience() {
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     setShared(true);
   };
-  const shareInvitation = () => {
-    if (!selectedCode) return;
-    const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", `I got ${outcome.persona.name} on the SmartX trader type test. Use my one-time invite to find yours.`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(selectedCode, outcome.resultId, true));
-    window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
-  };
   const copyInvitation = async (code?: string) => {
     if (!code) return;
     await navigator.clipboard.writeText(makeInvitationUrl(code, outcome.resultId, true));
     setCopiedCode(code);
     window.setTimeout(() => setCopiedCode(null), 1400);
   };
-  const restart = () => { setStage("quiz"); setQuestionIndex(0); setAnswerIds([]); setCopiedCode(null); setShared(false); setInviteIndex(0); setPreparedCards({}); setExportError(false); };
-
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-stage={stage} data-referral={Boolean(referralOutcome)}>
       <a className={styles.skipLink} href="#waitlist-content">Skip to waitlist</a>
+      <div className={styles.ambientBackdrop} aria-hidden="true">
+        <Image
+          src="/assets/consumer-network/hero-product.png"
+          alt=""
+          fill
+          sizes="100vw"
+          priority
+        />
+      </div>
       <header className={styles.header}>
         <Link href="/" aria-label="SmartX home" className={styles.logo}>
-          <Image src="/assets/smartx-logo.svg" alt="" width={218} height={42} priority />
+          <Brand />
         </Link>
         <span>Private beta</span>
       </header>
@@ -552,7 +608,7 @@ export function WaitlistExperience() {
           <div className={styles.formStage}>
             <span className={styles.eyebrow}>Your result is ready</span>
             <h1>Save your result.</h1>
-            <p>Bind an email to keep it and create your waitlist position.</p>
+            <p>Bind an email to save your result and join the waitlist.</p>
             <form onSubmit={submitEmail}>
               <label htmlFor="waitlist-email">Email address</label>
               <div className={styles.inlineField}>
@@ -573,7 +629,7 @@ export function WaitlistExperience() {
               <label htmlFor="waitlist-otp">Verification code</label>
               <div className={styles.inlineField}>
                 <input className={styles.otpInput} id="waitlist-otp" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "").slice(0, 6)); setOtpError(""); }} aria-invalid={Boolean(otpError)} aria-describedby={otpError ? "otp-error" : "otp-note"} placeholder="••••••" autoFocus required />
-                <button className={styles.primaryButton} type="submit">Reveal</button>
+                <button className={styles.primaryButton} type="submit">Continue</button>
               </div>
               {otpError ? <small className={styles.formError} id="otp-error" role="alert">{otpError}</small> : <small id="otp-note">Prototype code · <b>{OTP_CODE}</b></small>}
               <div className={styles.formMeta}>
@@ -584,43 +640,91 @@ export function WaitlistExperience() {
           </div>
         )}
 
+        {stage === "unlock" && (
+          <div className={styles.unlockStage}>
+            <span className={styles.eyebrow}>One last step</span>
+            <h1>Unlock your result.</h1>
+            <p>Join the SmartX community and follow product updates before your trader type is revealed.</p>
+            <div className={styles.unlockTasks}>
+              <button type="button" aria-pressed={telegramOpened} data-complete={telegramOpened} onClick={() => openCommunity("telegram")}>
+                <FaTelegramPlane aria-hidden="true" />
+                <span><b>Join Telegram</b><small>Enter the SmartX community</small></span>
+                <strong>{telegramOpened ? "Done ✓" : "Open ↗"}</strong>
+              </button>
+              <button type="button" aria-pressed={xOpened} data-complete={xOpened} onClick={() => openCommunity("x")}>
+                <FaXTwitter aria-hidden="true" />
+                <span><b>Follow SmartX on X</b><small>Follow product updates</small></span>
+                <strong>{xOpened ? "Done ✓" : "Open ↗"}</strong>
+              </button>
+            </div>
+            <button className={styles.primaryButton} type="button" disabled={!telegramOpened || !xOpened} onClick={() => setStage("result")}>Reveal my result</button>
+            <small>Both steps are required to continue.</small>
+          </div>
+        )}
+
         {stage === "result" && (
           <div className={styles.resultStage}>
             <PersonaPoster outcome={outcome} preparedCards={preparedCards} exportError={exportError} />
             <aside className={styles.resultPanel}>
-              <span className={styles.eyebrow}>Position active</span>
               <div className={styles.rankBlock} data-boosted={shared}>
-                <span>Your waitlist position</span><strong key={position}>#{position.toLocaleString("en-US")}</strong>
-                <small>{shared ? "Shared · moved up 500 places" : "Share your result to move up 500 places"}</small>
+                <span>Waitlist rank</span>
+                <strong key={rank}>#{rank.toLocaleString("en-US")}</strong>
+                <div className={styles.rankRewards}>
+                  <div data-applied={shared}>
+                    <span>{shared ? "Share reward applied" : "First result share"}</span>
+                    <b>+500 priority</b>
+                  </div>
+                  <div>
+                    <span>Each verified friend</span>
+                    <b>+500 priority</b>
+                  </div>
+                </div>
+                <small>Priority improves your score; rank updates against the live waitlist.</small>
+                <button className={styles.shareButton} type="button" onClick={shareResult}>{shared ? "Share again" : "Share result"}</button>
               </div>
-              <section className={styles.chemistryBlock}>
-                <div><span>Best match</span><strong>{bestMatch.name}</strong><small>{bestMatch.cn}</small></div>
-                <div><span>Natural rival</span><strong>{rival.name}</strong><small>{rival.cn}</small></div>
-              </section>
-              {!shared ? (
-                <button className={styles.shareButton} type="button" onClick={shareResult}>Share result & unlock invites</button>
-              ) : (
-                <section className={styles.invitationDeck} aria-label="Invitation card deck">
-                  <header><span>One-time invite</span><b>{inviteIndex + 1} / {codes.length}</b></header>
-                  <div className={styles.inviteCodeCard}><span>{outcome.persona.name}</span><strong>{selectedCode}</strong><small>This link includes your exact result snapshot.</small></div>
-                  <div className={styles.inviteActions}>
-                    <button type="button" onClick={() => copyInvitation(selectedCode)}>{copiedCode === selectedCode ? "Copied ✓" : "Copy link"}</button>
-                    <button type="button" onClick={shareInvitation}>Send on X ↗</button>
+              <section className={styles.invitationDeck} aria-label="One-time invitation cards">
+                <header>
+                  <div>
+                    <span>Invite friends</span>
+                    <p>Each link can be claimed once.</p>
                   </div>
-                  <div className={styles.inviteNavigation}>
-                    <button type="button" aria-label="Previous invite" disabled={inviteIndex === 0} onClick={() => setInviteIndex((current) => current - 1)}>←</button>
-                    <button type="button" aria-label="Next invite" disabled={inviteIndex === codes.length - 1} onClick={() => setInviteIndex((current) => current + 1)}>→</button>
-                  </div>
-                </section>
-              )}
-              <section className={styles.communityBlock}>
-                <span>Keep up with SmartX</span>
-                <div>
-                  <button type="button" data-complete={telegramOpened} onClick={() => openCommunity("telegram")}><FaTelegramPlane aria-hidden="true" /> Telegram {telegramOpened ? "✓" : "↗"}</button>
-                  <button type="button" data-complete={xOpened} onClick={() => openCommunity("x")}><FaXTwitter aria-hidden="true" /> Follow X {xOpened ? "✓" : "↗"}</button>
+                  {invitePageCount > 1 && (
+                    <div className={styles.inviteNavigation}>
+                      <b>{invitePage * INVITES_PER_PAGE + 1}–{Math.min((invitePage + 1) * INVITES_PER_PAGE, invitations.length)}</b>
+                      <button type="button" aria-label="Previous five invites" disabled={invitePage === 0} onClick={() => setInvitePage((current) => current - 1)}>←</button>
+                      <button type="button" aria-label="Next five invites" disabled={invitePage === invitePageCount - 1} onClick={() => setInvitePage((current) => current + 1)}>→</button>
+                    </div>
+                  )}
+                </header>
+                <div className={styles.inviteCardGrid}>
+                  {visibleInvitations.map((invitation) => {
+                    const shortCode = invitation.code.split("-").at(-1);
+                    const isCopied = copiedCode === invitation.code;
+                    return (
+                      <button
+                        className={styles.inviteCodeCard}
+                        data-copied={isCopied}
+                        data-used={invitation.used}
+                        disabled={invitation.used}
+                        key={invitation.code}
+                        type="button"
+                        aria-label={invitation.used ? `Invite ${shortCode} used` : `Copy invite link ${shortCode}`}
+                        onClick={() => copyInvitation(invitation.code)}
+                      >
+                        <header>
+                          <span>Invite {String(invitation.index + 1).padStart(2, "0")}</span>
+                          <i aria-hidden="true" />
+                        </header>
+                        <div aria-hidden="true"><strong>{invitation.used ? "—" : isCopied ? "✓" : "↗"}</strong></div>
+                        <footer>
+                          <span>{shortCode}</span>
+                          {(invitation.used || isCopied) && <b>{invitation.used ? "Used" : "Copied"}</b>}
+                        </footer>
+                      </button>
+                    );
+                  })}
                 </div>
               </section>
-              <button className={styles.restartButton} type="button" onClick={restart}>Take the test again</button>
             </aside>
           </div>
         )}

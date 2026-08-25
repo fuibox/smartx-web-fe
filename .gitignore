@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/public/assets/waitlist/persona-concepts/
 
 # debug
 npm-debug.log*
