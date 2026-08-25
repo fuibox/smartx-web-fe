@@ -65,31 +65,6 @@ export function SiteFooter() {
               App
             </a>
             <Link href="/blog">Blog</Link>
-            <a
-              href="https://smartx.gitbook.io/smartx.docs.io"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Docs
-            </a>
-          </nav>
-
-          <nav className={styles.footerGroup} aria-labelledby="footer-legal-title">
-            <h2 id="footer-legal-title">Legal</h2>
-            <a
-              href="https://smartx.gitbook.io/smartx.docs.io/terms-of-service"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms of Service
-            </a>
-            <a
-              href="https://smartx.gitbook.io/smartx.docs.io/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy Policy
-            </a>
           </nav>
         </div>
       </div>

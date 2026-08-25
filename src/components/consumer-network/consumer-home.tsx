@@ -229,11 +229,16 @@ function Hero() {
 
       <div className={styles.heroCopy}>
         <h1 id="consumer-hero-title">Trade your edge.</h1>
-        <p>
+        <p className={styles.heroLedeDesktop}>
           <span>
             The social trading app for memes, perps, stocks and prediction markets.
           </span>
           <span>Follow verified traders and trade in one tap.</span>
+        </p>
+        <p className={styles.heroLedeMobile}>
+          <span>The social trading app for memes, perps,</span>
+          <span>stocks and prediction markets. Follow</span>
+          <span>verified traders and trade in one tap.</span>
         </p>
         <WaitlistButton placement="hero" />
       </div>
@@ -330,14 +335,16 @@ function DiscoverySection() {
       aria-labelledby="discovery-title"
       data-reveal
     >
-      <Image
-        className={styles.discoveryScene}
-        src={`${ASSET_ROOT}/discovery-scene-latest.webp`}
-        alt="SmartX mobile signals feed on a dark trading console"
-        width={2492}
-        height={1600}
-        sizes="1246px"
-      />
+      <div className={styles.discoveryVisual}>
+        <Image
+          className={styles.discoveryScene}
+          src={`${ASSET_ROOT}/discovery-scene-latest.webp`}
+          alt="SmartX mobile signals feed on a dark trading console"
+          width={2492}
+          height={1600}
+          sizes="(max-width: 620px) 720px, 1246px"
+        />
+      </div>
 
       <div className={`${styles.storyCopy} ${styles.discoveryCopy}`}>
         <div>
@@ -361,14 +368,16 @@ function AccountSection() {
       aria-labelledby="account-title"
       data-reveal
     >
-      <Image
-        className={styles.accountImage}
-        src={`${ASSET_ROOT}/account-hub-network-brand-teal.webp`}
-        alt=""
-        fill
-        sizes="100vw"
-      />
-      <div className={styles.accountShade} aria-hidden="true" />
+      <div className={styles.accountVisual} aria-hidden="true">
+        <Image
+          className={styles.accountImage}
+          src={`${ASSET_ROOT}/account-hub-network-brand-teal.webp`}
+          alt=""
+          fill
+          sizes="100vw"
+        />
+        <div className={styles.accountShade} />
+      </div>
 
       <div className={`${styles.storyCopy} ${styles.accountCopy}`}>
         <div>

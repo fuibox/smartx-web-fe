@@ -35,8 +35,8 @@ Lexend 只用于 SmartX 品牌字标。Playfair Display 只保留在 `SmartX Jou
 - Dark 画布使用 `#010101`，主文字 `#F5F5F5`，次文字 `#8A8F98`，边线 `#1B1C1D`。
 - teal 固定为 `#08DFB5`，只承担 CTA、状态、当前章节和短强调线。
 - 列表页和详情页共享 Blog 专属明暗阅读主题；首页与其他公开路由不响应该主题状态。
-- Header 复用首页的品牌锁定、`Product / Blog` 导航与圆角 `Join the Waitlist`。
-- Footer 使用整块 teal 场域与 Lexend 大字标，同时保留 Product 与 Legal 导航契约。
+- Header 复用首页的品牌锁定、`X / Community / Blog` 导航与圆角 `Launch Alpha`；H5 Logo 尺寸和起始位置必须与首页一致，导航收进汉堡菜单，阅读主题切换器随菜单呈现。
+- Footer 与首页使用同一块 teal 场域、Lexend 大字标和 `Product: App / Blog` 目录；移动端共用相同高度、边距和 SmartX 字标缩放，不再保留 Docs / Legal 导航。
 - 不使用旧 navy 网格、像素尘、玻璃卡片或首页章节型滚动动效。
 - 列表页 masthead 只保留 `SmartX Journal` 与一句用途说明；不展示 Field notes、总文章数或更新时间。`1440 × 900` 下 masthead 高度约 `173px`，首篇文章从约 `238px` 开始进入视口。
 

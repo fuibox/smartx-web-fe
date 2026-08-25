@@ -34,13 +34,17 @@
 
 - Hero 描述分两行：第一行结束于 `prediction markets.`，第二行是 `Follow verified traders and trade in one tap.`。
 - 顶部导航整体靠右，不做视觉居中；官网不显示 Login。当前入口为 `X / Community / Blog`，不保留含义模糊的 `Product`。
+- Blog 的桌面与 H5 Header 复用首页的品牌锁定、Logo 尺寸和 `X / Community / Blog` 顺序；H5 使用汉堡菜单，主题切换器收进菜单，右侧 CTA 保留 `Launch Alpha`。Blog Footer 与首页保持同一份 `App / Blog` 目录和移动端 SmartX 大字标适配。
 - Hero 右上角主入口使用 `Launch Alpha` 并进入当前 Alpha；Hero 与 Closing 的 `Join the Waitlist` 暂不提交表单，点击后原位提示 `Coming soon`。
 - Docs/GitBook 入口暂时移除。
 - Discovery eyebrow 使用句式大小写 `Personalized for you`，不使用全大写。
 - 第二屏与第三屏共用一套中性的虚拟身份：`Clear Signal / North Index / Open Ledger / Quiet Market`，不使用廉价的编号占位名，也不显示可能属于真实用户的 `@handle`；副信息只写 `Verified profile / Demo profile`。社交推荐用 `A trader you follow liked this` 等中性关系文案，不暗示任何真实账号参与或背书。
 - 第二屏三列标题和说明文字保持紧密关系，当前间距为 `4px`；三列标题使用同一顶部基线。
+- H5 Hero 保留人物与手机的纵深，但整张人物/手机素材要向下错开，不能压住说明文案；导航、主标题、固定三行说明和 CTA 使用更紧凑的独立纵向节奏，主内容上移且不让 Header 与标题之间形成大段无意义空白。
 - H5 第二屏不沿用桌面三列构图；每项按“标题 → 说明 → 产品局部”纵向阅读，隐藏 `No. 01–03` 编号。
 - H5 第三屏隐藏桌面流程标签，先显示标题与说明，再接透明底的 Square + People 双手机图；产品图允许横向满幅，但不能出现不透明矩形接缝。
+- H5 `The next opportunity finds you.` 与 `One Account. Every Market.` 都使用“文案区 → 独立视觉区”的纵向构图，不把正文压在复杂产品 UI 或线路图之上。视觉区允许裁切放大主要实体，但上下用暗场渐隐衔接，并控制整屏高度，避免长幅背景造成空洞滚动。
+- H5 `Turn influence into income` 与 `The next opportunity finds you.` 共用同一标题、eyebrow 和正文字阶；`Performance → Rank → Audience → Income` 必须完整保留并压缩为单行窄屏流程，不得因移动端隐藏。One Account 的裁切以 SmartX Hub 接近视觉中心为准，同时保留左右入口与链路的存在感。
 - 第四屏在大屏构图中，产品 UI 需要上移以修正视觉重心。
 - `Be early` 使用 Figma `22228:784` 的高清点阵波纹。几何位置保持静止，只做低幅度亮度呼吸；不能回退到竖线轨道、连续位移的波面、多个错位圆形或多张图片叠加。
 
