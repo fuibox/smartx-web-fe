@@ -7,14 +7,14 @@ const PRODUCT_ASSET_ROOT = "/assets/consumer-network/product-ui";
 const rankedTraders = [
   {
     id: "quarterty",
-    name: "Trader 02",
+    name: "North Index",
     handle: "Verified profile",
     pnl: "+$128.4K",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
   },
   {
     id: "rowdy",
-    name: "Trader 01",
+    name: "Clear Signal",
     handle: "Verified profile",
     pnl: "+$219.8K",
     midPnl: "+$164.2K",
@@ -23,14 +23,14 @@ const rankedTraders = [
   },
   {
     id: "smartx",
-    name: "Trader 03",
+    name: "Open Ledger",
     handle: "Verified profile",
     pnl: "+$63.5K",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-smartx.png`,
   },
   {
     id: "macro",
-    name: "Trader 04",
+    name: "Quiet Market",
     handle: "Verified profile",
     pnl: "+$58.2K",
   },
@@ -55,7 +55,7 @@ function LeaderboardPreview() {
             {"avatar" in trader ? (
               <Image src={trader.avatar} alt="" width={38} height={38} sizes="38px" />
             ) : (
-              <span className={styles.rankingFallbackAvatar}>T4</span>
+              <span className={styles.rankingFallbackAvatar}>QM</span>
             )}
             <span className={styles.rankingIdentity}>
               <strong>{trader.name}</strong>
@@ -139,12 +139,12 @@ function SquarePost({
 
 const squarePosts = [
   {
-    key: "rowdy-primary",
-    avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    name: "Trader 01",
+    key: "north-index-primary",
+    avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
+    name: "North Index",
     handle: "Demo profile",
     body: "The committee still has room to wait. I am keeping the No position.",
-    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
+    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
     socialProof: "A trader you follow liked this",
     asset: {
       kind: "prediction",
@@ -156,12 +156,12 @@ const squarePosts = [
     },
   },
   {
-    key: "quarterty",
-    avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
-    name: "Trader 02",
+    key: "clear-signal",
+    avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
+    name: "Clear Signal",
     handle: "Demo profile",
     body: "Volume is improving without a matching spike in concentration.",
-    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
+    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
     socialProof: "3 traders you follow liked this",
     asset: {
       kind: "token",
@@ -173,9 +173,9 @@ const squarePosts = [
     },
   },
   {
-    key: "smartx-stock",
+    key: "open-ledger-stock",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-smartx.png`,
-    name: "Trader 03",
+    name: "Open Ledger",
     handle: "Demo profile",
     body: "Onchain equity volume is holding above the weekly range.",
     socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
@@ -190,12 +190,12 @@ const squarePosts = [
     },
   },
   {
-    key: "rowdy-loop",
-    avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    name: "Trader 01",
+    key: "north-index-loop",
+    avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
+    name: "North Index",
     handle: "Demo profile",
     body: "The committee still has room to wait. I am keeping the No position.",
-    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
+    socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
     socialProof: "A trader you follow liked this",
     asset: {
       kind: "prediction",
@@ -255,8 +255,8 @@ type SignalCardData = Readonly<{
 const tradeSignals: readonly SignalCardData[] = [
   {
     id: "fed",
-    trader: "Trader 01",
-    avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
+    trader: "North Index",
+    avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
     traderMeta: "30d 72% win · 982 trades",
     traderPnl: "+$220K",
     marketImage: `${PRODUCT_ASSET_ROOT}/market-fed.png`,
@@ -271,8 +271,8 @@ const tradeSignals: readonly SignalCardData[] = [
   },
   {
     id: "bitcoin",
-    trader: "Trader 02",
-    avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
+    trader: "Clear Signal",
+    avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
     traderMeta: "30d 68% win · 282 trades",
     traderPnl: "+$128.4K",
     marketImage: `${PRODUCT_ASSET_ROOT}/market-bitcoin.svg`,

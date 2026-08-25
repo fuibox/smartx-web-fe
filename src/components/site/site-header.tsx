@@ -30,7 +30,20 @@ export function SiteHeader({
 
       <div className={styles.headerActions}>
         <nav className={styles.headerNav} aria-label="Site navigation">
-          <Link href="/#product">Product</Link>
+          <a
+            href="https://x.com/SmartXTerminal"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            X
+          </a>
+          <a
+            href="https://t.me/+CTeuBkpOxSNkN2Y0"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Community
+          </a>
           <Link
             href="/blog"
             className={active === "blog" ? styles.activeLink : undefined}

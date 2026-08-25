@@ -37,7 +37,7 @@
 - Hero 右上角主入口使用 `Launch Alpha` 并进入当前 Alpha；Hero 与 Closing 的 `Join the Waitlist` 暂不提交表单，点击后原位提示 `Coming soon`。
 - Docs/GitBook 入口暂时移除。
 - Discovery eyebrow 使用句式大小写 `Personalized for you`，不使用全大写。
-- 第二屏所有演示身份统一使用 `Trader 01–04`，不显示 `@handle`；副信息只写 `Verified profile / Demo profile`。社交推荐用 `A trader you follow liked this` 等中性关系文案，不暗示任何真实账号参与或背书。
+- 第二屏与第三屏共用一套中性的虚拟身份：`Clear Signal / North Index / Open Ledger / Quiet Market`，不使用廉价的编号占位名，也不显示可能属于真实用户的 `@handle`；副信息只写 `Verified profile / Demo profile`。社交推荐用 `A trader you follow liked this` 等中性关系文案，不暗示任何真实账号参与或背书。
 - 第二屏三列标题和说明文字保持紧密关系，当前间距为 `4px`；三列标题使用同一顶部基线。
 - H5 第二屏不沿用桌面三列构图；每项按“标题 → 说明 → 产品局部”纵向阅读，隐藏 `No. 01–03` 编号。
 - H5 第三屏隐藏桌面流程标签，先显示标题与说明，再接透明底的 Square + People 双手机图；产品图允许横向满幅，但不能出现不透明矩形接缝。
@@ -60,8 +60,8 @@
 目的：证明排行榜来自真实 P&L，而不是自我声明。
 
 - 使用开放式四行排行榜，不显示局部 `Leaderboard` 标题、范围切换器或轮播点。
-- Trader 01 的 `30D P&L` 先从 `+$118.6K` 递增到 `+$164.2K`，再到 `+$219.8K`。
-- P&L 完成变化后，Trader 01 从 02 平滑移动到 01；Trader 02 同时下移。
+- Clear Signal 的 `30D P&L` 先从 `+$118.6K` 递增到 `+$164.2K`，再到 `+$219.8K`。
+- P&L 完成变化后，Clear Signal 从 02 平滑移动到 01；North Index 同时下移。
 - 数值变化必须先于排名变化，建立清楚因果。
 - 循环复位时不整块淡出；只让数值和行位置回到起始状态。
 
@@ -107,8 +107,8 @@
 
 当前两张演示卡：
 
-- A：Trader 01 / `Fed Decision in September?` / `No change` / Entry `61¢` → Current `64¢`。
-- B：Trader 02 / `Will Bitcoin reach $150K before 2027?` / `Yes` / Entry `34¢` → Current `38¢`。
+- A：North Index / `Fed Decision in September?` / `No change` / Entry `61¢` → Current `64¢`。
+- B：Clear Signal / `Will Bitcoin reach $150K before 2027?` / `Yes` / Entry `34¢` → Current `38¢`。
 
 ## 5. One Account 当前方案
 
