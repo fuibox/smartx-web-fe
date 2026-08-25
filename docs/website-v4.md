@@ -51,6 +51,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ### Hero / Prologue（视觉冻结）
 
 - 当前居中构图、标题、lede、CTA 与 navy/teal 气质保留。
+- Consumer Network 当前公开首页以 `7.23s / 1280 × 720 / H.264` 无声品牌片作为全屏背景；视频静音、内联、循环自动播放，离开首屏暂停，reduced-motion 使用同源静态帧。桌面和 H5 都保持文案层独立，不让标题跟随镜头移动。
 - Hero 是独立序章，正常纵向离场，不缩小、不向左让位。
 - idle 只允许边缘抖动密度发生极慢变化；标题与 CTA 的阅读状态保持稳定。首屏状态统一为 **Live alpha**。
 - 主 CTA 统一使用 `Launch Alpha`；hover 使用箭头端的 teal 像素染色由右向左覆盖文字区，文案不替换，不增加第二套 CTA 状态。
@@ -146,7 +147,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 | 章节 | 状态 | 说明 |
 | --- | --- | --- |
-| **Hero / Prologue** | ✅ 视觉冻结 | 保留当前版 |
+| **Hero / Prologue** | ✅ 视觉冻结 | 居中文案叠加全屏无声品牌片；H5 独立三行 lede，视频具备离屏暂停与 reduced-motion 静态帧 |
 | **Index** | 🟡 精修待签字 | 默认态取消假激活与无效 evidence；hover/focus 后显示证据摘要并强化对应像素状态，其他章节同步降噪 |
 | **01 Signals** | 🟡 精修待签字 | 手机缩小并只保留系统 chrome，产品导航来自真实截图；三列来源轨道等宽居中；不公开标签数量 |
 | **02 Execute** | 🟡 精修待签字 | 文案已收敛为两条路径；Recall 使用真实交易票据，Strategy follow 使用真实 Watchlist Rules，自动执行能力明确标 Coming |

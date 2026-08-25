@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
@@ -146,17 +146,67 @@ function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
 
 function Hero() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let isVisible = true;
+
+    const syncPlayback = () => {
+      if (reduceMotion.matches || !isVisible) {
+        video.pause();
+        return;
+      }
+
+      void video.play().catch(() => {
+        // The poster remains visible if a browser blocks autoplay.
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        syncPlayback();
+      },
+      { threshold: 0.05 },
+    );
+
+    observer.observe(video);
+    reduceMotion.addEventListener("change", syncPlayback);
+    syncPlayback();
+
+    return () => {
+      observer.disconnect();
+      reduceMotion.removeEventListener("change", syncPlayback);
+    };
+  }, []);
 
   return (
     <section className={styles.hero} aria-labelledby="consumer-hero-title">
-      <div className={styles.heroImage} aria-hidden="true">
+      <div className={styles.heroMedia} aria-hidden="true">
         <Image
-          src={`${ASSET_ROOT}/hero-product.webp`}
+          className={styles.heroPoster}
+          src={`${ASSET_ROOT}/hero-film-poster.jpg`}
           alt=""
           fill
-          sizes="(min-width: 1440px) 1425px, 100vw"
+          sizes="100vw"
           priority
         />
+        <video
+          ref={videoRef}
+          className={styles.heroVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+        >
+          <source src={`${ASSET_ROOT}/hero-film.mp4`} type="video/mp4" />
+        </video>
       </div>
       <div className={styles.heroShade} aria-hidden="true" />
 
@@ -229,18 +279,20 @@ function Hero() {
 
       <div className={styles.heroCopy}>
         <h1 id="consumer-hero-title">Trade your edge.</h1>
-        <p className={styles.heroLedeDesktop}>
-          <span>
-            The social trading app for memes, perps, stocks and prediction markets.
-          </span>
-          <span>Follow verified traders and trade in one tap.</span>
-        </p>
-        <p className={styles.heroLedeMobile}>
-          <span>The social trading app for memes, perps,</span>
-          <span>stocks and prediction markets. Follow</span>
-          <span>verified traders and trade in one tap.</span>
-        </p>
-        <WaitlistButton placement="hero" />
+        <div className={styles.heroSubcopy}>
+          <p className={styles.heroLedeDesktop}>
+            <span>
+              The social trading app for memes, perps, stocks and prediction markets.
+            </span>
+            <span>Follow verified traders and trade in one tap.</span>
+          </p>
+          <p className={styles.heroLedeMobile}>
+            <span>The social trading app for memes, perps,</span>
+            <span>stocks and prediction markets. Follow</span>
+            <span>verified traders and trade in one tap.</span>
+          </p>
+          <WaitlistButton placement="hero" />
+        </div>
       </div>
     </section>
   );

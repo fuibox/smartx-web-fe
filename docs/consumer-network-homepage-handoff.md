@@ -32,7 +32,8 @@
 
 ## 3. 全站已确认判断
 
-- Hero 描述分两行：第一行结束于 `prediction markets.`，第二行是 `Follow verified traders and trade in one tap.`。
+- Hero 描述桌面端分两行：第一行结束于 `prediction markets.`，第二行是 `Follow verified traders and trade in one tap.`；H5 使用独立的固定三行排版。
+- Hero 主视觉使用 `hero-film.mp4`：源片为 `7.23s / 1280 × 720 / H.264 / 无音轨`，按 Robinhood 式全屏背景处理，必须 `muted + playsInline + loop` 自动播放。视频离开首屏后暂停，回到首屏继续；`prefers-reduced-motion` 下隐藏视频并固定显示从 3 秒镜头提取的 `hero-film-poster.jpg`。
 - 顶部导航整体靠右，不做视觉居中；官网不显示 Login。当前入口为 `X / Community / Blog`，不保留含义模糊的 `Product`。
 - Blog 的桌面与 H5 Header 复用首页的品牌锁定、Logo 尺寸和 `X / Community / Blog` 顺序；H5 使用汉堡菜单，主题切换器收进菜单，右侧 CTA 保留 `Launch Alpha`。Blog Footer 与首页保持同一份 `App / Blog` 目录和移动端 SmartX 大字标适配。
 - Hero 右上角主入口使用 `Launch Alpha` 并进入当前 Alpha；Hero 与 Closing 的 `Join the Waitlist` 暂不提交表单，点击后原位提示 `Coming soon`。
@@ -40,7 +41,7 @@
 - Discovery eyebrow 使用句式大小写 `Personalized for you`，不使用全大写。
 - 第二屏与第三屏共用一套中性的虚拟身份：`Clear Signal / North Index / Open Ledger / Quiet Market`，不使用廉价的编号占位名，也不显示可能属于真实用户的 `@handle`；副信息只写 `Verified profile / Demo profile`。社交推荐用 `A trader you follow liked this` 等中性关系文案，不暗示任何真实账号参与或背书。
 - 第二屏三列标题和说明文字保持紧密关系，当前间距为 `4px`；三列标题使用同一顶部基线。
-- H5 Hero 保留人物与手机的纵深，但整张人物/手机素材要向下错开，不能压住说明文案；导航、主标题、固定三行说明和 CTA 使用更紧凑的独立纵向节奏，主内容上移且不让 Header 与标题之间形成大段无意义空白。
+- H5 Hero 对 16:9 视频使用居中 `object-fit: cover` 裁切；人物、teal 路径和手机在当前镜头中都必须保持可识别。导航、主标题、固定三行说明和 CTA 使用独立纵向节奏，稳定暗色遮罩负责可读性，不随镜头内容移动文字。
 - H5 第二屏不沿用桌面三列构图；每项按“标题 → 说明 → 产品局部”纵向阅读，隐藏 `No. 01–03` 编号。
 - H5 第三屏隐藏桌面流程标签，先显示标题与说明，再接透明底的 Square + People 双手机图；产品图允许横向满幅，但不能出现不透明矩形接缝。
 - H5 `The next opportunity finds you.` 与 `One Account. Every Market.` 都使用“文案区 → 独立视觉区”的纵向构图，不把正文压在复杂产品 UI 或线路图之上。视觉区允许裁切放大主要实体，但上下用暗场渐隐衔接，并控制整屏高度，避免长幅背景造成空洞滚动。

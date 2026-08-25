@@ -48,24 +48,49 @@
   background: linear-gradient(180deg, #010101 57.5%, #022d25 100%);
 }
 
-.heroImage {
+.heroMedia {
   position: absolute;
   z-index: -3;
-  inset: 0 auto auto 0;
-  width: min(74.22vw, 1425px);
-  height: 108%;
+  inset: 0;
+  overflow: hidden;
 }
 
-.heroImage img {
+.heroVideo,
+.heroPoster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: left top;
+  object-position: 50% 50%;
+}
+
+.heroPoster {
+  z-index: 0;
+}
+
+.heroVideo {
+  z-index: 1;
+  background: #010101;
 }
 
 .heroShade {
   position: absolute;
   z-index: -2;
   inset: 65px 0 0;
-  background: rgb(0 0 0 / 40%);
+  background:
+    radial-gradient(
+      ellipse at 50% 43%,
+      rgb(0 0 0 / 42%) 0%,
+      rgb(0 0 0 / 22%) 44%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(0 0 0 / 24%) 0%,
+      rgb(0 0 0 / 46%) 48%,
+      rgb(0 0 0 / 34%) 100%
+    );
 }
 
 .header {
@@ -77,8 +102,7 @@
   align-items: center;
   padding: 9px 40px;
   border-bottom: 1px solid #202020;
-  background: rgb(1 1 1 / 56%);
-  backdrop-filter: blur(12px);
+  background: #010101;
 }
 
 .headerBrand {
@@ -279,14 +303,26 @@
   line-height: 1.3;
 }
 
+.heroSubcopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  transform: translateY(28px);
+}
+
+.heroSubcopy p {
+  transform: translateY(-8px);
+}
+
 .heroCopy .heroLedeMobile {
   display: none;
 }
 
-.heroCopy > .waitlistButton {
-  width: 200px;
-  min-height: 56px;
-  font-size: 20px;
+.heroSubcopy > .waitlistButton {
+  width: 184px;
+  min-height: 50px;
+  font-size: 18px;
 }
 
 .network {
@@ -2957,10 +2993,9 @@
     display: flex;
   }
 
-  .heroImage {
-    left: -28%;
-    width: 118%;
-    height: 100%;
+  .heroVideo,
+  .heroPoster {
+    object-position: 52% 50%;
   }
 
   .heroCopy {
@@ -3096,26 +3131,41 @@
     font-size: 13px;
   }
 
-  .heroImage {
-    left: -66%;
-    width: 184%;
-    transform: translate3d(0, clamp(48px, 7svh, 62px), 0);
+  .heroVideo,
+  .heroPoster {
+    object-position: 54% 50%;
   }
 
   .heroShade {
     inset: 62px 0 0;
-    background: linear-gradient(
-      180deg,
-      rgb(0 0 0 / 46%) 0%,
-      rgb(0 0 0 / 56%) 48%,
-      rgb(0 0 0 / 34%) 100%
-    );
+    background:
+      radial-gradient(
+        ellipse at 50% 38%,
+        rgb(0 0 0 / 52%) 0%,
+        rgb(0 0 0 / 28%) 48%,
+        transparent 78%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(0 0 0 / 38%) 0%,
+        rgb(0 0 0 / 52%) 48%,
+        rgb(0 0 0 / 26%) 100%
+      );
   }
 
   .heroCopy {
     top: clamp(300px, 38svh, 340px);
     width: calc(100% - 24px);
     gap: 20px;
+  }
+
+  .heroSubcopy {
+    gap: 20px;
+    transform: translateY(26px);
+  }
+
+  .heroSubcopy p {
+    transform: translateY(-6px);
   }
 
   .heroCopy h1 {
@@ -3140,10 +3190,10 @@
     white-space: nowrap;
   }
 
-  .heroCopy > .waitlistButton {
-    width: min(210px, 74vw);
-    min-height: 52px;
-    font-size: 18px;
+  .heroSubcopy > .waitlistButton {
+    width: min(190px, 70vw);
+    min-height: 48px;
+    font-size: 17px;
   }
 
   .network > h2 {
@@ -3439,6 +3489,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .heroVideo {
+    display: none;
+  }
+
   .skipLink,
   .primaryNav a::after,
   .footerLinks a::after,
