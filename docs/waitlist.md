@@ -45,6 +45,8 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 没有有效邀请码，不能开始答题。六道题完成后才要求邮箱；邮箱验证成功代表正式加入 waitlist。
 
+如果当前用户有有效登录态且已经有结果，直接入口不再展示落地页，而是自动返回该用户原有结果、排名和邀请码。没有登录态的老用户从落地页的 `Already tested? View my result` 进入邮箱 OTP 找回流程。
+
 ### 2.2 从朋友分享进入
 
 进入后先展示朋友的真实结果，再邀请访问者测试。
@@ -60,6 +62,8 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 邀请码有效时，点击按钮后直接开始答题。
 - 邀请码无效、已使用或过期时，朋友结果仍然可见，访问者可以输入其他邀请码。
 - 用户可以只分享结果，也可以在结果链接中附带一个邀请码。
+- 如果访问者有有效登录态且已经有自己的结果，朋友结果仍然完整展示，但主按钮改为 `View my result`；页面不再提供重测入口。
+- 没有登录态的访问者仍可以选择测试，同时通过 `Already tested? View my result` 用邮箱 OTP 找回原结果。
 
 ### 2.3 从答题到结果
 
@@ -81,6 +85,14 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 验证码为 6 位数字，10 分钟有效，60 秒后可以重新发送。
 - 同一个验证码最多尝试 5 次；新验证码发出后，旧验证码失效。
 - 同一邮箱只能完成一次测试。结果生成后不允许重测；再次验证该邮箱时直接返回原结果。
+- 有有效登录态且已有结果的用户，从直接入口进入时自动返回原结果；从好友分享入口进入时仍先看朋友结果，再主动切换到自己的结果。
+- 没有登录态时，页面不能仅凭本地结果图片或公开 result ID 认定用户身份。用户必须完成邮箱 OTP，才能查看自己的私有结果、排名和邀请码。
+- 用户在完成一轮新答题后提交了已有结果的邮箱，OTP 验证成功后直接返回原结果；本轮新答案不生成结果，正在占用的邀请码立即释放，也不计为邀请人的有效邀请。
+- OTP 验证前不提示邮箱是否存在；验证后若没有对应结果，返回入口并提示使用邀请码开始测试。
+- 正式产品以服务端会话和邮箱记录为准；本地原型分别用当前浏览器的会话索引与邮箱结果索引模拟。
+- Waitlist 登录态与 SmartX 主站登录态相互独立。正式实现的会话仅作用于 `/waitlist`，不改变官网导航或其他页面的登录状态。
+- 私人结果页右侧显示 `Signed in as {email}` 和 `Sign out`。邮箱不进入公开分享页、人格海报或下载卡。
+- `Sign out` 只清除当前 waitlist 会话，不删除邮箱绑定、结果、排名或邀请码。退出后，直接入口回到活动落地页；如果用户从好友分享页切到自己的结果，退出后回到好友结果页。
 
 ### 3.2 结果如何生成
 
@@ -178,7 +190,14 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 ### 4.1 入口页
 
-入口分为两种状态：直接打开活动链接，以及从朋友分享链接进入。
+入口分为两种页面状态，并按登录态继续分流：
+
+| 入口 | 有有效登录态且已有结果 | 没有登录态 |
+| --- | --- | --- |
+| 直接入口 | 自动进入自己的结果页 | 展示邀请码主流程，并提供邮箱 OTP 找回入口 |
+| 好友分享入口 | 先展示朋友结果，提供 `View my result`，不提供重测 | 展示朋友结果，提供测试主按钮和邮箱 OTP 找回入口 |
+
+只有直接入口允许自动跳转。好友分享入口必须保留用户“查看朋友结果”的原始意图。
 
 #### 4.1.1 直接入口
 
@@ -192,6 +211,9 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 输入框：Invite code
 - 主按钮：Begin
 - 输入框下方：Strictly invite-only. Your code is reserved when the test begins.
+- 找回入口：Already tested? View my result
+
+有有效登录态且已有结果时不展示本页，直接进入结果页。没有登录态时无法预先判断是否为老用户，因此保留邀请码主流程和找回入口并存。
 
 #### 4.1.2 好友分享入口
 
@@ -201,9 +223,15 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - H1：A friend trades like {persona_name}.
 - Lede：Same type, different score—or something else entirely? Take the test to find yours.
 - 主按钮：Find my trader type
-- 次按钮：Use another invite
+- 找回入口：Already tested? View my result
 
-朋友的邀请码不可用时，朋友结果继续显示，并允许用户输入其他邀请码。
+朋友的邀请码不可用时，朋友结果继续显示，显示具体错误，并额外出现 `Use another invite`。
+
+已测用户仍先看到朋友结果，但操作区改为：
+
+- 主按钮：View my result
+- 辅助说明：Your result is saved as {persona_name}.
+- 不展示 `Find my trader type`、找回入口和 `Use another invite`，避免形成重测路径。
 
 ### 4.2 答题页
 
@@ -214,6 +242,15 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 ### 4.3 邮箱与验证码
 
 六道题完成后进入邮箱页，不提前打断答题。
+
+邮箱 OTP 同时承担结果找回。找回入口的首版文案：
+
+- Kicker：ALREADY TESTED?
+- H1：Find your result.
+- Lede：Enter the email you used. We’ll send a six-digit code.
+- 主按钮：Send code
+- 返回：Back
+- 验证后无结果：No saved result is linked to this email. Use an invite to take the test.
 
 #### 4.3.1 邮箱页
 
@@ -242,6 +279,7 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 任务二：Follow SmartX on X · Follow product updates
 - 主按钮：Reveal my result
 - 按钮下方：Both steps are required to continue.
+- 已验证身份：Verified as {email} · Sign out
 
 ### 4.5 结果页
 
@@ -257,6 +295,8 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 8. 结果卡下载。
 
 桌面端采用左右两栏：左侧承载人格、插画、属性、判词、关系和下载；右侧在同一首屏内承载排名、奖励说明、分享操作和五张窄竖向邀请码卡。邀请码不追加为结果页下方的第二段内容。
+
+右侧操作区最上方展示当前 waitlist 身份：`Signed in as {email}` 与低存在感的 `Sign out`。这一行只存在于用户自己的私人结果页，不进入公开结果页或任何导出图片。
 
 固定文案：
 
@@ -316,6 +356,10 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - [ ] 六题完成前不要求邮箱；同一邮箱只保留一个结果且不允许重测。
 - [ ] 邮箱验证后必须完成 Telegram 和 X，未完成时不能查看结果和排名。
 - [ ] 好友分享入口先展示朋友结果；邀请码失效不影响结果查看。
+- [ ] 有有效登录态且已有结果时，直接入口自动进入自己的结果页；好友分享入口保留朋友结果并提供 `View my result`。
+- [ ] 没有登录态时，直接入口和好友分享入口都有邮箱 OTP 找回入口；OTP 通过前不暴露邮箱是否存在。
+- [ ] 新答题流程验证到已有邮箱时返回原结果、释放当前邀请码，不生成第二结果且不产生邀请奖励。
+- [ ] 私人结果页显示当前邮箱并可退出 waitlist 会话；邮箱不会进入公开分享页或结果卡，退出不会删除任何结果数据。
 - [ ] 所有答案组合都能得到一种有效人格和三项有效属性。
 - [ ] Risk Monk 只按隐藏规则产生，并获得 10 个邀请码；其他人格获得 5 个。
 - [ ] 邀请码在结果生成后立即可用，不依赖分享；分享只影响排名优先值。
@@ -540,8 +584,13 @@ Risk Monk 的精确触发条件：
 
 | 事件 | 用人话说明监测什么 | 关键属性 |
 | --- | --- | --- |
-| waitlist_landing_view | 有多少人进入活动，来自官网还是朋友分享 | entry_type、result_present、invite_present |
+| waitlist_landing_view | 有多少人进入活动，来自官网还是朋友分享 | entry_type、session_state、result_present、invite_present |
 | referral_result_view | 分享人的结果有没有被打开，哪类人格带来访问 | result_id、persona_id |
+| result_recovery_started | 没有登录态的用户从哪个入口尝试找回结果 | entry_type |
+| result_recovery_verified | OTP 通过后是否找到已有结果 | entry_type、result_found |
+| existing_result_restored | 用户通过自动分流、好友页按钮或 OTP 返回原结果 | restore_source、result_id |
+| duplicate_result_prevented | 新答题流程验证到已有邮箱时是否阻止第二结果并释放邀请码 | invite_released、referral_reward_blocked |
+| waitlist_signed_out | 用户主动退出仅限 waitlist 的会话 | entry_type |
 | invite_submit | 用户看到邀请码门槛后是否尝试进入 | entry_type |
 | invite_reserve_success | 有多少人持有效邀请码通过入口 | entry_type |
 | invite_reserve_failed | 用户被挡在入口的原因 | reason |

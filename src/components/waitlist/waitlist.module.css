@@ -275,8 +275,70 @@
   line-height: 1.5;
 }
 
-.gateForm .testCodeButton { margin: 10px 0 0 20px; }
+.gateFormMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 10px 20px 0;
+}
+
+.gateFormMeta .testCodeButton,
+.gateFormMeta .textButton { margin: 0; }
 .formError { color: var(--coral) !important; }
+
+.returningGate {
+  display: flex;
+  width: min(100%, 760px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 46px;
+  padding: 22px 6px;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  text-align: left;
+}
+
+.returningGate > div {
+  display: grid;
+  gap: 5px;
+}
+
+.returningGate > div span {
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.returningGate > div strong {
+  color: var(--text);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.returningGate > button {
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 0 10px 18px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.returningGate > button span {
+  color: var(--teal);
+  font-size: 20px;
+  line-height: 1;
+}
 
 .referralStage {
   display: grid;
@@ -306,6 +368,30 @@
   display: block;
   margin-top: 18px;
 }
+
+.referralReturn small {
+  display: block;
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.referralError {
+  display: grid;
+  width: fit-content;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.referralError small {
+  max-width: 420px;
+  color: var(--coral);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.referralError .textButton { margin-top: 0; }
 
 .quizStage {
   width: min(100%, var(--quiz-width));
@@ -455,6 +541,16 @@
   margin: 16px 20px 0;
 }
 
+.recoveryBack {
+  width: fit-content;
+  margin: 18px 0 0 20px;
+  cursor: pointer;
+  border-bottom: 1px solid currentcolor;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .unlockStage {
   width: min(100%, 720px);
   text-align: center;
@@ -481,6 +577,58 @@
   margin-top: 40px;
   border-top: 1px solid var(--line);
   text-align: left;
+}
+
+.accountStrip {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.accountStrip[data-compact="true"] {
+  width: min(100%, 620px);
+  margin: 24px auto -14px;
+  padding: 14px 4px;
+  border-top: 1px solid var(--line);
+}
+
+.accountStrip > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.accountStrip span {
+  color: var(--dim);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.accountStrip strong {
+  overflow: hidden;
+  color: var(--body);
+  font-size: 12px;
+  font-weight: 450;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountStrip button {
+  cursor: pointer;
+  border-bottom: 1px solid currentcolor;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .unlockTasks > button {
@@ -885,6 +1033,14 @@
   outline-offset: 4px;
 }
 
+.accountStrip button:focus-visible,
+.recoveryBack:focus-visible,
+.returningGate > button:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+}
+
 @keyframes stage-enter {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
@@ -911,7 +1067,11 @@
   .unlockTasks > button,
   .inviteCodeCard,
   .inviteNavigation button,
-  .cardDownloads a {
+  .cardDownloads a,
+  .accountStrip button,
+  .recoveryBack,
+  .returningGate > button,
+  .returningGate > button span {
     transition:
       color 160ms var(--ease-out),
       border-color 160ms var(--ease-out),
@@ -930,6 +1090,11 @@
   .formMeta button:hover,
   .quizTopline button:hover,
   .cardDownloads a:hover { color: var(--text); }
+  .recoveryBack:hover { color: var(--text); }
+  .accountStrip button:hover { color: var(--text); }
+
+  .returningGate > button:hover { color: var(--teal); }
+  .returningGate > button:hover span { transform: translateX(4px); }
 
   .optionList > button:hover {
     border-color: rgba(8, 223, 181, 0.56);
@@ -996,6 +1161,11 @@
   .formStage > p,
   .unlockStage > p { font-size: 16px; }
   .inlineField { grid-template-columns: 1fr; }
+  .gateFormMeta { align-items: flex-start; flex-direction: column; margin-left: 20px; }
+  .returningGate { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .returningGate > button { padding-left: 0; }
+  .accountStrip { gap: 16px; }
+  .accountStrip strong { max-width: 230px; }
   .gateForm .primaryButton,
   .formStage .primaryButton { width: 100%; }
   .quizTopline { margin-bottom: 8px; }
@@ -1041,5 +1211,9 @@
   .inviteCodeCard,
   .inviteNavigation button,
   .cardDownloads a { animation: none; transition: none; }
+  .recoveryBack { animation: none; transition: none; }
+  .accountStrip button { animation: none; transition: none; }
+  .returningGate > button,
+  .returningGate > button span { animation: none; transition: none; }
   .optionList > button:hover { transform: none; }
 }

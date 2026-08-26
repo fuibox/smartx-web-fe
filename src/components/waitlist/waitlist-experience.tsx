@@ -12,6 +12,7 @@ import { renderResultCard, type RenderedResultCard, type ResultCardFormat } from
 import styles from "./waitlist.module.css";
 
 type Stage = "gate" | "quiz" | "email" | "verify" | "unlock" | "result";
+type AuthIntent = "create" | "recover";
 type Dimension = "risk" | "basis" | "mode";
 type Stat = "conviction" | "instinct" | "resilience";
 type Pole = "DEGEN" | "SNIPER" | "GUT" | "DATA" | "PACK" | "LONE";
@@ -55,6 +56,7 @@ type ResultSnapshot = {
   poles: readonly [Pole, Pole, Pole];
   rawScores: Scores;
   stats: StatScores;
+  rankBase?: number;
 };
 
 const QUESTIONS: readonly Question[] = [
@@ -212,6 +214,9 @@ const DEFAULT_ANSWERS = ["C", "D", "A", "A", "B", "B"] as const;
 const WAITLIST_URL = "https://smartx.io/waitlist/";
 const OTP_CODE = "824193";
 const SNAPSHOT_PREFIX = "smartx:waitlist-result:";
+const SESSION_RESULT_KEY = "smartx:waitlist-last-result";
+const SESSION_EMAIL_KEY = "smartx:waitlist-session-email";
+const EMAIL_RESULT_PREFIX = "smartx:waitlist-email-result:";
 const INVITES_PER_PAGE = 5;
 const PROTOTYPE_USED_INVITE_FRAGMENT = "N4Q8";
 const USED_INVITE_CODES = new Set(["SMARTX-RSK-USED"]);
@@ -252,6 +257,10 @@ function makeResultId(answerIds: readonly string[], identity: string) {
   return `SX-${hashValue(`${answerIds.join("")}:${identity.trim().toLowerCase() || "prototype"}`)}`;
 }
 
+function makeEmailResultKey(email: string) {
+  return `${EMAIL_RESULT_PREFIX}${hashValue(email.trim().toLowerCase())}`;
+}
+
 function resolveOutcome(answerIds: readonly string[], identity = ""): Outcome {
   const normalized = QUESTIONS.map((question, index) => question.options.find((option) => option.id === answerIds[index]) ?? question.options[0]);
   const rawScores: Scores = { risk: 0, basis: 0, mode: 0 };
@@ -288,11 +297,35 @@ function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = 
   return url.toString();
 }
 
-function createSnapshot(outcome: Outcome): ResultSnapshot {
+function createSnapshot(outcome: Outcome, rankBase?: number): ResultSnapshot {
   return {
     version: 1, resultId: outcome.resultId, personaMark: outcome.persona.mark,
-    poles: outcome.poles, rawScores: outcome.rawScores, stats: outcome.stats,
+    poles: outcome.poles, rawScores: outcome.rawScores, stats: outcome.stats, rankBase,
   };
+}
+
+function parseSnapshot(value: string | null): ResultSnapshot | null {
+  if (!value) return null;
+  try {
+    const snapshot = JSON.parse(value) as Partial<ResultSnapshot>;
+    if (
+      snapshot.version !== 1
+      || !snapshot.resultId
+      || !snapshot.personaMark
+      || !snapshot.poles
+      || !snapshot.rawScores
+      || !snapshot.stats
+    ) return null;
+    return snapshot as ResultSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+function restoreOutcome(snapshot: ResultSnapshot | null): Outcome | null {
+  if (!snapshot) return null;
+  const persona = PERSONAS_BY_CODE[snapshot.personaMark];
+  return persona ? { ...snapshot, persona } : null;
 }
 
 function Brand() {
@@ -389,11 +422,16 @@ export function WaitlistExperience() {
   const [inviteCode, setInviteCode] = useState("");
   const [gateError, setGateError] = useState("");
   const [referralSnapshot, setReferralSnapshot] = useState<ResultSnapshot | null>(null);
+  const [savedResultSnapshot, setSavedResultSnapshot] = useState<ResultSnapshot | null>(null);
+  const [viewingSavedResult, setViewingSavedResult] = useState(false);
+  const [authIntent, setAuthIntent] = useState<AuthIntent>("create");
   const [email, setEmail] = useState("");
+  const [sessionEmail, setSessionEmail] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [otpResent, setOtpResent] = useState(false);
+  const [recoveryError, setRecoveryError] = useState("");
   const [telegramOpened, setTelegramOpened] = useState(false);
   const [xOpened, setXOpened] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -409,21 +447,23 @@ export function WaitlistExperience() {
     return resolveOutcome(completeAnswers, email || inviteCode);
   }, [answerIds, email, inviteCode]);
 
-  const referralOutcome = useMemo<Outcome | null>(() => {
-    if (!referralSnapshot) return null;
-    const persona = PERSONAS_BY_CODE[referralSnapshot.personaMark];
-    return persona ? { ...referralSnapshot, persona } : null;
-  }, [referralSnapshot]);
+  const referralOutcome = useMemo(() => restoreOutcome(referralSnapshot), [referralSnapshot]);
+  const savedOutcome = useMemo(() => restoreOutcome(savedResultSnapshot), [savedResultSnapshot]);
+  const resultOutcome = viewingSavedResult && savedOutcome ? savedOutcome : outcome;
 
-  const codes = useMemo(() => makeCodes(outcome.persona), [outcome.persona]);
+  const codes = useMemo(() => makeCodes(resultOutcome.persona), [resultOutcome.persona]);
   const invitations = useMemo(() => codes
     .map((code, index) => ({ code, index, used: code.endsWith(`-${PROTOTYPE_USED_INVITE_FRAGMENT}`) }))
     .sort((left, right) => Number(left.used) - Number(right.used)), [codes]);
   const invitePageCount = Math.ceil(invitations.length / INVITES_PER_PAGE);
   const visibleInvitations = invitations.slice(invitePage * INVITES_PER_PAGE, (invitePage + 1) * INVITES_PER_PAGE);
-  const baseRank = useMemo(() => makeRank(email), [email]);
+  const rankIdentity = viewingSavedResult ? resultOutcome.resultId : email;
+  const baseRank = useMemo(
+    () => (viewingSavedResult && savedResultSnapshot?.rankBase !== undefined ? savedResultSnapshot.rankBase : makeRank(rankIdentity)),
+    [rankIdentity, savedResultSnapshot?.rankBase, viewingSavedResult],
+  );
   const rank = Math.max(1, baseRank - (shared ? 137 : 0));
-  const chemistry = CHEMISTRY[outcome.persona.mark];
+  const chemistry = CHEMISTRY[resultOutcome.persona.mark];
   const bestMatch = PERSONAS_BY_CODE[chemistry.best];
   const rival = PERSONAS_BY_CODE[chemistry.rival];
 
@@ -431,18 +471,32 @@ export function WaitlistExperience() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("invite")?.trim().toUpperCase();
     const resultId = params.get("result")?.trim();
+    const savedResultId = window.localStorage.getItem(SESSION_RESULT_KEY);
+    const savedSessionEmail = window.localStorage.getItem(SESSION_EMAIL_KEY) ?? "";
+    let hasSavedResult = false;
+
+    if (savedResultId) {
+      const savedSnapshot = parseSnapshot(window.localStorage.getItem(`${SNAPSHOT_PREFIX}${savedResultId}`));
+      if (savedSnapshot && restoreOutcome(savedSnapshot)) {
+        setSavedResultSnapshot(savedSnapshot);
+        setSessionEmail(savedSessionEmail);
+        hasSavedResult = true;
+        if (!resultId) {
+          setViewingSavedResult(true);
+          setStage("result");
+        }
+      } else {
+        window.localStorage.removeItem(SESSION_RESULT_KEY);
+        window.localStorage.removeItem(SESSION_EMAIL_KEY);
+      }
+    }
+
     if (resultId) {
       const stored = window.localStorage.getItem(`${SNAPSHOT_PREFIX}${resultId}`);
       if (stored) {
-        try {
-          const parsed = JSON.parse(stored) as Partial<ResultSnapshot>;
-          if (parsed.stats && parsed.personaMark && parsed.poles && parsed.rawScores) setReferralSnapshot(parsed as ResultSnapshot);
-          else {
-            const fallback = resolveOutcome(DEFAULT_ANSWERS, resultId);
-            setReferralSnapshot({ ...createSnapshot(fallback), resultId, personaMark: parsed.personaMark ?? fallback.persona.mark });
-          }
-        }
-        catch { window.localStorage.removeItem(`${SNAPSHOT_PREFIX}${resultId}`); }
+        const parsed = parseSnapshot(stored);
+        if (parsed && restoreOutcome(parsed)) setReferralSnapshot(parsed);
+        else window.localStorage.removeItem(`${SNAPSHOT_PREFIX}${resultId}`);
       } else {
         const legacyPersona = PERSONAS_BY_CODE[resultId.toUpperCase()];
         if (legacyPersona) {
@@ -455,12 +509,21 @@ export function WaitlistExperience() {
     setInviteCode(code);
     const inviteError = getInviteError(code);
     if (inviteError) { setGateError(inviteError); return; }
-    if (!resultId) setStage("quiz");
+    if (!resultId && !hasSavedResult) setStage("quiz");
   }, []);
 
   useEffect(() => {
-    if (stage === "result") window.localStorage.setItem(`${SNAPSHOT_PREFIX}${outcome.resultId}`, JSON.stringify(createSnapshot(outcome)));
-  }, [stage, outcome]);
+    if (stage !== "result" || viewingSavedResult) return;
+    const snapshot = createSnapshot(outcome, makeRank(email));
+    window.localStorage.setItem(`${SNAPSHOT_PREFIX}${outcome.resultId}`, JSON.stringify(snapshot));
+    window.localStorage.setItem(SESSION_RESULT_KEY, outcome.resultId);
+    if (email) {
+      window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
+      window.localStorage.setItem(makeEmailResultKey(email), outcome.resultId);
+      setSessionEmail(email.trim().toLowerCase());
+    }
+    setSavedResultSnapshot(snapshot);
+  }, [stage, outcome, viewingSavedResult, email]);
 
   useEffect(() => {
     if (stage !== "result") return;
@@ -469,10 +532,10 @@ export function WaitlistExperience() {
     setPreparedCards({});
     setExportError(false);
     const data = {
-      ...outcome.persona,
-      code: outcome.persona.mark,
-      poles: outcome.poles,
-      scores: outcome.stats,
+      ...resultOutcome.persona,
+      code: resultOutcome.persona.mark,
+      poles: resultOutcome.poles,
+      scores: resultOutcome.stats,
       bestMatch: { name: bestMatch.name, cn: bestMatch.cn },
       rival: { name: rival.name, cn: rival.cn },
     };
@@ -484,9 +547,46 @@ export function WaitlistExperience() {
       })
       .catch(() => { if (!disposed) setExportError(true); });
     return () => { disposed = true; rendered.forEach((card) => URL.revokeObjectURL(card.href)); };
-  }, [stage, outcome, bestMatch, rival]);
+  }, [stage, resultOutcome, bestMatch, rival]);
 
-  const beginQuiz = () => { setGateError(""); setQuestionIndex(0); setAnswerIds([]); setStage("quiz"); };
+  const beginQuiz = () => {
+    setAuthIntent("create");
+    setViewingSavedResult(false);
+    setRecoveryError("");
+    setGateError("");
+    setQuestionIndex(0);
+    setAnswerIds([]);
+    setStage("quiz");
+  };
+  const beginResultRecovery = () => {
+    setAuthIntent("recover");
+    setEmail("");
+    setOtp("");
+    setOtpError("");
+    setRecoveryError("");
+    setStage("email");
+  };
+  const viewSavedResult = () => {
+    if (!savedOutcome) return;
+    setViewingSavedResult(true);
+    setShared(false);
+    setCopiedCode(null);
+    setInvitePage(0);
+    setStage("result");
+  };
+  const signOutWaitlist = () => {
+    window.localStorage.removeItem(SESSION_RESULT_KEY);
+    window.localStorage.removeItem(SESSION_EMAIL_KEY);
+    setSavedResultSnapshot(null);
+    setViewingSavedResult(false);
+    setSessionEmail("");
+    setEmail("");
+    setEmailVerified(false);
+    setTelegramOpened(false);
+    setXOpened(false);
+    setShared(false);
+    setStage("gate");
+  };
   const submitGate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const normalizedCode = inviteCode.trim().toUpperCase();
@@ -498,14 +598,40 @@ export function WaitlistExperience() {
   const beginFromReferral = () => {
     const normalizedCode = inviteCode.trim().toUpperCase();
     const inviteError = getInviteError(normalizedCode);
-    if (inviteError) { setReferralSnapshot(null); setGateError(inviteError); return; }
+    if (inviteError) { setGateError(inviteError); return; }
     beginQuiz();
   };
   const clearReferral = () => { setReferralSnapshot(null); setInviteCode(""); setGateError(""); window.history.replaceState({}, "", "/waitlist/"); };
-  const submitEmail = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setOtp(""); setOtpError(""); setOtpResent(false); setStage("verify"); };
+  const submitEmail = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setOtp(""); setOtpError(""); setOtpResent(false); setRecoveryError(""); setStage("verify"); };
   const submitOtp = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (otp !== OTP_CODE) { setOtpError("That code does not match. Check the six digits and try again."); return; }
+    const existingResultId = window.localStorage.getItem(makeEmailResultKey(email));
+    if (existingResultId) {
+      const existingSnapshot = parseSnapshot(window.localStorage.getItem(`${SNAPSHOT_PREFIX}${existingResultId}`));
+      if (existingSnapshot && restoreOutcome(existingSnapshot)) {
+        window.localStorage.setItem(SESSION_RESULT_KEY, existingSnapshot.resultId);
+        window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
+        setSavedResultSnapshot(existingSnapshot);
+        setViewingSavedResult(true);
+        setSessionEmail(email.trim().toLowerCase());
+        setEmailVerified(true);
+        setOtpError("");
+        setShared(false);
+        setInvitePage(0);
+        setStage("result");
+        return;
+      }
+      window.localStorage.removeItem(makeEmailResultKey(email));
+    }
+    if (authIntent === "recover") {
+      setOtp("");
+      setRecoveryError("No saved result is linked to this email. Use an invite to take the test.");
+      setStage("email");
+      return;
+    }
+    window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
+    setSessionEmail(email.trim().toLowerCase());
     setOtpError(""); setTelegramOpened(false); setXOpened(false); setCopiedCode(null); setShared(false); setInvitePage(0); setEmailVerified(true); setStage("unlock");
   };
   const openCommunity = (network: "telegram" | "x") => {
@@ -521,14 +647,14 @@ export function WaitlistExperience() {
   const goBack = () => { if (questionIndex === 0) return; setAnswerIds((current) => current.slice(0, -1)); setQuestionIndex((current) => current - 1); };
   const shareResult = () => {
     const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", `My SmartX trader type is ${outcome.persona.name}.\n\n“${outcome.persona.roast}”\n\nFind yours in six questions.`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(codes[0], outcome.resultId, true));
+    shareUrl.searchParams.set("text", `My SmartX trader type is ${resultOutcome.persona.name}.\n\n“${resultOutcome.persona.roast}”\n\nFind yours in six questions.`);
+    shareUrl.searchParams.set("url", makeInvitationUrl(codes[0], resultOutcome.resultId, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     setShared(true);
   };
   const copyInvitation = async (code?: string) => {
     if (!code) return;
-    await navigator.clipboard.writeText(makeInvitationUrl(code, outcome.resultId, true));
+    await navigator.clipboard.writeText(makeInvitationUrl(code, resultOutcome.resultId, true));
     setCopiedCode(code);
     window.setTimeout(() => setCopiedCode(null), 1400);
   };
@@ -554,8 +680,23 @@ export function WaitlistExperience() {
               <span className={styles.eyebrow}>A result was shared with you</span>
               <h1>A friend trades like<br />{referralOutcome.persona.name}.</h1>
               <p>Different score, same type—or something else entirely? Six decisions reveal how you trade when it gets real.</p>
-              <button className={styles.primaryButton} type="button" onClick={beginFromReferral}>Find my trader type</button>
-              <button className={styles.textButton} type="button" onClick={clearReferral}>Use another invite</button>
+              {savedOutcome ? (
+                <div className={styles.referralReturn}>
+                  <button className={styles.primaryButton} type="button" onClick={viewSavedResult}>View my result</button>
+                  <small>Your result is saved as {savedOutcome.persona.name}.</small>
+                </div>
+              ) : (
+                <>
+                  <button className={styles.primaryButton} type="button" onClick={beginFromReferral}>Find my trader type</button>
+                  <button className={styles.textButton} type="button" onClick={beginResultRecovery}>Already tested? View my result</button>
+                  {gateError && (
+                    <div className={styles.referralError} role="alert">
+                      <small>{gateError}</small>
+                      <button className={styles.textButton} type="button" onClick={clearReferral}>Use another invite</button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}
@@ -567,15 +708,28 @@ export function WaitlistExperience() {
               <h1>How do you trade<br />when it gets <em>real?</em></h1>
               <p>Six decisions reveal your risk, signal, and social instincts.</p>
             </div>
-            <form className={styles.gateForm} onSubmit={submitGate}>
-              <label htmlFor="invite-code">Invite code</label>
-              <div className={styles.inlineField}>
-                <input id="invite-code" type="text" autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="SMARTX-RSK-7X2K" value={inviteCode} onChange={(event) => { setInviteCode(event.target.value.toUpperCase()); setGateError(""); }} aria-invalid={Boolean(gateError)} aria-describedby={gateError ? "invite-error" : "invite-note"} required />
-                <button className={styles.primaryButton} type="submit">Begin</button>
-              </div>
-              {gateError ? <small className={styles.formError} id="invite-error" role="alert">{gateError}</small> : <small id="invite-note">Strictly invite-only. Your code is reserved when the test begins.</small>}
-              <button className={styles.testCodeButton} type="button" onClick={() => { setInviteCode("123456"); setGateError(""); beginQuiz(); }}>Use prototype code</button>
-            </form>
+            {savedOutcome ? (
+              <section className={styles.returningGate} aria-label="Saved result">
+                <div>
+                  <span>Your result is saved</span>
+                  <strong>{savedOutcome.persona.name}</strong>
+                </div>
+                <button type="button" onClick={viewSavedResult}>View my result <span aria-hidden="true">→</span></button>
+              </section>
+            ) : (
+              <form className={styles.gateForm} onSubmit={submitGate}>
+                <label htmlFor="invite-code">Invite code</label>
+                <div className={styles.inlineField}>
+                  <input id="invite-code" type="text" autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="SMARTX-RSK-7X2K" value={inviteCode} onChange={(event) => { setInviteCode(event.target.value.toUpperCase()); setGateError(""); }} aria-invalid={Boolean(gateError)} aria-describedby={gateError ? "invite-error" : "invite-note"} required />
+                  <button className={styles.primaryButton} type="submit">Begin</button>
+                </div>
+                {gateError ? <small className={styles.formError} id="invite-error" role="alert">{gateError}</small> : <small id="invite-note">Strictly invite-only. Your code is reserved when the test begins.</small>}
+                <div className={styles.gateFormMeta}>
+                  <button className={styles.testCodeButton} type="button" onClick={() => { setInviteCode("123456"); setGateError(""); beginQuiz(); }}>Use prototype code</button>
+                  <button className={styles.textButton} type="button" onClick={beginResultRecovery}>Already tested? View my result</button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
@@ -603,16 +757,17 @@ export function WaitlistExperience() {
 
         {stage === "email" && (
           <div className={styles.formStage}>
-            <span className={styles.eyebrow}>Your result is ready</span>
-            <h1>Save your result.</h1>
-            <p>Bind an email to save your result and join the waitlist.</p>
+            <span className={styles.eyebrow}>{authIntent === "recover" ? "Already tested?" : "Your result is ready"}</span>
+            <h1>{authIntent === "recover" ? "Find your result." : "Save your result."}</h1>
+            <p>{authIntent === "recover" ? "Enter the email you used. We’ll send a six-digit code." : "Bind an email to save your result and join the waitlist."}</p>
             <form onSubmit={submitEmail}>
               <label htmlFor="waitlist-email">Email address</label>
               <div className={styles.inlineField}>
                 <input id="waitlist-email" type="email" autoComplete="email" placeholder="you@domain.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
-                <button className={styles.primaryButton} type="submit">Continue</button>
+                <button className={styles.primaryButton} type="submit">{authIntent === "recover" ? "Send code" : "Continue"}</button>
               </div>
-              <small>Prototype only · no data is submitted.</small>
+              {recoveryError ? <small className={styles.formError} role="alert">{recoveryError}</small> : <small>Prototype only · no data is submitted.</small>}
+              {authIntent === "recover" && <button className={styles.recoveryBack} type="button" onClick={() => { setRecoveryError(""); setStage("gate"); }}>← Back</button>}
             </form>
           </div>
         )}
@@ -642,6 +797,10 @@ export function WaitlistExperience() {
             <span className={styles.eyebrow}>One last step</span>
             <h1>Unlock your result.</h1>
             <p>Join the SmartX community and follow product updates before your trader type is revealed.</p>
+            <div className={styles.accountStrip} data-compact="true">
+              <div><span>Verified as</span><strong>{sessionEmail || email}</strong></div>
+              <button type="button" onClick={signOutWaitlist}>Sign out</button>
+            </div>
             <div className={styles.unlockTasks}>
               <button type="button" aria-pressed={telegramOpened} data-complete={telegramOpened} onClick={() => openCommunity("telegram")}>
                 <FaTelegramPlane aria-hidden="true" />
@@ -661,8 +820,12 @@ export function WaitlistExperience() {
 
         {stage === "result" && (
           <div className={styles.resultStage}>
-            <PersonaPoster outcome={outcome} preparedCards={preparedCards} exportError={exportError} />
+            <PersonaPoster outcome={resultOutcome} preparedCards={preparedCards} exportError={exportError} />
             <aside className={styles.resultPanel}>
+              <div className={styles.accountStrip}>
+                <div><span>Signed in as</span><strong>{sessionEmail || "Email verified"}</strong></div>
+                <button type="button" onClick={signOutWaitlist}>Sign out</button>
+              </div>
               <div className={styles.rankBlock} data-boosted={shared}>
                 <span>Waitlist rank</span>
                 <strong key={rank}>#{rank.toLocaleString("en-US")}</strong>
