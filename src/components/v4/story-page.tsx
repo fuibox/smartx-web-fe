@@ -1120,15 +1120,6 @@ function ClosingSection() {
           ref={ctaRef}
           className={styles.primaryAction}
         />
-        <a
-          className={styles.secondaryAction}
-          href="https://smartx.gitbook.io/smartx.docs.io"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>Read the docs</span>
-          <i aria-hidden="true">↗</i>
-        </a>
       </div>
     </section>
   );

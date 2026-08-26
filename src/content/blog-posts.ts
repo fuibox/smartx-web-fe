@@ -6,8 +6,131 @@ import type { BlogPostSource } from "./blog-types";
  */
 export const BLOG_POST_SOURCES = [
   {
+    slug: "how-to-build-a-polymarket-trading-strategy-that-actually-works",
+    status: "draft",
+    category: "Guide",
+    publishedAt: "2026-08-17",
+    title: "How to Build a Polymarket Trading Strategy That Actually Works",
+    dek: "A repeatable process for choosing a specialty, defining edge, sizing by conviction, reviewing results, and setting exits before entry.",
+    excerpt: "A practical framework for turning Polymarket opinions into a repeatable trading strategy that can improve over time.",
+    seo: {
+      title: "How to Build a Polymarket Trading Strategy That Works",
+      description:
+        "Build a repeatable Polymarket strategy by choosing a specialty, defining your edge, sizing by conviction, reviewing results, and setting exit rules.",
+    },
+    cover: {
+      src: "/assets/updates/polymarket-trading-strategy.webp",
+      alt: "How to Build a Polymarket Trading Strategy That Actually Works",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/how-to-build-a-polymarket-trading-strategy-that-actually-works-583f4cd7270b",
+    sections: [
+      {
+        id: "why-a-strategy-compounds-and-opinions-dont",
+        heading: "Why a strategy compounds and opinions don’t",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Most traders on Polymarket don’t have a strategy. They have opinions. There’s a meaningful difference, and the gap between the two is where most of the money is lost.",
+          },
+          {
+            type: "paragraph",
+            text: "An opinion is “I think this team will win.” A strategy is a repeatable process for identifying markets where your probability estimate is more accurate than the current price, sizing your positions accordingly, and tracking your results systematically across enough trades to learn from them. One of these compounds. The other doesn’t.",
+          },
+          {
+            type: "paragraph",
+            text: "If you’ve been trading on Polymarket and feel like your results are inconsistent — good stretches followed by drawdowns that erase the gains — the problem is almost certainly that you’re executing opinions, not a strategy.",
+          },
+        ],
+      },
+      {
+        id: "start-with-category-selection-not-market-selection",
+        heading: "Start with category selection, not market selection",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The first decision in any Polymarket strategy isn’t which market to trade. It’s which category to specialize in. The traders with the most consistent track records on Polymarket are not generalists. They’re specialists: the person who only trades NBA outcomes, the trader who focuses exclusively on macroeconomic policy markets, the analyst who has built a model for European soccer.",
+          },
+          {
+            type: "paragraph",
+            text: "Specialization matters because edge — the statistical advantage that makes prediction market trading profitable — is category-specific. Your knowledge about how NFL games unfold doesn’t transfer to your ability to predict Fed rate decisions. Trying to trade both gives you the worst of both worlds: not enough data in either category to know if you’re actually good.",
+          },
+        ],
+      },
+      {
+        id: "define-your-edge-before-you-trade",
+        heading: "Define your edge before you trade",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Before entering any market, write down your thesis in one sentence. Not “I think YES,” but “I think YES because [specific reason the market is mispriced].” If you can’t articulate why the current price is wrong, you don’t have edge — you have an opinion.",
+          },
+          {
+            type: "paragraph",
+            text: "The common reasons a market might be mispriced: the crowd is anchoring to recent news that isn’t predictive, the base rate for similar historical events points in a different direction, there’s a structural bias in how the market was set up, or you have relevant domain knowledge that isn’t widely priced in.",
+          },
+        ],
+      },
+      {
+        id: "size-positions-based-on-conviction-strength",
+        heading: "Size positions based on conviction strength, not market attractiveness",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "One of the most common strategy failures on Polymarket is flat-sizing — putting the same dollar amount on every trade regardless of how confident you are. This is a mistake because your edge isn’t equal across all your trades. Some trades are high-conviction with strong backing evidence. Others are lower-conviction, opportunistic bets.",
+          },
+          {
+            type: "paragraph",
+            text: "A simple approach: define three tiers. Standard, conviction, and high-conviction. Your standard tier might be 1–2% of your account per trade. Conviction is 3–4%. High-conviction is 5–7%. You should rarely be at the top tier — if everything feels like a high-conviction trade, your calibration is off.",
+          },
+        ],
+      },
+      {
+        id: "keep-a-trade-log-review-it-monthly",
+        heading: "Keep a trade log, review it monthly",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "The most consistent improvement lever for any Polymarket trader is a regular review of their trade history, broken down by category, by bet type (YES/NO), by conviction level, and by time horizon to resolution. Most traders skip this step. It’s also where most of the real learning comes from.",
+          },
+          {
+            type: "paragraph",
+            text: "You’ll find things like: you’re systematically overconfident on political markets, but well-calibrated on sports. You’re better at short-resolution markets than long-dated ones. Your NO positions underperform your YES positions. These patterns are invisible without the data.",
+          },
+          {
+            type: "paragraph",
+            text: "Tools like SmartX (smartx.io) are designed specifically to surface this kind of analysis automatically — so you’re not spending hours building your own spreadsheet.",
+          },
+        ],
+      },
+      {
+        id: "set-explicit-exit-rules-before-you-enter",
+        heading: "Set explicit exit rules before you enter",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "One of the worst habits in prediction markets is deciding when to exit based on how the trade is performing emotionally. The market is at 70% and you’re in at 40% — do you take profit? Ride it to 90%? Cut it if it drops back to 35%?",
+          },
+          {
+            type: "paragraph",
+            text: "The answer should be decided before entry, not during. Define a profit target and a stop-loss or max-hold policy as part of your trade thesis. Trades where you exit based on rules instead of emotion consistently outperform those where you exit based on feeling.",
+          },
+          {
+            type: "paragraph",
+            text: "Building a Polymarket strategy isn’t complicated. But it requires treating trading as a systematic process rather than a series of one-off bets. Start there, and the results tend to follow.",
+          },
+          {
+            type: "paragraph",
+            text: "Ready to trade with an edge? Track your strategy and performance at app.smartx.io/?ref=hwGjVafr.",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-to-win-on-polymarket-the-systems-that-separate-consistent-traders-from-the-rest",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-15",
     title: "How to Win on Polymarket: The Systems That Separate Consistent Traders from the Rest",
@@ -122,7 +245,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "skill-in-prediction-markets-is-real-copying-it-still-loses-money",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-14",
     title: "Skill in prediction markets is real. Copying it still loses money.",
@@ -327,7 +450,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "polymarket-liquidity-why-it-matters-more-than-most-traders-realize",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-13",
     title: "Polymarket Liquidity: Why It Matters More Than Most Traders Realize",
@@ -428,7 +551,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-track-and-measure-your-prediction-market-returns",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-13",
     title: "How to Track and Measure Your Prediction Market Returns",
@@ -533,7 +656,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-review-is-this-ai-terminal-worth-it-for-polymarket-traders",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-08-12",
     title: "SmartX Review: Is This AI Terminal Worth It for Polymarket Traders?",
@@ -638,7 +761,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "what-makes-prediction-markets-on-chain-the-technical-foundation-that-changes-everything",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-10",
     title: "What Makes Prediction Markets On-Chain: The Technical Foundation That Changes Everything",
@@ -749,7 +872,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-read-a-polymarket-wallet-and-what-the-data-actually-tells-you",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-03",
     title: "How to Read a Polymarket Wallet (And What the Data Actually Tells You)",
@@ -865,7 +988,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-think-about-probability-on-prediction-markets",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-08-03",
     title: "How to Think About Probability on Prediction Markets",
@@ -985,7 +1108,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "the-psychology-of-trading-prediction-markets-and-why-most-traders-lose-more-than-they-should",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-01",
     title: "The Psychology of Trading Prediction Markets (And Why Most Traders Lose More Than They Should)",
@@ -1101,7 +1224,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "prediction-markets-vs-traditional-sports-betting-whats-actually-different",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-08-01",
     title: "Prediction Markets vs Traditional Sports Betting: What’s Actually Different",
@@ -1225,7 +1348,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-terminal-a-complete-guide-for-prediction-market-traders",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-31",
     title: "SmartX Terminal: A Complete Guide for Prediction Market Traders",
@@ -1503,7 +1626,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "why-sports-markets-dominate-polymarket-volume-and-what-that-means-for-traders",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-07-29",
     title: "Why Sports Markets Dominate Polymarket Volume (And What That Means for Traders)",
@@ -1751,7 +1874,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "polymarket-for-beginners-7-things-experienced-traders-know-that-you-dont",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-28",
     title: "Polymarket for Beginners: 7 Things Experienced Traders Know That You Don’t",
@@ -1903,7 +2026,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-on-polymarket-what-it-does-who-its-for-and-how-it-works",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-28",
     title: "SmartX on Polymarket: What It Does, Who It’s For, and How It Works",
@@ -2033,7 +2156,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "how-to-analyze-prediction-markets-with-ai-a-step-by-step-guide",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-27",
     title: "How to Analyze Prediction Markets with AI: A Step-by-Step Guide",
@@ -2531,7 +2654,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "best-polymarket-analytics-tools-in-2026-ranked-and-reviewed",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-07-24",
     title: "Best Polymarket Analytics Tools in 2026 — Ranked and Reviewed",
@@ -2804,7 +2927,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-boost-trade-alongside-the-smart-money",
-    status: "published",
+    status: "draft",
     category: "Campaign",
     publishedAt: "2026-07-17",
     title: "SmartX Boost: Trade Alongside the Smart Money",
@@ -2875,7 +2998,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "introducing-smart-points-get-rewarded-for-being-early",
-    status: "published",
+    status: "draft",
     category: "Product",
     publishedAt: "2026-07-16",
     title: "Introducing Smart Points: Get Rewarded for Being Early",
@@ -2944,7 +3067,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smart-money-decoded-what-top-prediction-market-traders-actually-read",
-    status: "published",
+    status: "draft",
     category: "Intelligence",
     publishedAt: "2026-07-13",
     title:
@@ -3107,7 +3230,7 @@ export const BLOG_POST_SOURCES = [
   },
   {
     slug: "smartx-signal-bot-guide",
-    status: "published",
+    status: "draft",
     category: "Guide",
     publishedAt: "2026-06-02",
     title: "SmartX Signal Bot Guide",

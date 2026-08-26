@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ArticleContents } from "@/components/blog/article-contents";
 import { ArticleCta } from "@/components/blog/article-cta";
 import { BlogVisual } from "@/components/blog/blog-visual";
-import styles from "@/components/blog/blog.module.css";
+import styles from "@/components/blog/blog-article.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { getBlogReadingStats } from "@/content/blog-core";
@@ -196,7 +196,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <a className={styles.skipLink} href="#article-body">
         Skip to article
       </a>
-      <SiteHeader active="blog" />
+      <SiteHeader active="blog" allowThemeToggle />
 
       <main>
         <article>
@@ -206,11 +206,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <i aria-hidden="true">←</i>
                 Journal
               </Link>
-              <span>{post.category}</span>
+              <span className={styles.articleCategory}>{post.category}</span>
               <time dateTime={post.publishedAt}>
                 {formatBlogDate(post.publishedAt)}
               </time>
-              <small>{readTime}</small>
+              <span className={styles.articleReadTime}>{readTime}</span>
             </div>
             <h1>{post.title}</h1>
             {post.dek ? <p>{post.dek}</p> : null}
@@ -218,7 +218,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div id="article-body" className={styles.articleLayout}>
             <aside className={styles.articleRail}>
-              <p>In this dispatch</p>
+              <p className={styles.articleRailLabel}>In this dispatch</p>
               <ArticleContents
                 sections={post.sections.map(({ id, heading }) => ({
                   id,
@@ -233,6 +233,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   post={post}
                   priority
                   showLabel={false}
+                  className={styles.articleCover}
                   sizes="(min-width: 901px) 680px, (min-width: 641px) calc(100vw - 64px), calc(100vw - 40px)"
                 />
               </div>
@@ -258,17 +259,32 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           aria-labelledby="related-stories-title"
         >
           <header>
-            <p className={styles.eyebrow}>KEEP READING</p>
             <h2 id="related-stories-title">From the journal</h2>
           </header>
-          <div>
-            {relatedPosts.map((related, index) => (
+          <div className={styles.relatedGrid}>
+            {relatedPosts.slice(0, 3).map((related, index) => (
               <article key={related.slug}>
                 <Link href={`/blog/${related.slug}`}>
-                  <span>{formatBlogIndex(index + 1)}</span>
-                  <small>{related.category}</small>
-                  <h3>{related.title}</h3>
-                  <i aria-hidden="true">↗</i>
+                  <BlogVisual
+                    post={related}
+                    showLabel={false}
+                    className={styles.relatedVisual}
+                    sizes="(min-width: 901px) 400px, (min-width: 641px) 46vw, calc(100vw - 40px)"
+                  />
+                  <div className={styles.relatedCardCopy}>
+                    <span className={styles.relatedIndex}>
+                      {formatBlogIndex(index + 1)}
+                    </span>
+                    <div>
+                      <div className={styles.relatedMeta}>
+                        <span>{related.category}</span>
+                        <time dateTime={related.publishedAt}>
+                          {formatBlogDate(related.publishedAt)}
+                        </time>
+                      </div>
+                      <h3>{related.title}</h3>
+                    </div>
+                  </div>
                 </Link>
               </article>
             ))}

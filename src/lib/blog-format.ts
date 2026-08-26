@@ -13,6 +13,14 @@ export function formatBlogDate(publishedAt: string) {
   }).format(new Date(`${publishedAt}T00:00:00Z`));
 }
 
+export function formatBlogShortDate(publishedAt: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${publishedAt}T00:00:00Z`));
+}
+
 export function formatBlogArchiveMonth(publishedAt: string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",

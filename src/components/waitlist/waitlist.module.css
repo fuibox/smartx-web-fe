@@ -70,20 +70,6 @@
 
 .skipLink:focus-visible { transform: none; }
 
-.header {
-  position: relative;
-  z-index: 4;
-  display: flex;
-  min-height: 65px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 40px;
-  border-bottom: 1px solid #202020;
-  background: rgba(1, 1, 1, 0.66);
-  backdrop-filter: blur(12px);
-}
-
-.logo,
 .posterLogo {
   display: inline-flex;
   width: fit-content;
@@ -115,14 +101,6 @@
 .posterLogo .brand img {
   width: 24px;
   height: 20px;
-}
-
-.header > span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .stage {
@@ -889,7 +867,6 @@
 
 .inviteNavigation button:disabled { cursor: default; opacity: 0.3; }
 
-.logo:focus-visible,
 .posterLogo:focus-visible,
 .primaryButton:focus-visible,
 .shareButton:focus-visible,
@@ -994,7 +971,6 @@
 }
 
 @media (max-width: 880px) {
-  .header { padding-right: 24px; padding-left: 24px; }
   .stage { width: calc(100% - 40px); padding: 48px 0 64px; }
   .gateStage,
   .referralStage,
@@ -1013,9 +989,6 @@
 }
 
 @media (max-width: 620px) {
-  .brand { font-size: 20px; }
-  .brand img { width: 28px; height: 24px; }
-  .header > span { font-size: 9px; }
   .stage { padding-top: 36px; }
   .gateCopy h1 { font-size: 52px; }
   .gateCopy > p,

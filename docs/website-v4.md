@@ -5,6 +5,7 @@
 > 前身：`website-v4-design-brief.md`（初版简报，部分内容已被迭代推翻，以本文件为准）
 > **与旧方案的关系**：V2 太空叙事与 V3 编辑化原型均为已废弃探索，只保留在 Git 历史与历史文档中，不进入生产源码和构建产物。
 > 工作规则：仓库根 `AGENTS.md`（跨 Agent 设计优先级与反 Demo 约束）+ `CLAUDE.md`（Claude/Fable 动效与自审补充）
+> Consumer Network 官网改版分支的当前实现与素材交接见 `docs/consumer-network-homepage-handoff.md`；该文档只补充当前分支，不覆盖本文件的事实准确性与反 Demo 约束。
 
 ## 1. 定位与叙事（已签字）
 
@@ -50,6 +51,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 ### Hero / Prologue（视觉冻结）
 
 - 当前居中构图、标题、lede、CTA 与 navy/teal 气质保留。
+- Consumer Network 当前公开首页以 `7.23s / 1280 × 720 / H.264` 无声品牌片作为全屏背景；视频静音、内联、循环自动播放，离开首屏暂停，reduced-motion 使用同源静态帧。桌面和 H5 都保持文案层独立，不让标题跟随镜头移动。
 - Hero 是独立序章，正常纵向离场，不缩小、不向左让位。
 - idle 只允许边缘抖动密度发生极慢变化；标题与 CTA 的阅读状态保持稳定。首屏状态统一为 **Live alpha**。
 - 主 CTA 统一使用 `Launch Alpha`；hover 使用箭头端的 teal 像素染色由右向左覆盖文字区，文案不替换，不增加第二套 CTA 状态。
@@ -118,9 +120,9 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 - Closing：kicker 使用 **“Live on Polymarket”**，主标题 **“Trade with a terminal that gets sharper with you.”**；删除与 CTA 重复的 “Start with SmartX” 正文。主 CTA `Launch Alpha`，次入口 `Read the docs`。
 - Updates 固定三篇文章版式：第一篇带封面、后两篇为编辑式文本行；即使 Blog 文章数继续增长，首页也只读取最新三篇。数据接口固定为 `category / date / title / excerpt / cover / slug / sourceUrl`。当前内容从 SmartX 官方 Medium 迁入，但首页标题与 `See all` 均进入站内 `/blog`；`sourceUrl` 只作内部溯源，不在公开页面为 Medium 导流。
-- Blog 使用独立的编辑化阅读系统：`/blog` 为列表首页，采用一篇主稿 + 文本文章行，不增加无意义分类筛选；每页固定 6 篇，文章超过 6 篇后生成 `/blog/page/[page]/` 静态分页，禁止无限滚动。`/blog/[slug]` 为详情页，使用大标题、真实封面或语义化产品视觉、约 680px 的窄正文、桌面端吸顶目录与三篇相关文章。Blog 延续 V4 navy/teal 与像素索引语言；品牌级标题使用 Pixel，长正文使用 UI 字体，禁止把首页章节动效搬进阅读页。详情页支持 Blog 专属明暗阅读主题，阅读时长必须从正文自动计算；正文排版和内容接口以 `docs/blog-reading-system.md` 为准。
-- Footer 将信息拆为三组：左侧品牌与 X / Telegram 社交入口；`Product` 包含 App / Blog / Docs；`Legal` 包含 Terms of Service / Privacy Policy。底部继续以低对比灰色超大 `SMARTX` 字标收尾；移除无叙事价值的通用风险句。
-- Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、Docs、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
+- Blog 使用独立的编辑化阅读系统：`/blog` 为列表首页，采用一篇主稿 + 文本文章行，不增加无意义分类筛选；顶部只保留 `SmartX Journal` 与一句解释，不显示 Field notes、文章总数或更新时间，也不把列表页做成第二个 Hero。每页固定 6 篇，文章超过 6 篇后生成 `/blog/page/[page]/` 静态分页，禁止无限滚动。`/blog/[slug]` 为详情页，使用真实封面或语义化产品视觉、约 680px 的窄正文与桌面端吸顶目录；底部 `From the journal` 左对齐，最多三篇相关文章按 `01 / 02 / 03` 等宽横向排列，不展示 `Keep reading` 或主次推荐层级。Consumer Network 主线下，Blog 继承首页的 black / white / teal 与开放索引语言；Playfair Display 只用于 Journal 和编辑型分区标记，详情 H1、正文与元信息统一使用 IBM Plex Sans，Lexend 只用于品牌字标，PixelOperatorMono 与 JetBrainsMono 均不进入公开 Blog。禁止把首页章节动效搬进阅读页。列表与详情共享 Blog 专属明暗阅读主题，主题状态不影响首页或其他路由；阅读时长必须从正文自动计算，正文排版和内容接口以 `docs/blog-reading-system.md` 为准。
+- Footer 统一为左侧品牌与 X / Telegram 社交入口，以及 `Product` 下的 App / Blog；Blog 与首页共用整块 teal 场域、黑色 Lexend `SmartX` 大字标和移动端适配，不保留 Docs / Legal 公开导航。
+- Closing Banner 使用低对比 intelligence rail；三条离散 packet 在移动中收束为一条更窄的输出，直接表达 “gets sharper”。Closing 主 CTA 与 Hero 共用同一套右向左染色逻辑：箭头区默认 teal、箭头不位移。Hero / Closing CTA、页眉与 Footer 的真实链接都必须有清晰 hover/focus 状态，非交互文案不制造虚假点击暗示。
 - Updates 使用开放式编辑排版：首篇保留 4px 统一圆角的大封面，后两篇用单条分隔关系而不是完整线框卡片；三篇都显示日期并使用真实文章链接，hover 只做封面轻微收紧、标题与分类短线响应，不额外增加卡片箭头。
 
 ### 图形交接合同
@@ -145,14 +147,14 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 | 章节 | 状态 | 说明 |
 | --- | --- | --- |
-| **Hero / Prologue** | ✅ 视觉冻结 | 保留当前版 |
+| **Hero / Prologue** | ✅ 视觉冻结 | 居中文案叠加全屏无声品牌片；H5 独立三行 lede，视频具备离屏暂停与 reduced-motion 静态帧 |
 | **Index** | 🟡 精修待签字 | 默认态取消假激活与无效 evidence；hover/focus 后显示证据摘要并强化对应像素状态，其他章节同步降噪 |
 | **01 Signals** | 🟡 精修待签字 | 手机缩小并只保留系统 chrome，产品导航来自真实截图；三列来源轨道等宽居中；不公开标签数量 |
 | **02 Execute** | 🟡 精修待签字 | 文案已收敛为两条路径；Recall 使用真实交易票据，Strategy follow 使用真实 Watchlist Rules，自动执行能力明确标 Coming |
 | **03 Learn** | 🟡 精修待签字 | 已用 Memory nutrient loop 替换文字型 profile register：四维横向吸收、底部立即汇合、右侧单向回流并改变下一次 Feed 排序 |
 | **04 All-in-one** | 🟡 精修待签字 | 单行标题，删除冗余副标题与 spine 标签；intelligence layer 与六个平台保持统一居中轴 |
-| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；Footer 已按 Product / Legal 分组 |
-| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 二十一篇 `/blog/[slug]` 详情；已迁入截至 2026-08-03 的官方 Medium 全部文章，Medium 地址只作内部溯源 |
+| **Closing / Updates / Footer** | 🟡 精修待签字 | Banner packet 汇流表达 “gets sharper”，CTA 与 Hero 同构；Updates 已接站内 Blog；首页与 Blog Footer 已统一为品牌、社交入口和 App / Blog 目录 |
+| **Blog** | 🟡 首版待签字 | `/blog` 列表 + 七篇已发布 `/blog/[slug]` 详情；另有二十一篇按 2026-08-24 内容盘点撤下公开站点，Medium 地址只作内部溯源 |
 
 桌面首版已在 `1440 × 900` 浏览器逐屏验收；大屏舞台已在 `1920 × 1080` 与约 `2500 × 1280` 浏览器逐屏回归，并完成 motion review、章节锚点和 `prefers-reduced-motion` 降级验证。
 
@@ -168,10 +170,10 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 SEO 上线验收顺序：
 
-1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前二十一篇文章时应为 26 条 URL。
+1. 部署后直接打开 `https://smartx.io/sitemap.xml`，确认首页、Blog 列表、静态分页与全部已发布文章均出现；当前七篇文章时应为 10 条 URL。
 2. 在 Search Console 重新提交或刷新 `sitemap.xml`。Search Console 的 discovered pages 可能延迟更新，不以提交当下的数字判断失败。
 3. 用 Google Rich Results Test 检查首页的 Organization / WebSite / SoftwareApplication，以及文章页的 BlogPosting。
-4. Terms of Service 与 Privacy Policy 必须返回 200，不允许发布带 404 的 Legal 导航。
+4. 检查 Header 与 Footer 的全部公开链接均返回预期页面，不允许重新引入已移除的 Docs / Legal 导航。
 
 SEO 发布契约：所有可索引页面必须输出独立 title、description、canonical、robots、Open Graph 与 Twitter metadata；已发布文章还必须提供编辑过的 SEO 标题与描述、带尺寸的封面，以及与页面正文一致的 BlogPosting JSON-LD。具体字段和字符预算以 `docs/blog-reading-system.md` 为准。
 
@@ -204,7 +206,7 @@ src/components/v4/
   v4.module.css                  Hero 与共享 tokens
 src/components/blog/             Blog 编辑化页面组件与样式
 src/components/site/             Blog 页眉与全站共享 Footer
-src/content/blog-posts.ts        当前二十一篇本地编辑源（不被页面直接导入）
+src/content/blog-posts.ts        当前二十八篇本地编辑记录（七篇发布、二十一篇撤下；不被页面直接导入）
 src/content/blog-types.ts        Blog 摘要、详情与正文块契约
 src/content/blog-core.ts         内容验证、规范化、分页与阅读时长
 src/content/blog-repository.ts   首页/Blog/sitemap 的统一发布数据入口

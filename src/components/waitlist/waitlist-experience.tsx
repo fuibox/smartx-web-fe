@@ -6,6 +6,8 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
+import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
+
 import { renderResultCard, type RenderedResultCard, type ResultCardFormat } from "./result-card-export";
 import styles from "./waitlist.module.css";
 
@@ -542,12 +544,7 @@ export function WaitlistExperience() {
           priority
         />
       </div>
-      <header className={styles.header}>
-        <Link href="/" aria-label="SmartX home" className={styles.logo}>
-          <Brand />
-        </Link>
-        <span>Private beta</span>
-      </header>
+      <ConsumerHeader active="waitlist" placement="page" />
 
       <section className={styles.stage} id="waitlist-content" aria-live="polite">
         {stage === "gate" && referralOutcome && (

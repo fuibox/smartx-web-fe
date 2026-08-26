@@ -68,13 +68,6 @@ export function V4Hero() {
           <a href="https://t.me/+CTeuBkpOxSNkN2Y0" target="_blank" rel="noopener noreferrer">
             Telegram
           </a>
-          <a
-            href="https://smartx.gitbook.io/smartx.docs.io"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Docs
-          </a>
         </nav>
       </header>
 
