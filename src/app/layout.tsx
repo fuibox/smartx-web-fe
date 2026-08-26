@@ -4,6 +4,7 @@ import "@fontsource/ibm-plex-serif/400.css";
 import "@fontsource/ibm-plex-serif/500.css";
 import "@fontsource/ibm-plex-serif/600.css";
 
+import { AppNoticeHost } from "@/components/site/app-notice";
 import {
   SMARTX_DEFAULT_SOCIAL_IMAGE,
   SMARTX_OPEN_GRAPH_DEFAULTS,
@@ -45,6 +46,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#061b17",
 };
 
@@ -55,7 +58,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-      <body>{children}</body>
+      <body>
+        <AppNoticeHost />
+        {children}
+      </body>
     </html>
   );
 }

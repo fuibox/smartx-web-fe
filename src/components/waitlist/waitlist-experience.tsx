@@ -2,291 +2,123 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
+import { notifyError } from "@/components/site/app-notice";
+import { isValidInviteCode, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
+import { hydrateQuestions, mapCardToOutcome, PERSONAS_BY_CODE } from "@/lib/waitlist/persona";
+import {
+  decideWaitlistEntry,
+  isOwnResultAvailable,
+  rememberWaitlistNotice,
+  shareQueryPresent,
+  takeWaitlistNotice,
+  waitlistPathWithoutShare,
+} from "@/lib/waitlist/routing";
+import {
+  clearQuizDraft,
+  clearQuizSession,
+  clearWaitlistSession,
+  getQuizDraft,
+  getQuizSession,
+  getSessionTokenForInvite,
+  getUserToken,
+  setQuizDraft,
+  setQuizSession,
+  setUserToken,
+} from "@/lib/waitlist/session";
+import {
+  type AuthIntent,
+  type CommunityChannel,
+  type InviteItem,
+  type Outcome,
+  type QuizQuestion,
+  type ResultCard,
+  type UserInfo,
+  type WaitlistStage,
+  isMissingUserError,
+  isUnlockedResult,
+  isUserApiError,
+  isUserInfoError,
+  isWaitlistApiError,
+} from "@/lib/waitlist/types";
+
+import { WaitlistActionScope, WaitlistButton } from "./waitlist-button";
 
 import { renderResultCard, type RenderedResultCard, type ResultCardFormat } from "./result-card-export";
 import styles from "./waitlist.module.css";
 
-type Stage = "gate" | "quiz" | "email" | "verify" | "unlock" | "result";
-type AuthIntent = "create" | "recover";
-type Dimension = "risk" | "basis" | "mode";
-type Stat = "conviction" | "instinct" | "resilience";
-type Pole = "DEGEN" | "SNIPER" | "GUT" | "DATA" | "PACK" | "LONE";
-type Weight = -2 | -1 | 1 | 2;
-
-type QuizOption = {
-  id: "A" | "B" | "C" | "D";
-  label: string;
-  value: Weight;
-  statDelta: Partial<Record<Stat, number>>;
-};
-type Question = {
-  dimension: Dimension;
-  prompt: string;
-  artSrc: string;
-  artAlt: string;
-  options: readonly QuizOption[];
-};
-type Persona = {
-  name: string;
-  cn: string;
-  code: string;
-  mark: string;
-  roast: string;
-  artSrc: string;
-  artAlt: string;
-};
-type Scores = Record<Dimension, number>;
-type StatScores = Record<Stat, number>;
-type Outcome = {
-  persona: Persona;
-  poles: readonly [Pole, Pole, Pole];
-  rawScores: Scores;
-  stats: StatScores;
-  resultId: string;
-};
-type ResultSnapshot = {
-  version: 1;
-  resultId: string;
-  personaMark: string;
-  poles: readonly [Pole, Pole, Pole];
-  rawScores: Scores;
-  stats: StatScores;
-  rankBase?: number;
-};
-
-const QUESTIONS: readonly Question[] = [
-  {
-    dimension: "risk",
-    prompt: "A coin you do not own is up 40%. What do you do?",
-    artSrc: "/assets/waitlist/question-1.png",
-    artAlt: "A rising market visual climbing translucent steps",
-    options: [
-      { id: "A", label: "Buy now. Momentum rarely waits.", value: 2, statDelta: { conviction: 15 } },
-      { id: "B", label: "Start small and add if it holds.", value: 1, statDelta: { conviction: 10, instinct: 5 } },
-      { id: "C", label: "Set an entry and wait for my price.", value: -1, statDelta: { instinct: 10 } },
-      { id: "D", label: "Pass. Another setup will come.", value: -2, statDelta: { resilience: 10, instinct: 5 } },
-    ],
-  },
-  {
-    dimension: "risk",
-    prompt: "Your position moves 20% against you. What happens next?",
-    artSrc: "/assets/waitlist/question-2.png",
-    artAlt: "A falling red market line approaching a physical stop marker",
-    options: [
-      { id: "A", label: "Add immediately. The entry just got cheaper.", value: 2, statDelta: { conviction: 15 } },
-      { id: "B", label: "Give it more room before I decide.", value: 1, statDelta: { conviction: 10, resilience: 5 } },
-      { id: "C", label: "Reduce the position according to plan.", value: -1, statDelta: { resilience: 10, instinct: 5 } },
-      { id: "D", label: "Exit. The invalidation level did its job.", value: -2, statDelta: { resilience: 15 } },
-    ],
-  },
-  {
-    dimension: "basis",
-    prompt: "Before you enter, what makes the idea feel real?",
-    artSrc: "/assets/waitlist/question-3.png",
-    artAlt: "A magnifying lens inspecting wallet flows and market evidence",
-    options: [
-      { id: "A", label: "Wallet flows, data, and a clear invalidation.", value: 2, statDelta: { instinct: 15 } },
-      { id: "B", label: "A chart structure I can explain.", value: 1, statDelta: { instinct: 10, resilience: 5 } },
-      { id: "C", label: "The market mood and momentum feel right.", value: -1, statDelta: { conviction: 5, instinct: 5 } },
-      { id: "D", label: "A strong thesis that feels early.", value: -2, statDelta: { conviction: 10, instinct: 5 } },
-    ],
-  },
-  {
-    dimension: "basis",
-    prompt: "A trader you trust posts a new position. Your first move?",
-    artSrc: "/assets/waitlist/question-4.png",
-    artAlt: "A lens verifying two overlapping market evidence sheets",
-    options: [
-      { id: "A", label: "Verify the wallet, structure, and timing.", value: 2, statDelta: { instinct: 15 } },
-      { id: "B", label: "Check the chart before doing anything.", value: 1, statDelta: { instinct: 10, resilience: 5 } },
-      { id: "C", label: "Open a small starter and keep watching.", value: -1, statDelta: { conviction: 5, instinct: 5 } },
-      { id: "D", label: "Follow immediately. The source is the signal.", value: -2, statDelta: { conviction: 10 } },
-    ],
-  },
-  {
-    dimension: "mode",
-    prompt: "You catch a 10×. Who hears about it first?",
-    artSrc: "/assets/waitlist/question-5.png",
-    artAlt: "A winning chart on a phone surrounded by message tokens",
-    options: [
-      { id: "A", label: "Screenshot, group chat, X.", value: 2, statDelta: { conviction: 10 } },
-      { id: "B", label: "A close group that followed the trade.", value: 1, statDelta: { conviction: 5, resilience: 5 } },
-      { id: "C", label: "One person I trust.", value: -1, statDelta: { resilience: 5, instinct: 5 } },
-      { id: "D", label: "No one. The PnL is enough.", value: -2, statDelta: { resilience: 10, instinct: 5 } },
-    ],
-  },
-  {
-    dimension: "mode",
-    prompt: "The group disagrees with your trade. What changes?",
-    artSrc: "/assets/waitlist/question-6.png",
-    artAlt: "Four different directional choices surrounding one decision marker",
-    options: [
-      { id: "A", label: "We debate it, and I adjust if they are right.", value: 2, statDelta: { resilience: 5, instinct: 5 } },
-      { id: "B", label: "I listen, then make the final call.", value: 1, statDelta: { instinct: 10, resilience: 5 } },
-      { id: "C", label: "I note it, but keep the original plan.", value: -1, statDelta: { conviction: 5, resilience: 10 } },
-      { id: "D", label: "Nothing. I execute alone for a reason.", value: -2, statDelta: { conviction: 10, resilience: 5 } },
-    ],
-  },
-];
-
-const PERSONAS: Record<string, Persona> = {
-  "DEGEN|GUT|PACK": {
-    name: "The Liquidity Donor", cn: "送钱者", code: "APE", mark: "LQD",
-    roast: "You’re not trading. You’re funding the ecosystem.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/lqd-liquidity-donor.png",
-    artAlt: "The Liquidity Donor handing cash to a rising candlestick market",
-  },
-  "DEGEN|GUT|LONE": {
-    name: "The All-In Mystic", cn: "梭哈仙人", code: "WOLF", mark: "AIM",
-    roast: "Every all-in starts with enlightenment and ends with reincarnation.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/aim-all-in-mystic.png",
-    artAlt: "The All-In Mystic meditating beside an all-in stack of chips",
-  },
-  "DEGEN|DATA|PACK": {
-    name: "The Signal General", cn: "喊单军师", code: "PARROT", mark: "SIG",
-    roast: "Three hours of research. Two-word thesis: send it.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/sig-signal-general.png",
-    artAlt: "The Signal General directing followers from a chart-covered strategy table",
-  },
-  "DEGEN|DATA|LONE": {
-    name: "The Candle Prophet", cn: "K线教主", code: "FOX", mark: "CND",
-    roast: "You can chart every line except the one marking enough exposure.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/cnd-candle-prophet.png",
-    artAlt: "The Candle Prophet explaining charts beside an oversized position lever",
-  },
-  "SNIPER|GUT|PACK": {
-    name: "The Dip Ringleader", cn: "抄底带头大哥", code: "TURTLE", mark: "DIP",
-    roast: "You’re not buying the dip. You’re giving the downtrend a demo.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/dip-dip-ringleader.png",
-    artAlt: "The Dip Ringleader leading followers down a falling candlestick chart",
-  },
-  "SNIPER|GUT|LONE": {
-    name: "The Market Doctor", cn: "行情老中医", code: "BEAR", mark: "DOC",
-    roast: "Every symptom diagnosed. Every loss professionally explained.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/doc-market-doctor.png",
-    artAlt: "The Market Doctor listening to a candlestick chart with a stethoscope",
-  },
-  "SNIPER|DATA|PACK": {
-    name: "The Onchain Detective", cn: "链上侦探", code: "WHALE", mark: "CHN",
-    roast: "You know everyone’s position except, occasionally, your own.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/chn-onchain-detective.png",
-    artAlt: "The Onchain Detective tracing wallets while ignoring its own losing trade",
-  },
-  "SNIPER|DATA|LONE": {
-    name: "The Limit Sniper", cn: "潜伏狙击手", code: "CAT", mark: "LMT",
-    roast: "The limit order was perfect. Shame you two never met again.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/lmt-limit-sniper.png",
-    artAlt: "The Limit Sniper watching price turn just before reaching an entry line",
-  },
-  OWL: {
-    name: "The Risk Monk", cn: "风控大师", code: "OWL", mark: "RSK",
-    roast: "They study how to double once. You study how to stay in the game.",
-    artSrc: "/assets/waitlist/personas/ops-meme-v1/rsk-risk-monk.png",
-    artAlt: "The Risk Monk meditating safely inside a shield during market chaos",
-  },
-};
-
-const PERSONAS_BY_CODE = Object.values(PERSONAS).reduce<Record<string, Persona>>((index, persona) => {
-  index[persona.code] = persona;
-  index[persona.mark] = persona;
-  return index;
-}, {});
-
-const CHEMISTRY: Record<string, { best: string; rival: string }> = {
-  LQD: { best: "DIP", rival: "LMT" }, AIM: { best: "DOC", rival: "CHN" },
-  SIG: { best: "CHN", rival: "DOC" }, CND: { best: "LMT", rival: "DIP" },
-  DIP: { best: "LQD", rival: "CND" }, DOC: { best: "AIM", rival: "SIG" },
-  CHN: { best: "SIG", rival: "AIM" }, LMT: { best: "CND", rival: "LQD" },
-  RSK: { best: "CHN", rival: "LQD" },
-};
-
-const AXES: Record<Dimension, { negative: Pole; positive: Pole }> = {
-  risk: { negative: "SNIPER", positive: "DEGEN" },
-  basis: { negative: "GUT", positive: "DATA" },
-  mode: { negative: "LONE", positive: "PACK" },
-};
-const DEFAULT_ANSWERS = ["C", "D", "A", "A", "B", "B"] as const;
 const WAITLIST_URL = "https://smartx.io/waitlist/";
-const OTP_CODE = "824193";
-const SNAPSHOT_PREFIX = "smartx:waitlist-result:";
-const SESSION_RESULT_KEY = "smartx:waitlist-last-result";
-const SESSION_EMAIL_KEY = "smartx:waitlist-session-email";
-const EMAIL_RESULT_PREFIX = "smartx:waitlist-email-result:";
 const INVITES_PER_PAGE = 5;
-const PROTOTYPE_USED_INVITE_FRAGMENT = "N4Q8";
-const USED_INVITE_CODES = new Set(["SMARTX-RSK-USED"]);
-const LOCKED_INVITE_CODES = new Set(["SMARTX-RSK-LOCKED"]);
+const NO_SAVED_RESULT = "No saved result is linked to this email. Use an invite to take the test.";
+const GENERIC_ERROR = "Something went wrong. Please try again.";
+const RESERVE_EXPIRED = "Invite reservation expired. Reserve again.";
+const RESERVE_LIMIT = "Invite reservation time limit reached.";
+const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try again.";
+const INVITE_CLAIMED = "This invite has already been claimed. Ask for another one.";
+const RESERVE_CAP_HINT = "Your invite can’t be extended further. Finish the test to save it.";
+const RENEW_INTERVAL_MS = 90_000;
+const OTP_RESEND_SECONDS = 60;
+const OTP_EXPIRE_SECONDS = 300;
+const DEFAULT_COMMUNITY = {
+  telegram: "https://t.me/+CTeuBkpOxSNkN2Y0",
+  x: "https://x.com/SmartXTerminal",
+};
 
-function makeCodes(persona: Persona) {
-  const fragments = ["7X2K", "N4Q8", "M9R3", "K2V6", "F8P1", "C5T7", "Y3L9", "H6W4", "B1J8", "D7S2"];
-  return fragments.slice(0, persona.mark === "RSK" ? 10 : 5).map((fragment) => `SMARTX-${persona.mark}-${fragment}`);
+type Workspace =
+  | {
+      kind: "result";
+      outcome: Outcome;
+      rank: number;
+      shareCompleted: boolean;
+      invitations: InviteItem[];
+      links: { telegram: string; x: string };
+      telegramCompleted: boolean;
+      xCompleted: boolean;
+    }
+  | {
+      kind: "unlock";
+      links: { telegram: string; x: string };
+      telegramCompleted: boolean;
+      xCompleted: boolean;
+    };
+
+function buildQuizAnswers(questions: QuizQuestion[], answers: Record<string, string>) {
+  return Object.fromEntries(
+    questions
+      .map((question) => [question.questionId, answers[question.questionId]] as const)
+      .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
+  );
 }
 
-function makeLegacyCodes(persona: Persona) {
-  const fragments = ["7X2K", "N4Q8", "M9R3", "K2V6", "F8P1", "C5T7", "Y3L9", "H6W4", "B1J8", "D7S2"];
-  return fragments.slice(0, persona.code === "OWL" ? 10 : 5).map((fragment) => `SMARTX-${persona.code}-${fragment}`);
+function remainingSeconds(until: number, now: number) {
+  return Math.max(0, Math.ceil((until - now) / 1000));
 }
 
-const VALID_INVITE_CODES = new Set([
-  "123456",
-  ...Object.values(PERSONAS).flatMap((persona) => [...makeCodes(persona), ...makeLegacyCodes(persona)]),
-]);
-
-function getInviteError(code: string) {
-  if (USED_INVITE_CODES.has(code)) return "This invite has already been claimed. Ask for another one.";
-  if (LOCKED_INVITE_CODES.has(code)) return "This invite is being used in another session. Try again in 2 minutes.";
-  if (!VALID_INVITE_CODES.has(code)) return "Invite code not recognized. Check the code and try again.";
-  return "";
+function formatClock(total: number) {
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-function hashValue(value: string) {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36).toUpperCase().padStart(7, "0");
+function errorMessage(error: unknown) {
+  if (isWaitlistApiError(error)) return error.message || GENERIC_ERROR;
+  return GENERIC_ERROR;
 }
 
-function makeResultId(answerIds: readonly string[], identity: string) {
-  return `SX-${hashValue(`${answerIds.join("")}:${identity.trim().toLowerCase() || "prototype"}`)}`;
+function isUnauthorized(error: unknown) {
+  return isWaitlistApiError(error) && error.code === 401;
 }
 
-function makeEmailResultKey(email: string) {
-  return `${EMAIL_RESULT_PREFIX}${hashValue(email.trim().toLowerCase())}`;
-}
-
-function resolveOutcome(answerIds: readonly string[], identity = ""): Outcome {
-  const normalized = QUESTIONS.map((question, index) => question.options.find((option) => option.id === answerIds[index]) ?? question.options[0]);
-  const rawScores: Scores = { risk: 0, basis: 0, mode: 0 };
-  const stats: StatScores = { conviction: 30, instinct: 30, resilience: 30 };
-  normalized.forEach((option, index) => {
-    rawScores[QUESTIONS[index].dimension] += option.value;
-    Object.entries(option.statDelta).forEach(([stat, delta]) => { stats[stat as Stat] += delta; });
-  });
-  Object.keys(stats).forEach((stat) => { stats[stat as Stat] = Math.max(5, Math.min(99, stats[stat as Stat])); });
-
-  const resolvePole = (dimension: Dimension): Pole => {
-    if (rawScores[dimension] > 0) return AXES[dimension].positive;
-    if (rawScores[dimension] < 0) return AXES[dimension].negative;
-    const lastIndex = QUESTIONS.findLastIndex((question) => question.dimension === dimension);
-    return normalized[lastIndex].value > 0 ? AXES[dimension].positive : AXES[dimension].negative;
-  };
-
-  const poles = [resolvePole("risk"), resolvePole("basis"), resolvePole("mode")] as const;
-  const isRiskMonk = rawScores.risk === -4 && Math.abs(rawScores.basis) !== 4 && Math.abs(rawScores.mode) !== 4;
-  const persona = isRiskMonk ? PERSONAS.OWL : PERSONAS[poles.join("|")];
-  return { persona, poles, rawScores, stats, resultId: makeResultId(answerIds, identity) };
-}
-
-function makeRank(email: string) {
-  const seed = [...email].reduce((sum, character) => sum + character.charCodeAt(0), 0);
-  return 7_900 + (seed % 1_800);
+function shouldPurgeOnUserApiError(error: unknown) {
+  if (isUnauthorized(error)) return true;
+  if (isUserInfoError(error)) return true;
+  if (isUserApiError(error) && isMissingUserError(error)) return true;
+  return isUserApiError(error) && error.code === 500;
 }
 
 function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = false) {
@@ -297,65 +129,67 @@ function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = 
   return url.toString();
 }
 
-function createSnapshot(outcome: Outcome, rankBase?: number): ResultSnapshot {
-  return {
-    version: 1, resultId: outcome.resultId, personaMark: outcome.persona.mark,
-    poles: outcome.poles, rawScores: outcome.rawScores, stats: outcome.stats, rankBase,
+function reservationToken(data: { sessionToken?: string; token?: string } | null | undefined) {
+  return (data?.sessionToken || data?.token || "").trim();
+}
+
+function publicShareCard(data: { hidden?: boolean; card?: ResultCard | null } | null) {
+  if (!data || data.hidden || !data.card) return null;
+  return data.card;
+}
+
+async function fetchWorkspace(token: string): Promise<Workspace> {
+  const [result, community] = await Promise.all([
+    waitlistApi.getMyResult(token),
+    waitlistApi.getCommunityInfo(token),
+  ]);
+  const links = {
+    telegram: community.links?.telegram || DEFAULT_COMMUNITY.telegram,
+    x: community.links?.x || DEFAULT_COMMUNITY.x,
   };
-}
+  const telegramCompleted = community.telegramCompleted === 1;
+  const xCompleted = community.xCompleted === 1;
 
-function parseSnapshot(value: string | null): ResultSnapshot | null {
-  if (!value) return null;
-  try {
-    const snapshot = JSON.parse(value) as Partial<ResultSnapshot>;
-    if (
-      snapshot.version !== 1
-      || !snapshot.resultId
-      || !snapshot.personaMark
-      || !snapshot.poles
-      || !snapshot.rawScores
-      || !snapshot.stats
-    ) return null;
-    return snapshot as ResultSnapshot;
-  } catch {
-    return null;
+  const toResultWorkspace = async (card: ResultCard & { rank: number; shareCompleted: number }) => {
+    const invites = await waitlistApi.getMyInvites(token);
+    return {
+      kind: "result" as const,
+      outcome: mapCardToOutcome(card),
+      rank: card.rank,
+      shareCompleted: card.shareCompleted === 1,
+      invitations: invites.list,
+      links,
+      telegramCompleted,
+      xCompleted,
+    };
+  };
+
+  if (isUnlockedResult(result)) return toResultWorkspace(result);
+
+  if (telegramCompleted && xCompleted) {
+    const retry = await waitlistApi.getMyResult(token);
+    if (isUnlockedResult(retry)) return toResultWorkspace(retry);
   }
-}
 
-function restoreOutcome(snapshot: ResultSnapshot | null): Outcome | null {
-  if (!snapshot) return null;
-  const persona = PERSONAS_BY_CODE[snapshot.personaMark];
-  return persona ? { ...snapshot, persona } : null;
+  return { kind: "unlock", links, telegramCompleted, xCompleted };
 }
 
 function Brand() {
   return (
     <span className={styles.brand}>
-      <Image
-        src="/assets/consumer-network/logo-white.svg"
-        alt=""
-        width={34}
-        height={28}
-      />
+      <Image src="/assets/consumer-network/logo-white.svg" alt="" width={34} height={28} />
       <span>SmartX</span>
     </span>
   );
 }
 
-function QuestionArtwork({ question }: { question: Question }) {
+function QuestionArtwork({ question }: { question: QuizQuestion }) {
   return (
     <div className={styles.questionArtwork}>
       <Image src={question.artSrc} alt={question.artAlt} fill sizes="(max-width: 860px) 90vw, 540px" priority />
     </div>
   );
 }
-
-type PersonaPosterProps = {
-  outcome: Outcome;
-  preparedCards?: Partial<Record<ResultCardFormat, RenderedResultCard>>;
-  exportError?: boolean;
-  preview?: boolean;
-};
 
 function ScoreAxis({ label, score }: { label: string; score: number }) {
   return (
@@ -366,11 +200,41 @@ function ScoreAxis({ label, score }: { label: string; score: number }) {
   );
 }
 
-function PersonaPoster({ outcome, preparedCards, exportError, preview = false }: PersonaPosterProps) {
-  const chemistry = CHEMISTRY[outcome.persona.mark];
-  const bestMatch = PERSONAS_BY_CODE[chemistry.best];
-  const rival = PERSONAS_BY_CODE[chemistry.rival];
+function AccountSession({
+  email,
+  label,
+  compact,
+  place,
+  onSignOut,
+}: {
+  email: string;
+  label: string;
+  compact?: boolean;
+  place?: "copy" | "scene";
+  onSignOut: () => void;
+}) {
+  return (
+    <div className={styles.accountStrip} data-compact={compact ? "true" : undefined} data-place={place}>
+      <div>
+        <span>{label}</span>
+        <strong>{email || "Email verified"}</strong>
+      </div>
+      <WaitlistButton type="button" onClick={onSignOut}>Sign out</WaitlistButton>
+    </div>
+  );
+}
 
+function PersonaPoster({
+  outcome,
+  preparedCards,
+  exportError,
+  preview = false,
+}: {
+  outcome: Outcome;
+  preparedCards?: Partial<Record<ResultCardFormat, RenderedResultCard>>;
+  exportError?: boolean;
+  preview?: boolean;
+}) {
   return (
     <article className={styles.personaPoster} data-preview={preview}>
       {preview && (
@@ -383,7 +247,6 @@ function PersonaPoster({ outcome, preparedCards, exportError, preview = false }:
       <div className={styles.posterIdentity}>
         <span>{outcome.poles.join(" · ")}</span>
         <h2>{outcome.persona.name}</h2>
-        <p>{outcome.persona.cn}</p>
       </div>
       <div className={styles.personaArt}>
         <Image
@@ -399,10 +262,10 @@ function PersonaPoster({ outcome, preparedCards, exportError, preview = false }:
         <ScoreAxis label="Instinct" score={outcome.stats.instinct} />
         <ScoreAxis label="Resilience" score={outcome.stats.resilience} />
       </div>
-      <blockquote>“{outcome.persona.roast}”</blockquote>
+      {outcome.persona.roast ? <blockquote>“{outcome.persona.roast}”</blockquote> : null}
       <section className={styles.chemistryBlock} aria-label="Persona chemistry">
-        <div><span>Best match</span><strong>{bestMatch.name}</strong><small>{bestMatch.cn}</small></div>
-        <div><span>Natural rival</span><strong>{rival.name}</strong><small>{rival.cn}</small></div>
+        <div><span>Best match</span><strong>{outcome.bestMatch.name}</strong></div>
+        <div><span>Natural rival</span><strong>{outcome.rival.name}</strong></div>
       </section>
       {!preview && (
         <section className={styles.cardDownloads} aria-label="Download result card">
@@ -418,146 +281,421 @@ function PersonaPoster({ outcome, preparedCards, exportError, preview = false }:
 }
 
 export function WaitlistExperience() {
-  const [stage, setStage] = useState<Stage>("gate");
+  const router = useRouter();
+  const pathname = usePathname();
+  const shareParams = useSearchParams();
+  const routerRef = useRef(router);
+  routerRef.current = router;
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
+  const [stage, setStage] = useState<WaitlistStage>("boot");
   const [inviteCode, setInviteCode] = useState("");
   const [gateError, setGateError] = useState("");
-  const [referralSnapshot, setReferralSnapshot] = useState<ResultSnapshot | null>(null);
-  const [savedResultSnapshot, setSavedResultSnapshot] = useState<ResultSnapshot | null>(null);
-  const [viewingSavedResult, setViewingSavedResult] = useState(false);
+  const [showInviteSwitch, setShowInviteSwitch] = useState(false);
+  const [referralOutcome, setReferralOutcome] = useState<Outcome | null>(null);
+  const [ownOutcome, setOwnOutcome] = useState<Outcome | null>(null);
+  const [userToken, setUserTokenState] = useState("");
+  const [sessionToken, setSessionTokenState] = useState("");
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [authIntent, setAuthIntent] = useState<AuthIntent>("create");
   const [email, setEmail] = useState("");
   const [sessionEmail, setSessionEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [otpResent, setOtpResent] = useState(false);
+  const [otpResendAt, setOtpResendAt] = useState(0);
+  const [otpExpireAt, setOtpExpireAt] = useState(0);
+  const [nowMs, setNowMs] = useState(0);
   const [recoveryError, setRecoveryError] = useState("");
   const [telegramOpened, setTelegramOpened] = useState(false);
   const [xOpened, setXOpened] = useState(false);
+  const [communityLinks, setCommunityLinks] = useState(DEFAULT_COMMUNITY);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [answerIds, setAnswerIds] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
+  const inviteCodeRef = useRef(inviteCode);
+  inviteCodeRef.current = inviteCode;
+  const renewalCappedRef = useRef(false);
+  const [reserveWarning, setReserveWarning] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const [shared, setShared] = useState(false);
+  const [shareCompleted, setShareCompleted] = useState(false);
   const [invitePage, setInvitePage] = useState(0);
+  const [invitations, setInvitations] = useState<InviteItem[]>([]);
+  const [rank, setRank] = useState<number | null>(null);
   const [preparedCards, setPreparedCards] = useState<Partial<Record<ResultCardFormat, RenderedResultCard>>>({});
   const [exportError, setExportError] = useState(false);
 
-  const outcome = useMemo(() => {
-    const completeAnswers = answerIds.length === QUESTIONS.length ? answerIds : DEFAULT_ANSWERS;
-    return resolveOutcome(completeAnswers, email || inviteCode);
-  }, [answerIds, email, inviteCode]);
-
-  const referralOutcome = useMemo(() => restoreOutcome(referralSnapshot), [referralSnapshot]);
-  const savedOutcome = useMemo(() => restoreOutcome(savedResultSnapshot), [savedResultSnapshot]);
-  const resultOutcome = viewingSavedResult && savedOutcome ? savedOutcome : outcome;
-
-  const codes = useMemo(() => makeCodes(resultOutcome.persona), [resultOutcome.persona]);
-  const invitations = useMemo(() => codes
-    .map((code, index) => ({ code, index, used: code.endsWith(`-${PROTOTYPE_USED_INVITE_FRAGMENT}`) }))
-    .sort((left, right) => Number(left.used) - Number(right.used)), [codes]);
-  const invitePageCount = Math.ceil(invitations.length / INVITES_PER_PAGE);
+  const loggedIn = Boolean(userToken && userInfo);
+  const hasOwnResult = isOwnResultAvailable({ loggedIn, submitted: Boolean(userInfo?.submitted && userInfo.resultId) });
+  const inviteReady = isValidInviteCode(inviteCode);
+  const savedPersonaName = ownOutcome?.persona.name ?? PERSONAS_BY_CODE[userInfo?.personaId ?? ""]?.name ?? "your trader type";
+  const currentQuestion = questions[questionIndex];
+  const invitePageCount = Math.max(1, Math.ceil(invitations.length / INVITES_PER_PAGE));
   const visibleInvitations = invitations.slice(invitePage * INVITES_PER_PAGE, (invitePage + 1) * INVITES_PER_PAGE);
-  const rankIdentity = viewingSavedResult ? resultOutcome.resultId : email;
-  const baseRank = useMemo(
-    () => (viewingSavedResult && savedResultSnapshot?.rankBase !== undefined ? savedResultSnapshot.rankBase : makeRank(rankIdentity)),
-    [rankIdentity, savedResultSnapshot?.rankBase, viewingSavedResult],
-  );
-  const rank = Math.max(1, baseRank - (shared ? 137 : 0));
-  const chemistry = CHEMISTRY[resultOutcome.persona.mark];
-  const bestMatch = PERSONAS_BY_CODE[chemistry.best];
-  const rival = PERSONAS_BY_CODE[chemistry.rival];
+  const verifiedEmail = userInfo?.email || sessionEmail || email;
+  const clock = nowMs || (otpExpireAt || otpResendAt ? Date.now() : 0);
+  const otpCooldown = otpResendAt ? remainingSeconds(otpResendAt, clock) : 0;
+  const otpExpiresIn = otpExpireAt ? remainingSeconds(otpExpireAt, clock) : 0;
+
+  const clearShareUrl = (options?: { hard?: boolean; notice?: string }) => {
+    if (typeof window === "undefined") return;
+    const dirty = shareQueryPresent() || Boolean(shareParams.get("result") || shareParams.get("invite"));
+    const next = waitlistPathWithoutShare();
+    if (!dirty) {
+      if (options?.notice) setGateError(options.notice);
+      return;
+    }
+    if (options?.hard) {
+      if (options.notice) rememberWaitlistNotice(options.notice);
+      window.location.replace(next);
+      return;
+    }
+    window.history.replaceState(window.history.state, "", next);
+    routerRef.current.replace(next || pathnameRef.current, { scroll: false });
+  };
+
+  const applyWorkspace = (workspace: Workspace) => {
+    setCommunityLinks(workspace.links);
+    setTelegramOpened(workspace.telegramCompleted);
+    setXOpened(workspace.xCompleted);
+    if (workspace.kind === "result") {
+      setOwnOutcome(workspace.outcome);
+      setRank(workspace.rank);
+      setShareCompleted(workspace.shareCompleted);
+      setInvitations(workspace.invitations);
+      setInvitePage(0);
+      setStage("result");
+      return;
+    }
+    setStage("unlock");
+  };
+
+  const persistReservation = (reserved: { sessionToken?: string; token?: string; inviteCode?: string }) => {
+    const token = reservationToken(reserved);
+    const code = normalizeInviteCode(reserved.inviteCode || inviteCodeRef.current);
+    if (!token || !isValidInviteCode(code)) return false;
+    setQuizSession({ sessionToken: token, inviteCode: code });
+    setSessionTokenState(token);
+    setInviteCode(code);
+    return true;
+  };
+
+  const dropReservation = () => {
+    clearQuizSession();
+    setSessionTokenState("");
+  };
+
+  const resetAuth = () => {
+    clearWaitlistSession();
+    setUserTokenState("");
+    setSessionTokenState("");
+    setUserInfo(null);
+    setOwnOutcome(null);
+    setInvitations([]);
+    setRank(null);
+    setShareCompleted(false);
+    setSessionEmail("");
+    setEmail("");
+    setOtp("");
+    setTelegramOpened(false);
+    setXOpened(false);
+    setAnswers({});
+    setQuestionIndex(0);
+  };
+
+  const purgeWaitlistClient = (notice = "") => {
+    resetAuth();
+    setReferralOutcome(null);
+    setInviteCode("");
+    setGateError(notice);
+    setShowInviteSwitch(false);
+    setReserveWarning("");
+    setPreparedCards({});
+    setExportError(false);
+    setAuthIntent("create");
+    setOtpError("");
+    setRecoveryError("");
+    clearShareUrl({ hard: shareQueryPresent(), notice });
+    setStage("gate");
+  };
+
+  const handleUserApiError = (error: unknown) => {
+    if (!shouldPurgeOnUserApiError(error)) return false;
+    purgeWaitlistClient(errorMessage(error));
+    return true;
+  };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("invite")?.trim().toUpperCase();
-    const resultId = params.get("result")?.trim();
-    const savedResultId = window.localStorage.getItem(SESSION_RESULT_KEY);
-    const savedSessionEmail = window.localStorage.getItem(SESSION_EMAIL_KEY) ?? "";
-    let hasSavedResult = false;
+    let cancelled = false;
 
-    if (savedResultId) {
-      const savedSnapshot = parseSnapshot(window.localStorage.getItem(`${SNAPSHOT_PREFIX}${savedResultId}`));
-      if (savedSnapshot && restoreOutcome(savedSnapshot)) {
-        setSavedResultSnapshot(savedSnapshot);
-        setSessionEmail(savedSessionEmail);
-        hasSavedResult = true;
-        if (!resultId) {
-          setViewingSavedResult(true);
-          setStage("result");
-        }
-      } else {
-        window.localStorage.removeItem(SESSION_RESULT_KEY);
-        window.localStorage.removeItem(SESSION_EMAIL_KEY);
+    async function bootstrap() {
+      const pendingNotice = takeWaitlistNotice();
+      if (pendingNotice) setGateError(pendingNotice);
+
+      const params = new URLSearchParams(window.location.search);
+      const resultId = params.get("result")?.trim() ?? "";
+      const urlInviteRaw = (params.get("invite") ?? "").trim();
+      const urlInvite = normalizeInviteCode(urlInviteRaw);
+      const shareEntry = Boolean(resultId || urlInviteRaw);
+      const storedUserToken = getUserToken();
+      const storedSession = getQuizSession();
+      const quizDraft = getQuizDraft();
+
+      let invite = urlInvite;
+      if (urlInvite && storedSession?.inviteCode && storedSession.inviteCode !== urlInvite) {
+        clearQuizSession();
+      } else if (urlInvite && storedSession?.sessionToken && !storedSession.inviteCode) {
+        setQuizSession({ sessionToken: storedSession.sessionToken, inviteCode: urlInvite });
+      } else if (!urlInvite && storedSession?.inviteCode) {
+        invite = storedSession.inviteCode;
       }
+
+      if (invite) setInviteCode(invite);
+      const matchingSession = getSessionTokenForInvite(invite);
+      if (matchingSession) setSessionTokenState(matchingSession);
+      if (quizDraft) {
+        setAnswers(quizDraft.answers);
+        setQuestionIndex(quizDraft.questionIndex);
+      }
+
+      const resumeInProgress = Boolean(matchingSession) && !storedUserToken;
+      const [questionsResult, infoResult, publicResult, inviteCardResult, inviteStatusResult] = await Promise.allSettled([
+        waitlistApi.getQuestions().then((data) => hydrateQuestions(data.questions)),
+        storedUserToken ? waitlistApi.getUserInfo(storedUserToken) : Promise.resolve(null),
+        resultId && !resumeInProgress ? waitlistApi.getPublicResult(resultId) : Promise.resolve(null),
+        shareEntry && isValidInviteCode(urlInvite) && !resumeInProgress ? waitlistApi.getInviterCard(urlInvite) : Promise.resolve(null),
+        shareEntry && isValidInviteCode(urlInvite) && !resumeInProgress ? waitlistApi.checkInvite(urlInvite) : Promise.resolve(null),
+      ]);
+
+      if (cancelled) return;
+
+      if (questionsResult.status === "fulfilled") setQuestions(questionsResult.value);
+
+      let info: UserInfo | null = null;
+      if (infoResult.status === "fulfilled") {
+        info = infoResult.value;
+      } else if (storedUserToken) {
+        purgeWaitlistClient(errorMessage(infoResult.reason));
+        return;
+      }
+
+      if (info && storedUserToken) {
+        setUserTokenState(storedUserToken);
+        setUserInfo(info);
+        setSessionEmail(info.email);
+        clearQuizSession();
+        setSessionTokenState("");
+      }
+
+      if (publicResult.status === "rejected") {
+        clearShareUrl({
+          hard: true,
+          notice: errorMessage(publicResult.reason),
+        });
+        setStage("gate");
+        return;
+      }
+
+      const friendCard =
+        (publicResult.status === "fulfilled" ? publicShareCard(publicResult.value) : null) ??
+        (inviteCardResult.status === "fulfilled" ? inviteCardResult.value : null);
+      if (friendCard) setReferralOutcome(mapCardToOutcome(friendCard));
+
+      if (friendCard && !isValidInviteCode(invite)) setShowInviteSwitch(true);
+
+      const inviteView = inviteStatusResult.status === "fulfilled" ? inviteStatusResult.value : null;
+      const ownReservation = Boolean(matchingSession) && inviteView?.status === 1;
+      const resumeSession = Boolean(matchingSession) && !(info?.submitted && info.resultId) && (inviteView?.status === 0 || inviteView?.status === 1 || !inviteView);
+
+      if (inviteStatusResult.status === "rejected") {
+        setGateError(errorMessage(inviteStatusResult.reason));
+        if (friendCard) setShowInviteSwitch(true);
+      } else if (inviteView && inviteView.status !== 0 && !ownReservation) {
+        setGateError(inviteView.message);
+        if (matchingSession && (inviteView.status === 2 || inviteView.status === 3)) dropReservation();
+        if (friendCard) setShowInviteSwitch(true);
+      }
+
+      const route = decideWaitlistEntry({
+        hasFriendCard: Boolean(friendCard),
+        loggedIn: Boolean(info && storedUserToken),
+        submitted: Boolean(info?.submitted && info.resultId),
+        unlocked: Boolean(info?.unlocked),
+        hasQuizSession: resumeSession,
+      });
+
+      if ((route.stage === "result" || route.stage === "unlock") && storedUserToken) {
+        try {
+          applyWorkspace(await fetchWorkspace(storedUserToken));
+        } catch (error) {
+          if (!handleUserApiError(error)) {
+            setGateError(errorMessage(error));
+            setStage("gate");
+          }
+        }
+        return;
+      }
+
+      if (route.stage === "quiz" && questionsResult.status !== "fulfilled") {
+        setGateError(errorMessage(questionsResult.reason));
+        setStage("gate");
+        return;
+      }
+
+      if (route.stage === "quiz") clearShareUrl();
+      setStage(route.stage);
     }
 
-    if (resultId) {
-      const stored = window.localStorage.getItem(`${SNAPSHOT_PREFIX}${resultId}`);
-      if (stored) {
-        const parsed = parseSnapshot(stored);
-        if (parsed && restoreOutcome(parsed)) setReferralSnapshot(parsed);
-        else window.localStorage.removeItem(`${SNAPSHOT_PREFIX}${resultId}`);
-      } else {
-        const legacyPersona = PERSONAS_BY_CODE[resultId.toUpperCase()];
-        if (legacyPersona) {
-          const fallback = resolveOutcome(DEFAULT_ANSWERS, resultId);
-          setReferralSnapshot({ ...createSnapshot(fallback), resultId, personaMark: legacyPersona.mark });
-        }
+    bootstrap().catch(() => {
+      if (!cancelled) {
+        setGateError(GENERIC_ERROR);
+        setStage("gate");
       }
-    }
-    if (!code) return;
-    setInviteCode(code);
-    const inviteError = getInviteError(code);
-    if (inviteError) { setGateError(inviteError); return; }
-    if (!resultId && !hasSavedResult) setStage("quiz");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only bootstrap
   }, []);
 
   useEffect(() => {
-    if (stage !== "result" || viewingSavedResult) return;
-    const snapshot = createSnapshot(outcome, makeRank(email));
-    window.localStorage.setItem(`${SNAPSHOT_PREFIX}${outcome.resultId}`, JSON.stringify(snapshot));
-    window.localStorage.setItem(SESSION_RESULT_KEY, outcome.resultId);
-    if (email) {
-      window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
-      window.localStorage.setItem(makeEmailResultKey(email), outcome.resultId);
-      setSessionEmail(email.trim().toLowerCase());
-    }
-    setSavedResultSnapshot(snapshot);
-  }, [stage, outcome, viewingSavedResult, email]);
+    if (stage !== "verify") return;
+    setNowMs(Date.now());
+    const timer = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [stage]);
 
   useEffect(() => {
-    if (stage !== "result") return;
+    if (stage !== "quiz" && stage !== "email" && stage !== "verify") return;
+    setQuizDraft({ answers, questionIndex });
+  }, [answers, questionIndex, stage]);
+
+  const syncReservation = async () => {
+    const code = inviteCodeRef.current;
+    if (!isValidInviteCode(code) || renewalCappedRef.current) return;
+    try {
+      const renewed = await waitlistApi.renewReserve(code);
+      if (reservationToken(renewed)) persistReservation({ ...renewed, inviteCode: code });
+      setReserveWarning("");
+    } catch (error) {
+      if (isWaitlistApiError(error) && error.message === RESERVE_LIMIT) {
+        renewalCappedRef.current = true;
+        setReserveWarning(RESERVE_CAP_HINT);
+        return;
+      }
+      if (isWaitlistApiError(error) && error.message === RESERVE_EXPIRED) {
+        try {
+          persistReservation({ ...(await waitlistApi.reserveInvite(code)), inviteCode: code });
+          setReserveWarning("");
+        } catch (reserveError) {
+          dropReservation();
+          setReserveWarning(errorMessage(reserveError));
+        }
+        return;
+      }
+      setReserveWarning(errorMessage(error));
+    }
+  };
+  const syncReservationRef = useRef(syncReservation);
+  syncReservationRef.current = syncReservation;
+
+  useEffect(() => {
+    if (stage !== "quiz") return;
+    const timer = window.setInterval(() => {
+      void syncReservationRef.current();
+    }, RENEW_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage !== "result" || !ownOutcome) return;
     let disposed = false;
     let rendered: RenderedResultCard[] = [];
     setPreparedCards({});
     setExportError(false);
     const data = {
-      ...resultOutcome.persona,
-      code: resultOutcome.persona.mark,
-      poles: resultOutcome.poles,
-      scores: resultOutcome.stats,
-      bestMatch: { name: bestMatch.name, cn: bestMatch.cn },
-      rival: { name: rival.name, cn: rival.cn },
+      ...ownOutcome.persona,
+      code: ownOutcome.persona.mark,
+      poles: ownOutcome.poles,
+      scores: ownOutcome.stats,
+      bestMatch: { name: ownOutcome.bestMatch.name, cn: ownOutcome.bestMatch.cn },
+      rival: { name: ownOutcome.rival.name, cn: ownOutcome.rival.cn },
     };
     Promise.all([renderResultCard(data, "story"), renderResultCard(data, "og")])
       .then((cards) => {
         rendered = cards;
-        if (disposed) { cards.forEach((card) => URL.revokeObjectURL(card.href)); return; }
+        if (disposed) {
+          cards.forEach((card) => URL.revokeObjectURL(card.href));
+          return;
+        }
         setPreparedCards({ story: cards[0], og: cards[1] });
       })
-      .catch(() => { if (!disposed) setExportError(true); });
-    return () => { disposed = true; rendered.forEach((card) => URL.revokeObjectURL(card.href)); };
-  }, [stage, resultOutcome, bestMatch, rival]);
+      .catch(() => {
+        if (!disposed) setExportError(true);
+      });
+    return () => {
+      disposed = true;
+      rendered.forEach((card) => URL.revokeObjectURL(card.href));
+    };
+  }, [stage, ownOutcome]);
 
-  const beginQuiz = () => {
-    setAuthIntent("create");
-    setViewingSavedResult(false);
-    setRecoveryError("");
-    setGateError("");
-    setQuestionIndex(0);
-    setAnswerIds([]);
-    setStage("quiz");
+  const ensureQuestions = async () => {
+    if (questions.length) return questions;
+    const data = await waitlistApi.getQuestions();
+    const next = hydrateQuestions(data.questions);
+    setQuestions(next);
+    return next;
   };
+
+  const startQuiz = async (options: { reserve: boolean }) => {
+    if (options.reserve && !isValidInviteCode(inviteCode)) return;
+    setGateError("");
+    setReserveWarning("");
+    renewalCappedRef.current = false;
+    try {
+      await ensureQuestions();
+      if (options.reserve) {
+        const existingSession = getSessionTokenForInvite(inviteCode);
+        if (existingSession) {
+          persistReservation({ sessionToken: existingSession, inviteCode });
+        } else {
+          try {
+            const reserved = await waitlistApi.reserveInvite(inviteCode);
+            if (!persistReservation({ ...reserved, inviteCode })) {
+              dropReservation();
+              throw new Error(GENERIC_ERROR);
+            }
+          } catch (error) {
+            dropReservation();
+            throw error;
+          }
+        }
+      }
+      setAuthIntent("create");
+      const draft = getQuizDraft();
+      if (!draft || !Object.keys(draft.answers).length) {
+        setQuestionIndex(0);
+        setAnswers({});
+      } else {
+        setAnswers(draft.answers);
+        setQuestionIndex(draft.questionIndex);
+      }
+      clearShareUrl();
+      setStage("quiz");
+    } catch (error) {
+      setGateError(errorMessage(error));
+      if (referralOutcome) setShowInviteSwitch(true);
+    }
+  };
+
+  const beginFromReferral = () => {
+    if (loggedIn && !hasOwnResult) return startQuiz({ reserve: false });
+    return startQuiz({ reserve: true });
+  };
+
   const beginResultRecovery = () => {
     setAuthIntent("recover");
     setEmail("");
@@ -566,133 +704,325 @@ export function WaitlistExperience() {
     setRecoveryError("");
     setStage("email");
   };
-  const viewSavedResult = () => {
-    if (!savedOutcome) return;
-    setViewingSavedResult(true);
-    setShared(false);
-    setCopiedCode(null);
-    setInvitePage(0);
-    setStage("result");
+
+  const viewSavedResult = async () => {
+    if (!userToken) return;
+    try {
+      applyWorkspace(await fetchWorkspace(userToken));
+    } catch (error) {
+      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+    }
   };
+
   const signOutWaitlist = () => {
-    window.localStorage.removeItem(SESSION_RESULT_KEY);
-    window.localStorage.removeItem(SESSION_EMAIL_KEY);
-    setSavedResultSnapshot(null);
-    setViewingSavedResult(false);
-    setSessionEmail("");
-    setEmail("");
-    setEmailVerified(false);
-    setTelegramOpened(false);
-    setXOpened(false);
-    setShared(false);
+    resetAuth();
     setStage("gate");
   };
-  const submitGate = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const normalizedCode = inviteCode.trim().toUpperCase();
-    const inviteError = getInviteError(normalizedCode);
-    if (inviteError) { setGateError(inviteError); return; }
-    setInviteCode(normalizedCode);
-    beginQuiz();
+
+  const submitEmail = async () => {
+    setRecoveryError("");
+    setOtpError("");
+    try {
+      await waitlistApi.sendEmailCode(email);
+      setOtp("");
+      setOtpResent(false);
+      const now = Date.now();
+      setNowMs(now);
+      setOtpResendAt(now + OTP_RESEND_SECONDS * 1000);
+      setOtpExpireAt(now + OTP_EXPIRE_SECONDS * 1000);
+      setStage("verify");
+    } catch (error) {
+      setRecoveryError(errorMessage(error));
+    }
   };
-  const beginFromReferral = () => {
-    const normalizedCode = inviteCode.trim().toUpperCase();
-    const inviteError = getInviteError(normalizedCode);
-    if (inviteError) { setGateError(inviteError); return; }
-    beginQuiz();
+
+  const resendCode = async () => {
+    if (otpCooldown > 0) return;
+    try {
+      await waitlistApi.sendEmailCode(email);
+      setOtpResent(true);
+      setOtpError("");
+      const now = Date.now();
+      setNowMs(now);
+      setOtpResendAt(now + OTP_RESEND_SECONDS * 1000);
+      setOtpExpireAt(now + OTP_EXPIRE_SECONDS * 1000);
+    } catch (error) {
+      setOtpError(errorMessage(error));
+    }
   };
-  const clearReferral = () => { setReferralSnapshot(null); setInviteCode(""); setGateError(""); window.history.replaceState({}, "", "/waitlist/"); };
-  const submitEmail = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setOtp(""); setOtpError(""); setOtpResent(false); setRecoveryError(""); setStage("verify"); };
-  const submitOtp = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (otp !== OTP_CODE) { setOtpError("That code does not match. Check the six digits and try again."); return; }
-    const existingResultId = window.localStorage.getItem(makeEmailResultKey(email));
-    if (existingResultId) {
-      const existingSnapshot = parseSnapshot(window.localStorage.getItem(`${SNAPSHOT_PREFIX}${existingResultId}`));
-      if (existingSnapshot && restoreOutcome(existingSnapshot)) {
-        window.localStorage.setItem(SESSION_RESULT_KEY, existingSnapshot.resultId);
-        window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
-        setSavedResultSnapshot(existingSnapshot);
-        setViewingSavedResult(true);
-        setSessionEmail(email.trim().toLowerCase());
-        setEmailVerified(true);
-        setOtpError("");
-        setShared(false);
-        setInvitePage(0);
-        setStage("result");
+
+  const enterAfterLogin = async (token: string, intent: AuthIntent, isNewUser: boolean, resultId: string) => {
+    setUserToken(token);
+    setUserTokenState(token);
+    setSessionTokenState("");
+    if (intent === "recover") {
+      if (isNewUser || !resultId) {
+        resetAuth();
+        setRecoveryError(NO_SAVED_RESULT);
+        setStage("email");
         return;
       }
-      window.localStorage.removeItem(makeEmailResultKey(email));
-    }
-    if (authIntent === "recover") {
-      setOtp("");
-      setRecoveryError("No saved result is linked to this email. Use an invite to take the test.");
-      setStage("email");
+      const info = await waitlistApi.getUserInfo(token);
+      setUserInfo(info);
+      setSessionEmail(info.email);
+      clearQuizDraft();
+      applyWorkspace(await fetchWorkspace(token));
       return;
     }
-    window.localStorage.setItem(SESSION_EMAIL_KEY, email.trim().toLowerCase());
-    setSessionEmail(email.trim().toLowerCase());
-    setOtpError(""); setTelegramOpened(false); setXOpened(false); setCopiedCode(null); setShared(false); setInvitePage(0); setEmailVerified(true); setStage("unlock");
+
+    if (!isNewUser) {
+      const info = await waitlistApi.getUserInfo(token);
+      setUserInfo(info);
+      setSessionEmail(info.email);
+      clearQuizDraft();
+      applyWorkspace(await fetchWorkspace(token));
+      return;
+    }
+
+    await waitlistApi.submitQuiz(buildQuizAnswers(questions, answersRef.current), token);
+    clearQuizDraft();
+    const info = await waitlistApi.getUserInfo(token);
+    setUserInfo(info);
+    setSessionEmail(info.email);
+    applyWorkspace(await fetchWorkspace(token));
   };
-  const openCommunity = (network: "telegram" | "x") => {
-    window.open(network === "telegram" ? "https://t.me/+CTeuBkpOxSNkN2Y0" : "https://x.com/SmartXTerminal", "_blank", "noopener,noreferrer");
-    if (network === "telegram") setTelegramOpened(true); else setXOpened(true);
+
+  const submitOtp = async () => {
+    setOtpError("");
+    try {
+      const login = await waitlistApi.login(email, otp);
+      await enterAfterLogin(login.token, authIntent, login.isNewUser, login.resultId);
+    } catch (error) {
+      if (handleUserApiError(error)) return;
+      if (authIntent === "create" && isWaitlistApiError(error) && error.message === INVITE_UNRECOGNIZED && isValidInviteCode(inviteCode)) {
+        try {
+          persistReservation({ ...(await waitlistApi.reserveInvite(inviteCode)), inviteCode });
+          const login = await waitlistApi.login(email, otp);
+          await enterAfterLogin(login.token, authIntent, login.isNewUser, login.resultId);
+          return;
+        } catch (retryError) {
+          if (handleUserApiError(retryError)) return;
+          setOtpError(errorMessage(retryError));
+          return;
+        }
+      }
+      if (authIntent === "create" && isWaitlistApiError(error) && error.message === INVITE_CLAIMED) {
+        dropReservation();
+        setGateError(error.message);
+        setStage("gate");
+        return;
+      }
+      if (authIntent === "recover" && isWaitlistApiError(error) && /invite code not recognized|user not found/i.test(error.message)) {
+        setRecoveryError(NO_SAVED_RESULT);
+        setStage("email");
+      } else {
+        setOtpError(errorMessage(error));
+      }
+    }
   };
-  const answerQuestion = (option: QuizOption) => {
-    const nextAnswers = [...answerIds.slice(0, questionIndex), option.id];
-    setAnswerIds(nextAnswers);
-    if (questionIndex === QUESTIONS.length - 1) { setShared(false); setInvitePage(0); setStage(emailVerified ? "unlock" : "email"); return; }
+
+  const finishQuiz = async () => {
+    if (userToken) {
+      try {
+        await waitlistApi.submitQuiz(buildQuizAnswers(questions, answersRef.current), userToken);
+        clearQuizDraft();
+        const info = await waitlistApi.getUserInfo(userToken);
+        setUserInfo(info);
+        applyWorkspace(await fetchWorkspace(userToken));
+      } catch (error) {
+        if (!handleUserApiError(error)) setReserveWarning(errorMessage(error));
+      }
+      return;
+    }
+    setAuthIntent("create");
+    setStage("email");
+  };
+
+  const answerQuestion = async (optionId: string) => {
+    if (!currentQuestion) return;
+    const nextAnswers = { ...answers, [currentQuestion.questionId]: optionId };
+    answersRef.current = nextAnswers;
+    setAnswers(nextAnswers);
+    if (inviteCode && (sessionToken || getQuizSession()?.sessionToken)) {
+      await syncReservation();
+    }
+    if (questionIndex === questions.length - 1) {
+      await finishQuiz();
+      return;
+    }
     setQuestionIndex((current) => current + 1);
   };
-  const goBack = () => { if (questionIndex === 0) return; setAnswerIds((current) => current.slice(0, -1)); setQuestionIndex((current) => current - 1); };
-  const shareResult = () => {
+
+  const goBack = () => {
+    if (questionIndex === 0) return;
+    setQuestionIndex((current) => current - 1);
+  };
+
+  const reReserveInvite = async () => {
+    try {
+      persistReservation({ ...(await waitlistApi.reserveInvite(inviteCode)), inviteCode });
+      renewalCappedRef.current = false;
+      setReserveWarning("");
+    } catch (error) {
+      dropReservation();
+      setReserveWarning(errorMessage(error));
+    }
+  };
+
+  const openCommunity = async (channel: CommunityChannel) => {
+    const href = channel === "telegram" ? communityLinks.telegram : communityLinks.x;
+    window.open(href, "_blank", "noopener,noreferrer");
+    if (!userToken) return;
+    try {
+      const result = await waitlistApi.completeCommunity(channel, userToken);
+      setTelegramOpened(result.telegramCompleted === 1);
+      setXOpened(result.xCompleted === 1);
+    } catch (error) {
+      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+    }
+  };
+
+  const revealResult = async () => {
+    if (!userToken) return;
+    try {
+      applyWorkspace(await fetchWorkspace(userToken));
+    } catch (error) {
+      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+    }
+  };
+
+  const shareResult = async () => {
+    if (!ownOutcome) return;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", `My SmartX trader type is ${resultOutcome.persona.name}.\n\n“${resultOutcome.persona.roast}”\n\nFind yours in six questions.`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(codes[0], resultOutcome.resultId, true));
+    shareUrl.searchParams.set("text", `My SmartX trader type is ${ownOutcome.persona.name}.${ownOutcome.persona.roast ? `\n\n“${ownOutcome.persona.roast}”` : ""}\n\nFind yours in six questions.`);
+    shareUrl.searchParams.set("url", makeInvitationUrl(invitations.find((item) => item.status === 0)?.code, ownOutcome.resultId, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
-    setShared(true);
+    if (!userToken || shareCompleted) return;
+    try {
+      await waitlistApi.shareComplete(userToken);
+      const nextRank = await waitlistApi.getRank(userToken);
+      setShareCompleted(true);
+      setRank(nextRank.rank);
+    } catch (error) {
+      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+    }
   };
+
   const copyInvitation = async (code?: string) => {
-    if (!code) return;
-    await navigator.clipboard.writeText(makeInvitationUrl(code, resultOutcome.resultId, true));
-    setCopiedCode(code);
-    window.setTimeout(() => setCopiedCode(null), 1400);
+    if (!code || !ownOutcome) return;
+    try {
+      await navigator.clipboard.writeText(makeInvitationUrl(code, ownOutcome.resultId, true));
+      setCopiedCode(code);
+      window.setTimeout(() => setCopiedCode(null), 1400);
+    } catch (error) {
+      notifyError(errorMessage(error) === GENERIC_ERROR ? "Couldn’t copy the invite link. Try again." : errorMessage(error));
+    }
   };
+
+  const inviteForm = (
+    <>
+      <label htmlFor="invite-code">Invite code</label>
+      <div className={styles.inlineField}>
+        <input
+          id="invite-code"
+          type="text"
+          inputMode="text"
+          autoComplete="off"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          maxLength={8}
+          pattern="[a-z0-9]{8}"
+          placeholder="8-character code"
+          value={inviteCode}
+          onChange={(event) => {
+            const next = sanitizeInviteCodeInput(event.target.value);
+            setInviteCode(next);
+            setGateError("");
+            const storedInvite = getQuizSession()?.inviteCode;
+            if (isValidInviteCode(next) && storedInvite && storedInvite !== next) {
+              dropReservation();
+            }
+          }}
+          aria-invalid={Boolean(gateError)}
+          aria-describedby={gateError ? "invite-note invite-error" : "invite-note"}
+          required
+        />
+        <WaitlistButton
+          className={styles.primaryButton}
+          type="submit"
+          disabled={!inviteReady}
+          onAction={() => startQuiz({ reserve: true })}
+        >
+          Begin
+        </WaitlistButton>
+      </div>
+      <small id="invite-note" className={styles.formHint}>Strictly invite-only. Your code is reserved when the test begins.</small>
+      {gateError ? <small className={styles.formError} id="invite-error" role="alert">{gateError}</small> : null}
+    </>
+  );
+
   return (
+    <WaitlistActionScope>
     <main className={styles.page} data-stage={stage} data-referral={Boolean(referralOutcome)}>
       <a className={styles.skipLink} href="#waitlist-content">Skip to waitlist</a>
       <div className={styles.ambientBackdrop} aria-hidden="true">
-        <Image
-          src="/assets/consumer-network/hero-product.png"
-          alt=""
-          fill
-          sizes="100vw"
-          priority
-        />
+        <Image src="/assets/consumer-network/hero-product.png" alt="" fill sizes="100vw" priority />
       </div>
       <ConsumerHeader active="waitlist" placement="page" />
 
       <section className={styles.stage} id="waitlist-content" aria-live="polite">
+        {stage === "boot" && (
+          <div className={styles.formStage}>
+            <span className={styles.eyebrow}>Waitlist</span>
+            <h1>Loading your session.</h1>
+            <p>Checking invite, result, and sign-in state.</p>
+          </div>
+        )}
+
         {stage === "gate" && referralOutcome && (
           <div className={styles.referralStage}>
             <PersonaPoster outcome={referralOutcome} preview />
             <div className={styles.referralCopy}>
               <span className={styles.eyebrow}>A result was shared with you</span>
-              <h1>A friend trades like<br />{referralOutcome.persona.name}.</h1>
+              <h1>A friend trades like <span className={styles.referralPersona}>{referralOutcome.persona.name}.</span></h1>
               <p>Different score, same type—or something else entirely? Six decisions reveal how you trade when it gets real.</p>
-              {savedOutcome ? (
+              {loggedIn && (
+                <AccountSession
+                  email={verifiedEmail}
+                  label="Verified as"
+                  place="copy"
+                  onSignOut={signOutWaitlist}
+                />
+              )}
+              {hasOwnResult ? (
                 <div className={styles.referralReturn}>
-                  <button className={styles.primaryButton} type="button" onClick={viewSavedResult}>View my result</button>
-                  <small>Your result is saved as {savedOutcome.persona.name}.</small>
+                  <WaitlistButton className={styles.primaryButton} onAction={viewSavedResult}>
+                    View my result
+                  </WaitlistButton>
+                  <small>Your result is saved as {savedPersonaName}.</small>
                 </div>
+              ) : loggedIn ? (
+                <WaitlistButton className={styles.primaryButton} onAction={beginFromReferral}>
+                  Find my trader type
+                </WaitlistButton>
               ) : (
                 <>
-                  <button className={styles.primaryButton} type="button" onClick={beginFromReferral}>Find my trader type</button>
-                  <button className={styles.textButton} type="button" onClick={beginResultRecovery}>Already tested? View my result</button>
-                  {gateError && (
+                  {!showInviteSwitch && (
+                    <WaitlistButton className={styles.primaryButton} disabled={!inviteReady} onAction={beginFromReferral}>
+                      Find my trader type
+                    </WaitlistButton>
+                  )}
+                  {showInviteSwitch && (
+                    <form className={styles.gateForm} onSubmit={(event) => event.preventDefault()}>
+                      {inviteForm}
+                    </form>
+                  )}
+                  <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>Already tested? View my result</WaitlistButton>
+                  {gateError && !showInviteSwitch && (
                     <div className={styles.referralError} role="alert">
                       <small>{gateError}</small>
-                      <button className={styles.textButton} type="button" onClick={clearReferral}>Use another invite</button>
+                      <WaitlistButton className={styles.textButton} onClick={() => setShowInviteSwitch(true)}>Use another invite</WaitlistButton>
                     </div>
                   )}
                 </>
@@ -708,48 +1038,61 @@ export function WaitlistExperience() {
               <h1>How do you trade<br />when it gets <em>real?</em></h1>
               <p>Six decisions reveal your risk, signal, and social instincts.</p>
             </div>
-            {savedOutcome ? (
-              <section className={styles.returningGate} aria-label="Saved result">
-                <div>
-                  <span>Your result is saved</span>
-                  <strong>{savedOutcome.persona.name}</strong>
-                </div>
-                <button type="button" onClick={viewSavedResult}>View my result <span aria-hidden="true">→</span></button>
-              </section>
-            ) : (
-              <form className={styles.gateForm} onSubmit={submitGate}>
-                <label htmlFor="invite-code">Invite code</label>
-                <div className={styles.inlineField}>
-                  <input id="invite-code" type="text" autoComplete="off" autoCapitalize="characters" spellCheck={false} placeholder="SMARTX-RSK-7X2K" value={inviteCode} onChange={(event) => { setInviteCode(event.target.value.toUpperCase()); setGateError(""); }} aria-invalid={Boolean(gateError)} aria-describedby={gateError ? "invite-error" : "invite-note"} required />
-                  <button className={styles.primaryButton} type="submit">Begin</button>
-                </div>
-                {gateError ? <small className={styles.formError} id="invite-error" role="alert">{gateError}</small> : <small id="invite-note">Strictly invite-only. Your code is reserved when the test begins.</small>}
-                <div className={styles.gateFormMeta}>
-                  <button className={styles.testCodeButton} type="button" onClick={() => { setInviteCode("123456"); setGateError(""); beginQuiz(); }}>Use prototype code</button>
-                  <button className={styles.textButton} type="button" onClick={beginResultRecovery}>Already tested? View my result</button>
-                </div>
-              </form>
-            )}
+            <form className={styles.gateForm} onSubmit={(event) => event.preventDefault()}>
+              {inviteForm}
+              <div className={styles.gateFormMeta}>
+                <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>Already tested? View my result</WaitlistButton>
+              </div>
+            </form>
           </div>
         )}
 
-        {stage === "quiz" && (
-          <div className={styles.quizStage} key={questionIndex}>
+        {stage === "quiz" && !currentQuestion && (
+          <div className={styles.formStage}>
+            <span className={styles.eyebrow}>Waitlist</span>
+            <h1>Couldn’t load the test.</h1>
+            <p>The questions didn’t come through. Check your connection and try again.</p>
+            <form onSubmit={(event) => event.preventDefault()}>
+              <WaitlistButton className={styles.primaryButton} onClick={() => setStage("gate")}>Back to invite</WaitlistButton>
+            </form>
+          </div>
+        )}
+
+        {stage === "quiz" && currentQuestion && (
+          <div className={styles.quizStage}>
+            {loggedIn && (
+              <AccountSession
+                email={verifiedEmail}
+                label="Verified as"
+                place="scene"
+                onSignOut={signOutWaitlist}
+              />
+            )}
             <div className={styles.quizTopline}>
-              {questionIndex > 0 ? <button type="button" onClick={goBack}>← Back</button> : <span />}
-              <div className={styles.progress} aria-label={`Question ${questionIndex + 1} of ${QUESTIONS.length}`}>
-                {QUESTIONS.map((question, index) => <i key={question.prompt} data-active={index <= questionIndex} />)}
+              {questionIndex > 0 ? <WaitlistButton type="button" onClick={goBack}>← Back</WaitlistButton> : <span />}
+              <div className={styles.progress} aria-label={`Question ${questionIndex + 1} of ${questions.length}`}>
+                {questions.map((question, index) => <i key={question.questionId} data-active={index <= questionIndex} />)}
               </div>
             </div>
-            <div className={styles.quizLayout}>
-              <QuestionArtwork question={QUESTIONS[questionIndex]} />
+            <div className={styles.quizLayout} key={currentQuestion.questionId}>
+              <QuestionArtwork question={currentQuestion} />
               <div className={styles.questionPanel}>
-                <h1>{QUESTIONS[questionIndex].prompt}</h1>
+                <h1>{currentQuestion.prompt}</h1>
                 <div className={styles.optionList}>
-                  {QUESTIONS[questionIndex].options.map((option) => (
-                    <button type="button" key={option.id} onClick={() => answerQuestion(option)}><i aria-hidden="true" /><span>{option.label}</span></button>
+                  {currentQuestion.options.map((option) => (
+                    <WaitlistButton type="button" key={option.optionId} onAction={() => answerQuestion(option.optionId)}>
+                      <i aria-hidden="true" /><span>{option.label}</span>
+                    </WaitlistButton>
                   ))}
                 </div>
+                {reserveWarning && (
+                  <div className={styles.quizWarning} role="alert">
+                    <small>{reserveWarning}</small>
+                    {/expired|reserve again/i.test(reserveWarning) && (
+                      <WaitlistButton className={styles.textButton} onAction={reReserveInvite}>Reserve again</WaitlistButton>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -760,14 +1103,21 @@ export function WaitlistExperience() {
             <span className={styles.eyebrow}>{authIntent === "recover" ? "Already tested?" : "Your result is ready"}</span>
             <h1>{authIntent === "recover" ? "Find your result." : "Save your result."}</h1>
             <p>{authIntent === "recover" ? "Enter the email you used. We’ll send a six-digit code." : "Bind an email to save your result and join the waitlist."}</p>
-            <form onSubmit={submitEmail}>
+            <form onSubmit={(event) => event.preventDefault()}>
               <label htmlFor="waitlist-email">Email address</label>
               <div className={styles.inlineField}>
                 <input id="waitlist-email" type="email" autoComplete="email" placeholder="you@domain.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
-                <button className={styles.primaryButton} type="submit">{authIntent === "recover" ? "Send code" : "Continue"}</button>
+                <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitEmail}>
+                  {authIntent === "recover" ? "Send code" : "Continue"}
+                </WaitlistButton>
               </div>
-              {recoveryError ? <small className={styles.formError} role="alert">{recoveryError}</small> : <small>Prototype only · no data is submitted.</small>}
-              {authIntent === "recover" && <button className={styles.recoveryBack} type="button" onClick={() => { setRecoveryError(""); setStage("gate"); }}>← Back</button>}
+              <small className={styles.formHint}>We’ll use this to save your result and send waitlist updates.</small>
+              {recoveryError ? <small className={styles.formError} role="alert">{recoveryError}</small> : null}
+              {authIntent === "recover" && (
+                <WaitlistButton className={styles.recoveryBack} onClick={() => { setRecoveryError(""); setStage("gate"); }}>
+                  ← Back
+                </WaitlistButton>
+              )}
             </form>
           </div>
         )}
@@ -777,16 +1127,38 @@ export function WaitlistExperience() {
             <span className={styles.eyebrow}>Check your inbox</span>
             <h1>Six digits.</h1>
             <p>Enter the code sent to <b>{email}</b>.</p>
-            <form onSubmit={submitOtp}>
+            <form onSubmit={(event) => event.preventDefault()}>
               <label htmlFor="waitlist-otp">Verification code</label>
               <div className={styles.inlineField}>
-                <input className={styles.otpInput} id="waitlist-otp" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "").slice(0, 6)); setOtpError(""); }} aria-invalid={Boolean(otpError)} aria-describedby={otpError ? "otp-error" : "otp-note"} placeholder="••••••" autoFocus required />
-                <button className={styles.primaryButton} type="submit">Continue</button>
+                <input
+                  className={styles.otpInput}
+                  id="waitlist-otp"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "").slice(0, 6)); setOtpError(""); }}
+                  aria-invalid={Boolean(otpError)}
+                  aria-describedby="otp-note"
+                  placeholder="••••••"
+                  autoFocus
+                  required
+                />
+                <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitOtp}>
+                  Continue
+                </WaitlistButton>
               </div>
-              {otpError ? <small className={styles.formError} id="otp-error" role="alert">{otpError}</small> : <small id="otp-note">Prototype code · <b>{OTP_CODE}</b></small>}
+              <small id="otp-note" className={styles.formHint} aria-live="polite">
+                {otpExpiresIn > 0 ? `The code expires in ${formatClock(otpExpiresIn)}.` : "The code has expired. Resend to get a new one."}
+              </small>
+              {otpError ? <small className={styles.formError} id="otp-error" role="alert">{otpError}</small> : null}
               <div className={styles.formMeta}>
-                <button type="button" onClick={() => { setOtpResent(true); setOtpError(""); }}>{otpResent ? "Code sent again" : "Resend code"}</button>
-                <button type="button" onClick={() => setStage("email")}>Change email</button>
+                <WaitlistButton type="button" disabled={otpCooldown > 0} onAction={resendCode}>
+                  {otpCooldown > 0 ? `Resend in ${otpCooldown}s` : otpResent ? "Code sent again" : "Resend code"}
+                </WaitlistButton>
+                <WaitlistButton type="button" onClick={() => setStage("email")}>Change email</WaitlistButton>
               </div>
             </form>
           </div>
@@ -797,41 +1169,42 @@ export function WaitlistExperience() {
             <span className={styles.eyebrow}>One last step</span>
             <h1>Unlock your result.</h1>
             <p>Join the SmartX community and follow product updates before your trader type is revealed.</p>
-            <div className={styles.accountStrip} data-compact="true">
-              <div><span>Verified as</span><strong>{sessionEmail || email}</strong></div>
-              <button type="button" onClick={signOutWaitlist}>Sign out</button>
-            </div>
+            <AccountSession
+              email={verifiedEmail}
+              label="Verified as"
+              compact
+              onSignOut={signOutWaitlist}
+            />
             <div className={styles.unlockTasks}>
-              <button type="button" aria-pressed={telegramOpened} data-complete={telegramOpened} onClick={() => openCommunity("telegram")}>
+              <WaitlistButton type="button" aria-pressed={telegramOpened} data-complete={telegramOpened} onAction={() => openCommunity("telegram")}>
                 <FaTelegramPlane aria-hidden="true" />
                 <span><b>Join Telegram</b><small>Enter the SmartX community</small></span>
                 <strong>{telegramOpened ? "Done ✓" : "Open ↗"}</strong>
-              </button>
-              <button type="button" aria-pressed={xOpened} data-complete={xOpened} onClick={() => openCommunity("x")}>
+              </WaitlistButton>
+              <WaitlistButton type="button" aria-pressed={xOpened} data-complete={xOpened} onAction={() => openCommunity("x")}>
                 <FaXTwitter aria-hidden="true" />
                 <span><b>Follow SmartX on X</b><small>Follow product updates</small></span>
                 <strong>{xOpened ? "Done ✓" : "Open ↗"}</strong>
-              </button>
+              </WaitlistButton>
             </div>
-            <button className={styles.primaryButton} type="button" disabled={!telegramOpened || !xOpened} onClick={() => setStage("result")}>Reveal my result</button>
+            <WaitlistButton className={styles.primaryButton} disabled={!telegramOpened || !xOpened} onAction={revealResult}>
+              Reveal my result
+            </WaitlistButton>
             <small>Both steps are required to continue.</small>
           </div>
         )}
 
-        {stage === "result" && (
+        {stage === "result" && ownOutcome && (
           <div className={styles.resultStage}>
-            <PersonaPoster outcome={resultOutcome} preparedCards={preparedCards} exportError={exportError} />
+            <PersonaPoster outcome={ownOutcome} preparedCards={preparedCards} exportError={exportError} />
             <aside className={styles.resultPanel}>
-              <div className={styles.accountStrip}>
-                <div><span>Signed in as</span><strong>{sessionEmail || "Email verified"}</strong></div>
-                <button type="button" onClick={signOutWaitlist}>Sign out</button>
-              </div>
-              <div className={styles.rankBlock} data-boosted={shared}>
+              <AccountSession email={verifiedEmail} label="Signed in as" onSignOut={signOutWaitlist} />
+              <div className={styles.rankBlock} data-boosted={shareCompleted}>
                 <span>Waitlist rank</span>
-                <strong key={rank}>#{rank.toLocaleString("en-US")}</strong>
+                <strong key={rank ?? "pending"}>#{(rank ?? 0).toLocaleString("en-US")}</strong>
                 <div className={styles.rankRewards}>
-                  <div data-applied={shared}>
-                    <span>{shared ? "Share reward applied" : "First result share"}</span>
+                  <div data-applied={shareCompleted}>
+                    <span>{shareCompleted ? "Share recorded" : "First result share"}</span>
                     <b>+500 priority</b>
                   </div>
                   <div>
@@ -840,7 +1213,9 @@ export function WaitlistExperience() {
                   </div>
                 </div>
                 <small>Priority improves your score; rank updates against the live waitlist.</small>
-                <button className={styles.shareButton} type="button" onClick={shareResult}>{shared ? "Share again" : "Share result"}</button>
+                <WaitlistButton className={styles.shareButton} onAction={shareResult}>
+                  {shareCompleted ? "Share again" : "Share result"}
+                </WaitlistButton>
               </div>
               <section className={styles.invitationDeck} aria-label="One-time invitation cards">
                 <header>
@@ -851,36 +1226,38 @@ export function WaitlistExperience() {
                   {invitePageCount > 1 && (
                     <div className={styles.inviteNavigation}>
                       <b>{invitePage * INVITES_PER_PAGE + 1}–{Math.min((invitePage + 1) * INVITES_PER_PAGE, invitations.length)}</b>
-                      <button type="button" aria-label="Previous five invites" disabled={invitePage === 0} onClick={() => setInvitePage((current) => current - 1)}>←</button>
-                      <button type="button" aria-label="Next five invites" disabled={invitePage === invitePageCount - 1} onClick={() => setInvitePage((current) => current + 1)}>→</button>
+                      <WaitlistButton type="button" aria-label="Previous five invites" disabled={invitePage === 0} onClick={() => setInvitePage((current) => current - 1)}>←</WaitlistButton>
+                      <WaitlistButton type="button" aria-label="Next five invites" disabled={invitePage === invitePageCount - 1} onClick={() => setInvitePage((current) => current + 1)}>→</WaitlistButton>
                     </div>
                   )}
                 </header>
                 <div className={styles.inviteCardGrid}>
-                  {visibleInvitations.map((invitation) => {
-                    const shortCode = invitation.code.split("-").at(-1);
+                  {visibleInvitations.map((invitation, index) => {
+                    const used = invitation.status !== 0;
                     const isCopied = copiedCode === invitation.code;
+                    const absoluteIndex = invitePage * INVITES_PER_PAGE + index;
                     return (
-                      <button
+                      <WaitlistButton
                         className={styles.inviteCodeCard}
                         data-copied={isCopied}
-                        data-used={invitation.used}
-                        disabled={invitation.used}
+                        data-used={used}
+                        disabled={used}
                         key={invitation.code}
                         type="button"
-                        aria-label={invitation.used ? `Invite ${shortCode} used` : `Copy invite link ${shortCode}`}
-                        onClick={() => copyInvitation(invitation.code)}
+                        lock={false}
+                        aria-label={used ? `Invite ${invitation.code} used` : `Copy invite link ${invitation.code}`}
+                        onAction={() => copyInvitation(invitation.code)}
                       >
                         <header>
-                          <span>Invite {String(invitation.index + 1).padStart(2, "0")}</span>
+                          <span>Invite {String(absoluteIndex + 1).padStart(2, "0")}</span>
                           <i aria-hidden="true" />
                         </header>
-                        <div aria-hidden="true"><strong>{invitation.used ? "—" : isCopied ? "✓" : "↗"}</strong></div>
+                        <div aria-hidden="true"><strong>{used ? "—" : isCopied ? "✓" : "↗"}</strong></div>
                         <footer>
-                          <span>{shortCode}</span>
-                          {(invitation.used || isCopied) && <b>{invitation.used ? "Used" : "Copied"}</b>}
+                          <span>{invitation.code}</span>
+                          {(used || isCopied) && <b>{used ? "Used" : "Copied"}</b>}
                         </footer>
-                      </button>
+                      </WaitlistButton>
                     );
                   })}
                 </div>
@@ -890,5 +1267,6 @@ export function WaitlistExperience() {
         )}
       </section>
     </main>
+    </WaitlistActionScope>
   );
 }

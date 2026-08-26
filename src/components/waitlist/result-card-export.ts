@@ -112,10 +112,6 @@ function drawRelations(context: CanvasRenderingContext2D, data: ResultCardExport
   context.font = "500 18px IBM Plex Sans, sans-serif";
   context.fillText(data.bestMatch.name, x, y + 28);
   context.fillText(data.rival.name, x + columnWidth, y + 28);
-  context.fillStyle = COLORS.muted;
-  context.font = "500 12px IBM Plex Sans, sans-serif";
-  context.fillText(data.bestMatch.cn, x, y + 48);
-  context.fillText(data.rival.cn, x + columnWidth, y + 48);
 }
 
 function drawAxis(
@@ -154,9 +150,6 @@ function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData
   context.fillStyle = COLORS.text;
   context.font = "600 84px \"Playfair Display\", Georgia, serif";
   wrapText(context, data.name, 84, 282, 912, 88, 2);
-  context.fillStyle = COLORS.muted;
-  context.font = "500 25px Inter, sans-serif";
-  context.fillText(data.cn, 88, 390);
   drawArtwork(context, artwork, 84, 440, 912, 600);
   drawAxis(context, "Conviction", data.scores.conviction, 84, 1105, 278);
   drawAxis(context, "Instinct", data.scores.instinct, 400, 1105, 278);
@@ -190,9 +183,6 @@ function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, a
   context.fillStyle = COLORS.text;
   context.font = "600 58px \"Playfair Display\", Georgia, serif";
   wrapText(context, data.name, 54, 190, 590, 60, 2);
-  context.fillStyle = COLORS.muted;
-  context.font = "500 18px Inter, sans-serif";
-  context.fillText(data.cn, 58, 275);
   context.fillStyle = COLORS.mint;
   context.font = "500 24px \"Playfair Display\", Georgia, serif";
   wrapText(context, `“${data.roast}”`, 54, 350, 560, 31, 3);

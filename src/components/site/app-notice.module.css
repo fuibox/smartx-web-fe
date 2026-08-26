@@ -1,0 +1,62 @@
+.host {
+  position: fixed;
+  z-index: 240;
+  top: 18px;
+  left: 50%;
+  display: flex;
+  width: min(calc(100vw - 32px), 420px);
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 16px 14px 18px;
+  border: 1px solid #303436;
+  border-radius: 16px;
+  background: #0e1112;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+  color: #f5f5f5;
+  transform: translateX(-50%);
+  animation: notice-in 240ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.host p {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.host button {
+  cursor: pointer;
+  flex: none;
+  margin-top: 1px;
+  border: 0;
+  background: transparent;
+  color: #8a8f98;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .host {
+    animation: notice-fade 200ms ease both;
+  }
+
+  @keyframes notice-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}

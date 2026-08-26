@@ -16,6 +16,8 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   position: relative;
   isolation: isolate;
+  width: 100%;
+  max-width: 100%;
   min-height: 100svh;
   overflow-x: clip;
   background: var(--consumer-black);
@@ -50,6 +52,7 @@
   content: "";
 }
 
+.page[data-stage="boot"] .ambientBackdrop,
 .page[data-stage="gate"] .ambientBackdrop { opacity: 0.72; }
 .page[data-stage="gate"][data-referral="true"] .ambientBackdrop { opacity: 0.13; }
 
@@ -107,10 +110,16 @@
   display: grid;
   box-sizing: border-box;
   width: min(calc(100% - 80px), var(--shell-width));
+  min-width: 0;
   min-height: calc(100svh - 65px);
   margin: 0 auto;
   padding: 52px 0 68px;
   place-items: center;
+}
+
+.stage > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .page[data-stage="result"] .stage {
@@ -150,6 +159,13 @@
   color: #666b70;
 }
 
+.primaryButton[aria-busy="true"]:disabled,
+.shareButton[aria-busy="true"]:disabled {
+  cursor: progress;
+  background: var(--teal);
+  color: var(--consumer-black);
+}
+
 .textButton,
 .testCodeButton,
 .formMeta button,
@@ -173,6 +189,8 @@
 
 .gateCopy {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   justify-items: center;
 }
 
@@ -184,11 +202,12 @@
 }
 
 .gateCopy h1 {
-  max-width: 950px;
+  max-width: 100%;
   margin: 28px 0 24px;
   font-size: clamp(64px, 6.4vw, 92px);
   letter-spacing: -0.04em;
   line-height: 0.98;
+  overflow-wrap: break-word;
 }
 
 .gateCopy h1 em {
@@ -200,7 +219,7 @@
 .gateCopy > p,
 .referralCopy > p,
 .formStage > p {
-  max-width: 610px;
+  max-width: min(610px, 100%);
   margin: 0;
   color: var(--body);
   font-size: 18px;
@@ -211,6 +230,7 @@
 .formStage form {
   display: grid;
   min-width: 0;
+  max-width: 100%;
 }
 
 .gateForm {
@@ -244,10 +264,11 @@
   padding: 0 22px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  outline: 0;
+  outline: none;
   background: rgba(5, 8, 8, 0.84);
   color: var(--text);
   font: 500 14px var(--font-jb), monospace;
+  transition: border-color 160ms var(--ease-out);
 }
 
 .gateForm input::placeholder,
@@ -255,6 +276,14 @@
 
 .gateForm input[aria-invalid="true"],
 .formStage input[aria-invalid="true"] { border-color: var(--coral); }
+
+.gateForm input:focus,
+.gateForm input:focus-visible,
+.formStage input:focus,
+.formStage input:focus-visible {
+  outline: none;
+  border-color: var(--teal);
+}
 
 .gateForm .primaryButton {
   min-width: 126px;
@@ -285,7 +314,22 @@
 
 .gateFormMeta .testCodeButton,
 .gateFormMeta .textButton { margin: 0; }
-.formError { color: var(--coral) !important; }
+.formError { color: var(--coral); }
+
+.gateForm:has(.formError) .formHint,
+.formStage:has(.formError) .formHint {
+  display: none;
+}
+
+.gateForm:has(input:focus) .formError,
+.formStage:has(input:focus) .formError {
+  display: none;
+}
+
+.gateForm:has(input:focus) .formHint,
+.formStage:has(input:focus) .formHint {
+  display: block;
+}
 
 .returningGate {
   display: flex;
@@ -344,29 +388,52 @@
   display: grid;
   width: min(100%, 1180px);
   align-items: center;
-  grid-template-columns: minmax(440px, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   gap: 96px;
   animation: stage-enter 380ms var(--ease-out) both;
+}
+
+.referralCopy {
+  min-width: 0;
 }
 
 .referralCopy h1 {
   max-width: 650px;
   margin: 22px 0 26px;
-  font-size: clamp(54px, 4.7vw, 72px);
+  font-size: clamp(48px, 4.2vw, 68px);
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.05;
+  overflow-wrap: break-word;
 }
 
-.referralCopy .primaryButton {
+.referralPersona {
+  display: block;
+  white-space: nowrap;
+}
+
+.referralCopy > .primaryButton,
+.referralCopy .referralReturn .primaryButton {
   display: block;
   min-width: 232px;
   margin-top: 34px;
   padding: 0 28px;
 }
 
+.referralCopy .gateForm {
+  width: 100%;
+  margin-top: 34px;
+}
+
+.referralCopy .inlineField .primaryButton {
+  min-width: 108px;
+  margin-top: 0;
+  padding: 0 22px;
+}
+
 .referralCopy .textButton {
   display: block;
   margin-top: 18px;
+  white-space: nowrap;
 }
 
 .referralReturn small {
@@ -392,6 +459,18 @@
 }
 
 .referralError .textButton { margin-top: 0; }
+
+.quizWarning {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.quizWarning small {
+  color: var(--coral);
+  font-size: 11px;
+  line-height: 1.45;
+}
 
 .quizStage {
   width: min(100%, var(--quiz-width));
@@ -503,6 +582,10 @@
   line-height: 1.4;
 }
 
+.optionList > button[aria-busy="true"]:disabled {
+  color: var(--body);
+}
+
 .formStage {
   width: min(100%, 760px);
   text-align: center;
@@ -537,8 +620,15 @@
 
 .formMeta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin: 16px 20px 0;
+}
+
+.formMeta button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .recoveryBack {
@@ -598,13 +688,31 @@
   border-top: 1px solid var(--line);
 }
 
+.accountStrip[data-place="copy"] {
+  width: min(100%, 460px);
+  margin: 22px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.accountStrip[data-place="scene"] {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 0 0 12px;
+}
+
+.referralCopy > .accountStrip + .primaryButton,
+.referralCopy > .accountStrip + .referralReturn .primaryButton {
+  margin-top: 28px;
+}
+
 .accountStrip > div {
   display: grid;
   min-width: 0;
   gap: 4px;
 }
 
-.accountStrip span {
+.accountStrip > div span {
   color: var(--dim);
   font-size: 9px;
   font-weight: 600;
@@ -675,6 +783,9 @@
 }
 
 .unlockTasks > button[data-complete="true"] strong { color: var(--teal); }
+.unlockTasks > button[aria-busy="true"]:disabled {
+  color: var(--body);
+}
 .unlockStage > .primaryButton { min-width: 220px; margin-top: 30px; padding: 0 30px; }
 .unlockStage > small { display: block; margin-top: 12px; color: var(--dim); font-size: 11px; }
 
@@ -713,11 +824,12 @@
 }
 
 .posterIdentity h2 {
-  max-width: 620px;
+  max-width: 100%;
   margin: 8px 0 4px;
   font-size: clamp(48px, 4.3vw, 62px);
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.05;
+  overflow-wrap: break-word;
 }
 
 .posterIdentity p {
@@ -826,7 +938,7 @@
   display: grid;
   width: min(100%, 1280px);
   align-items: start;
-  grid-template-columns: minmax(560px, 1.05fr) minmax(500px, 0.95fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   column-gap: 72px;
   animation: stage-enter 380ms var(--ease-out) both;
 }
@@ -894,7 +1006,7 @@
 
 .chemistryBlock {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 28px;
   margin-top: 22px;
   padding: 21px 0;
@@ -902,9 +1014,9 @@
   border-bottom: 1px solid var(--line);
 }
 
-.chemistryBlock > div { display: grid; }
+.chemistryBlock > div { display: grid; min-width: 0; }
 .chemistryBlock span { color: var(--dim); font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; }
-.chemistryBlock strong { margin-top: 8px; color: var(--text); font-size: 16px; font-weight: 500; line-height: 1.15; }
+.chemistryBlock strong { margin-top: 8px; color: var(--text); font-size: 16px; font-weight: 500; line-height: 1.15; overflow-wrap: break-word; }
 .chemistryBlock small { margin-top: 5px; color: var(--muted); font-size: 11px; }
 
 .invitationDeck {
@@ -1018,8 +1130,6 @@
 .posterLogo:focus-visible,
 .primaryButton:focus-visible,
 .shareButton:focus-visible,
-.gateForm input:focus-visible,
-.formStage input:focus-visible,
 .textButton:focus-visible,
 .testCodeButton:focus-visible,
 .formMeta button:focus-visible,
@@ -1091,7 +1201,8 @@
   .quizTopline button:hover,
   .cardDownloads a:hover { color: var(--text); }
   .recoveryBack:hover { color: var(--text); }
-  .accountStrip button:hover { color: var(--text); }
+  .accountStrip button:hover,
+  .accountStrip button:hover span { color: var(--text); }
 
   .returningGate > button:hover { color: var(--teal); }
   .returningGate > button:hover span { transform: translateX(4px); }
@@ -1130,17 +1241,17 @@
 
 @media (max-width: 1120px) {
   .stage { width: min(calc(100% - 56px), 1040px); }
-  .referralStage { gap: 54px; grid-template-columns: minmax(420px, 0.92fr) minmax(0, 1.08fr); }
+  .referralStage { gap: 54px; }
   .quizLayout { grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr); gap: 48px; }
-  .resultStage { grid-template-columns: minmax(470px, 1fr) minmax(390px, 0.88fr); gap: 50px; }
+  .resultStage { column-gap: 50px; }
 }
 
 @media (max-width: 880px) {
-  .stage { width: calc(100% - 40px); padding: 48px 0 64px; }
+  .stage { width: calc(100% - 32px); padding: 36px 0 56px; }
   .gateStage,
   .referralStage,
   .quizLayout,
-  .resultStage { grid-template-columns: 1fr; gap: 46px; }
+  .resultStage { grid-template-columns: minmax(0, 1fr); gap: 36px; }
   .gateForm { width: min(100%, 650px); }
   .questionArtwork { width: min(100%, 620px); justify-self: center; }
   .questionPanel { width: min(100%, 620px); justify-self: center; }
@@ -1151,42 +1262,76 @@
   .inviteCardGrid { grid-template-columns: repeat(5, minmax(100px, 1fr)); }
   .inviteCodeCard { min-height: 158px; }
   .resultPanel { padding-top: 0; }
+  .referralPersona { white-space: normal; }
+  .gateCopy h1 { font-size: clamp(36px, 8.6vw, 56px); }
+  .referralCopy h1 { font-size: clamp(32px, 7.4vw, 48px); margin: 16px 0 18px; }
+  .posterIdentity h2,
+  .personaPoster[data-preview="true"] .posterIdentity h2 {
+    font-size: clamp(28px, 7.2vw, 40px);
+  }
+  .referralCopy > .primaryButton,
+  .referralCopy .referralReturn .primaryButton {
+    min-width: 0;
+    width: 100%;
+    max-width: 280px;
+  }
+  .formMeta {
+    flex-wrap: wrap;
+    margin-right: 0;
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 620px) {
-  .stage { padding-top: 36px; }
-  .gateCopy h1 { font-size: 52px; }
+  .stage { width: calc(100% - 24px); padding: 24px 0 48px; }
+  .gateCopy h1 { font-size: clamp(32px, 10vw, 44px); }
   .gateCopy > p,
   .referralCopy > p,
   .formStage > p,
   .unlockStage > p { font-size: 16px; }
-  .inlineField { grid-template-columns: 1fr; }
-  .gateFormMeta { align-items: flex-start; flex-direction: column; margin-left: 20px; }
+  .inlineField { gap: 8px; }
+  .gateForm input,
+  .formStage input { height: 50px; padding: 0 16px; font-size: 13px; }
+  .gateForm .inlineField .primaryButton,
+  .formStage .inlineField .primaryButton {
+    min-width: 84px;
+    padding: 0 14px;
+  }
+  .gateFormMeta { align-items: flex-start; flex-direction: column; margin-left: 12px; }
   .returningGate { align-items: flex-start; flex-direction: column; gap: 16px; }
   .returningGate > button { padding-left: 0; }
-  .accountStrip { gap: 16px; }
-  .accountStrip strong { max-width: 230px; }
-  .gateForm .primaryButton,
-  .formStage .primaryButton { width: 100%; }
+  .accountStrip { gap: 12px; }
+  .accountStrip strong { max-width: min(180px, 48vw); }
   .quizTopline { margin-bottom: 8px; }
-  .quizLayout { gap: 26px; }
-  .questionPanel h1 { font-size: 38px; line-height: 1.1; }
-  .optionList { margin-top: 30px; }
-  .optionList > button { min-height: 66px; padding: 14px 16px; border-radius: 14px; }
-  .optionList > button span { font-size: 16px; }
-  .formStage h1 { font-size: 52px; }
-  .unlockStage h1 { font-size: 48px; }
-  .unlockTasks { margin-top: 32px; }
-  .unlockTasks > button { grid-template-columns: 24px 1fr auto; gap: 12px; }
-  .personaPoster { padding: 22px; }
-  .posterIdentity h2 { font-size: 44px; }
+  .quizLayout { gap: 22px; }
+  .questionPanel h1 { font-size: clamp(26px, 7.4vw, 34px); line-height: 1.12; }
+  .optionList { margin-top: 24px; }
+  .optionList > button { min-height: 62px; padding: 12px 14px; border-radius: 14px; }
+  .optionList > button span { font-size: 15px; }
+  .formStage h1 { font-size: clamp(32px, 9vw, 44px); }
+  .unlockStage h1 { font-size: clamp(32px, 9vw, 42px); }
+  .unlockStage > .primaryButton { min-width: 0; width: 100%; max-width: 280px; }
+  .unlockTasks { margin-top: 28px; }
+  .unlockTasks > button { min-width: 0; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; }
+  .unlockTasks > button span { min-width: 0; }
+  .personaPoster,
+  .personaPoster[data-preview="true"] { padding: 16px; }
+  .posterIdentity { margin: 16px 0 14px; }
+  .posterIdentity h2,
+  .personaPoster[data-preview="true"] .posterIdentity h2 {
+    font-size: clamp(26px, 8.2vw, 34px);
+  }
+  .personaArt,
+  .personaPoster[data-preview="true"] .personaArt { height: 210px; }
+  .personaPoster blockquote { font-size: 15px; }
   .posterScores { grid-template-columns: 1fr; gap: 14px; }
   .cardDownloads > div { gap: 12px; }
   .invitationDeck > header { align-items: start; flex-direction: column; }
   .inviteCardGrid { overflow-x: auto; grid-template-columns: repeat(5, 104px); padding-bottom: 8px; scroll-snap-type: x proximity; }
   .inviteCodeCard { scroll-snap-align: start; }
   .chemistryBlock { grid-template-columns: 1fr; }
-  .rankBlock strong { font-size: 66px; }
+  .rankBlock strong { font-size: clamp(48px, 16vw, 66px); }
+  .referralCopy .textButton { white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1210,6 +1355,8 @@
   .unlockTasks > button,
   .inviteCodeCard,
   .inviteNavigation button,
+  .gateForm input,
+  .formStage input,
   .cardDownloads a { animation: none; transition: none; }
   .recoveryBack { animation: none; transition: none; }
   .accountStrip button { animation: none; transition: none; }

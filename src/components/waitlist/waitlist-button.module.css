@@ -1,0 +1,50 @@
+.host {
+  position: relative;
+}
+
+.host[aria-busy="true"] {
+  cursor: progress;
+}
+
+.host[aria-busy="true"] > :not(.icon) {
+  opacity: 0;
+}
+
+.icon {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  place-items: center;
+  pointer-events: none;
+  grid-area: 1 / 1 / -1 / -1;
+}
+
+.spinner {
+  width: 1.15em;
+  height: 1.15em;
+  min-width: 14px;
+  min-height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: waitlist-spin 640ms linear infinite;
+}
+
+@keyframes waitlist-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-right-color: currentColor;
+    opacity: 0.55;
+  }
+}
