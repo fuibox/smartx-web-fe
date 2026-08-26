@@ -64,6 +64,7 @@ export function SiteFooter() {
             >
               App
             </a>
+            <Link href="/waitlist/">Waitlist</Link>
             <Link href="/blog">Blog</Link>
           </nav>
         </div>

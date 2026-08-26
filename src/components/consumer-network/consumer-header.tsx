@@ -4,37 +4,40 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import { BlogThemeToggle } from "@/components/blog/blog-theme-toggle";
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
-import styles from "./site-chrome.module.css";
+import styles from "./consumer-home.module.css";
 
-type SiteHeaderProps = {
-  active?: "home" | "blog" | "waitlist";
-  allowThemeToggle?: boolean;
+const ASSET_ROOT = "/assets/consumer-network";
+
+type ConsumerHeaderProps = {
+  active?: "home" | "waitlist";
+  placement?: "overlay" | "page";
 };
 
-export function SiteHeader({
-  active,
-  allowThemeToggle = false,
-}: SiteHeaderProps) {
+export function ConsumerHeader({
+  active = "home",
+  placement = "overlay",
+}: ConsumerHeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <header className={styles.header}>
-      <Link className={styles.headerBrand} href="/" aria-label="SmartX home">
-        <Image
-          src="/assets/consumer-network/logo-white.svg"
-          alt=""
-          width={34}
-          height={28}
-          priority
-        />
-        <span>SmartX</span>
+    <header className={styles.header} data-placement={placement}>
+      <Link href="/" className={styles.headerBrand} aria-label="SmartX home">
+        <span className={styles.brand}>
+          <Image
+            src={`${ASSET_ROOT}/logo-white.svg`}
+            alt=""
+            width={34}
+            height={28}
+            priority
+          />
+          <span>SmartX</span>
+        </span>
       </Link>
 
       <div className={styles.headerActions}>
-        <nav className={styles.headerNav} aria-label="Site navigation">
+        <nav className={styles.primaryNav} aria-label="Site navigation">
           <Link
             href="/"
             className={active === "home" ? styles.activeLink : undefined}
@@ -63,47 +66,33 @@ export function SiteHeader({
           >
             Community
           </a>
-          <Link
-            href="/blog"
-            className={active === "blog" ? styles.activeLink : undefined}
-            aria-current={active === "blog" ? "page" : undefined}
-          >
-            Blog
-          </Link>
+          <Link href="/blog">Blog</Link>
         </nav>
-
-        <div className={styles.headerTools}>
-          {allowThemeToggle ? (
-            <span className={styles.desktopThemeToggle}>
-              <BlogThemeToggle />
-            </span>
-          ) : null}
-          <a
-            className={styles.headerAction}
-            href={createSmartXAppHref("blog_header")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Launch Alpha
-          </a>
-          <button
-            className={styles.mobileMenuButton}
-            type="button"
-            aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={mobileNavOpen}
-            aria-controls="blog-mobile-site-navigation"
-            data-open={mobileNavOpen ? "true" : "false"}
-            onClick={() => setMobileNavOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
+        <button
+          className={styles.mobileMenuButton}
+          type="button"
+          aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={mobileNavOpen}
+          aria-controls="consumer-site-navigation"
+          data-open={mobileNavOpen ? "true" : "false"}
+          onClick={() => setMobileNavOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <a
+          className={styles.waitlistButton}
+          href={createSmartXAppHref("hero_cta")}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Launch Alpha
+        </a>
       </div>
 
       <nav
-        id="blog-mobile-site-navigation"
+        id="consumer-site-navigation"
         className={styles.mobileNav}
         aria-label="Mobile site navigation"
         hidden={!mobileNavOpen}
@@ -140,20 +129,9 @@ export function SiteHeader({
         >
           Community
         </a>
-        <Link
-          href="/blog"
-          className={active === "blog" ? styles.activeMobileLink : undefined}
-          aria-current={active === "blog" ? "page" : undefined}
-          onClick={() => setMobileNavOpen(false)}
-        >
+        <Link href="/blog" onClick={() => setMobileNavOpen(false)}>
           Blog
         </Link>
-        {allowThemeToggle ? (
-          <div className={styles.mobileThemeControl}>
-            <span>Reading theme</span>
-            <BlogThemeToggle />
-          </div>
-        ) : null}
       </nav>
     </header>
   );

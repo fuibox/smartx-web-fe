@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
+import { ConsumerHeader } from "./consumer-header";
 import {
   NetworkProductPreview,
   type NetworkPreviewKind,
@@ -109,43 +110,19 @@ function Brand({ tone = "light" }: { tone?: "light" | "dark" }) {
   );
 }
 
-function LaunchAlphaLink() {
-  return (
-    <a
-      className={styles.waitlistButton}
-      href={createSmartXAppHref("hero_cta")}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Launch Alpha
-    </a>
-  );
-}
-
 function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
-  const [comingSoon, setComingSoon] = useState(false);
-
-  useEffect(() => {
-    if (!comingSoon) return;
-    const timeout = window.setTimeout(() => setComingSoon(false), 2200);
-    return () => window.clearTimeout(timeout);
-  }, [comingSoon]);
-
   return (
-    <button
+    <Link
       className={styles.waitlistButton}
-      type="button"
-      onClick={() => setComingSoon(true)}
+      href="/waitlist/"
       data-placement={placement}
-      aria-live="polite"
     >
-      {comingSoon ? "Coming soon" : "Join the Waitlist"}
-    </button>
+      Join the Waitlist
+    </Link>
   );
 }
 
 function Hero() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -210,72 +187,7 @@ function Hero() {
       </div>
       <div className={styles.heroShade} aria-hidden="true" />
 
-      <header className={styles.header}>
-        <Link href="/" className={styles.headerBrand} aria-label="SmartX home">
-          <Brand />
-        </Link>
-
-        <div className={styles.headerActions}>
-          <nav className={styles.primaryNav} aria-label="Site navigation">
-            <a
-              href="https://x.com/SmartXTerminal"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              X
-            </a>
-            <a
-              href="https://t.me/+CTeuBkpOxSNkN2Y0"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Community
-            </a>
-            <Link href="/blog">Blog</Link>
-          </nav>
-          <button
-            className={styles.mobileMenuButton}
-            type="button"
-            aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={mobileNavOpen}
-            aria-controls="mobile-site-navigation"
-            data-open={mobileNavOpen ? "true" : "false"}
-            onClick={() => setMobileNavOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-          <LaunchAlphaLink />
-        </div>
-
-        <nav
-          id="mobile-site-navigation"
-          className={styles.mobileNav}
-          aria-label="Mobile site navigation"
-          hidden={!mobileNavOpen}
-        >
-          <a
-            href="https://x.com/SmartXTerminal"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileNavOpen(false)}
-          >
-            X
-          </a>
-          <a
-            href="https://t.me/+CTeuBkpOxSNkN2Y0"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileNavOpen(false)}
-          >
-            Community
-          </a>
-          <Link href="/blog" onClick={() => setMobileNavOpen(false)}>
-            Blog
-          </Link>
-        </nav>
-      </header>
+      <ConsumerHeader />
 
       <div className={styles.heroCopy}>
         <h1 id="consumer-hero-title">Trade your edge.</h1>
@@ -513,6 +425,7 @@ function ConsumerFooter() {
             >
               App
             </a>
+            <Link href="/waitlist/">Waitlist</Link>
             <Link href="/blog">Blog</Link>
           </nav>
         </div>
