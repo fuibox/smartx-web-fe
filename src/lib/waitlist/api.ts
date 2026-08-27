@@ -104,6 +104,14 @@ export function isValidInviteCode(value: string) {
   return /^[a-z0-9]{8}$/.test(normalizeInviteCode(value));
 }
 
+export function normalizeEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
+export function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
+}
+
 export const waitlistApi = {
   getQuestions() {
     return waitlistRequest<{ questions: ApiQuizQuestion[] }>("/quiz/questions");
@@ -155,8 +163,8 @@ export const waitlistApi = {
   },
 
   checkEmailRegistered(email: string) {
-    return waitlistRequest<{ registered: boolean }>("/waitlist_public/check_email_registered", {
-      query: { email: email.trim().toLowerCase() },
+    return waitlistRequest<{ registered: boolean } | null>("/waitlist_public/check_email_registered", {
+      query: { email: normalizeEmail(email) },
     });
   },
 

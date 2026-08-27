@@ -9,7 +9,7 @@ import { FaXTwitter } from "react-icons/fa6";
 
 import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
 import { notifyError } from "@/components/site/app-notice";
-import { isValidInviteCode, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
+import { isValidEmail, isValidInviteCode, normalizeEmail, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
 import { hydrateQuestions, mapCardToOutcome, PERSONAS_BY_CODE } from "@/lib/waitlist/persona";
 import {
   decideWaitlistEntry,
@@ -57,6 +57,8 @@ const INVITES_PER_PAGE = 5;
 const PRIORITY_PER_FRIEND = 500;
 const PRIORITY_FRIEND_CAP = 5000;
 const NO_SAVED_RESULT = "No saved result is linked to this email. Use an invite to take the test.";
+const ALREADY_REGISTERED = "This email is already registered. Sign in to view your result.";
+const INVALID_EMAIL = "Please enter a valid email address.";
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 const RESERVE_EXPIRED = "Invite reservation expired. Reserve again.";
 const RESERVE_LIMIT = "Invite reservation time limit reached.";
@@ -71,6 +73,17 @@ const DEFAULT_COMMUNITY = {
   telegram: "https://t.me/+CTeuBkpOxSNkN2Y0",
   x: "https://x.com/SmartXTerminal",
 };
+
+const INVITE_CARD_STATES = {
+  0: { label: "", mark: "↗", available: true },
+  1: { label: "Held", mark: "—", available: false },
+  2: { label: "Used", mark: "—", available: false },
+  3: { label: "Invalid", mark: "—", available: false },
+} as const;
+
+function inviteCardState(status: number) {
+  return INVITE_CARD_STATES[status as 0 | 1 | 2 | 3] ?? INVITE_CARD_STATES[3];
+}
 
 type Workspace =
   | {
@@ -771,8 +784,39 @@ export function WaitlistExperience() {
   const submitEmail = async () => {
     setRecoveryError("");
     setOtpError("");
+    const nextEmail = normalizeEmail(email);
+    if (!isValidEmail(nextEmail)) {
+      setRecoveryError(INVALID_EMAIL);
+      return;
+    }
+    setEmail(nextEmail);
     try {
-      await waitlistApi.sendEmailCode(email);
+      if (authIntent === "create") {
+        const check = await waitlistApi.checkEmailRegistered(nextEmail);
+        if (check?.registered === true) {
+          clearWaitlistSession();
+          setUserTokenState("");
+          setSessionTokenState("");
+          setUserInfo(null);
+          setOwnOutcome(null);
+          setInvitations([]);
+          setRank(null);
+          setShareCompleted(false);
+          setVerifiedFriends(0);
+          setAnswers({});
+          setQuestionIndex(0);
+          setInviteCode("");
+          setTelegramOpened(false);
+          setXOpened(false);
+          setOtp("");
+          setOtpError("");
+          setAuthIntent("recover");
+          setRecoveryError(ALREADY_REGISTERED);
+          setStage("email");
+          return;
+        }
+      }
+      await waitlistApi.sendEmailCode(nextEmail);
       setOtp("");
       setOtpResent(false);
       const now = Date.now();
@@ -1155,7 +1199,23 @@ export function WaitlistExperience() {
             <form onSubmit={(event) => event.preventDefault()}>
               <label htmlFor="waitlist-email">Email address</label>
               <div className={styles.inlineField}>
-                <input id="waitlist-email" type="email" autoComplete="email" placeholder="you@domain.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                <input
+                  id="waitlist-email"
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder="you@domain.com"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setRecoveryError("");
+                  }}
+                  aria-invalid={Boolean(recoveryError)}
+                  required
+                />
                 <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitEmail}>
                   {authIntent === "recover" ? "Send code" : "Continue"}
                 </WaitlistButton>
@@ -1282,29 +1342,34 @@ export function WaitlistExperience() {
                 </header>
                 <div className={styles.inviteCardGrid}>
                   {visibleInvitations.map((invitation, index) => {
-                    const used = invitation.status !== 0;
-                    const isCopied = copiedCode === invitation.code;
+                    const card = inviteCardState(invitation.status);
+                    const isCopied = card.available && copiedCode === invitation.code;
                     const absoluteIndex = invitePage * INVITES_PER_PAGE + index;
+                    const statusLabel = isCopied ? "Copied" : card.label;
                     return (
                       <WaitlistButton
                         className={styles.inviteCodeCard}
                         data-copied={isCopied}
-                        data-used={used}
-                        disabled={used}
+                        data-status={invitation.status}
+                        disabled={!card.available}
                         key={invitation.code}
                         type="button"
                         lock={false}
-                        aria-label={used ? `Invite ${invitation.code} used` : `Copy invite link ${invitation.code}`}
+                        aria-label={
+                          card.available
+                            ? `Copy invite link ${invitation.code}`
+                            : `Invite ${invitation.code} ${card.label.toLowerCase()}`
+                        }
                         onAction={() => copyInvitation(invitation.code)}
                       >
                         <header>
                           <span>Invite {String(absoluteIndex + 1).padStart(2, "0")}</span>
                           <i aria-hidden="true" />
                         </header>
-                        <div aria-hidden="true"><strong>{used ? "—" : isCopied ? "✓" : "↗"}</strong></div>
+                        <div aria-hidden="true"><strong>{isCopied ? "✓" : card.mark}</strong></div>
                         <footer>
                           <span>{invitation.code}</span>
-                          {(used || isCopied) && <b>{used ? "Used" : "Copied"}</b>}
+                          {statusLabel ? <b>{statusLabel}</b> : null}
                         </footer>
                       </WaitlistButton>
                     );

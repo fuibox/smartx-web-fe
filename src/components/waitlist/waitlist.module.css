@@ -237,6 +237,16 @@
   width: min(100%, 760px);
   margin-top: 46px;
   text-align: left;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.gateForm > label,
+.gateForm > .inlineField {
+  grid-column: 1 / -1;
+}
+
+.gateForm > small {
+  grid-column: 1;
 }
 
 .gateForm label,
@@ -306,27 +316,31 @@
 
 .gateFormMeta {
   display: flex;
+  grid-column: 2;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 18px;
-  margin: 10px 20px 0;
+  margin: 11px 0 0;
 }
 
 .gateFormMeta .testCodeButton,
 .gateFormMeta .textButton { margin: 0; }
-.formError { color: var(--coral); }
+
+.gateForm > .formError,
+.formStage form > .formError,
+.formError {
+  color: var(--coral);
+}
 
 .gateForm:has(.formError) .formHint,
 .formStage:has(.formError) .formHint {
   display: none;
 }
 
-.gateForm:has(input:focus) .formError,
 .formStage:has(input:focus) .formError {
   display: none;
 }
 
-.gateForm:has(input:focus) .formHint,
 .formStage:has(input:focus) .formHint {
   display: block;
 }
@@ -1089,16 +1103,26 @@
 .inviteCodeCard footer span { color: var(--dim); font: 600 9px var(--font-jb), monospace; }
 .inviteCodeCard footer b { color: var(--teal); font-size: 9px; font-weight: 600; }
 
-.inviteCodeCard[data-used="true"] {
+.inviteCodeCard[data-status="1"],
+.inviteCodeCard[data-status="2"],
+.inviteCodeCard[data-status="3"] {
   border-color: var(--line);
   background: #030404;
   box-shadow: none;
   cursor: default;
-  opacity: 0.38;
 }
 
-.inviteCodeCard[data-used="true"] > header i { background: var(--muted); }
-.inviteCodeCard[data-used="true"] footer b { color: var(--muted); }
+.inviteCodeCard[data-status="1"] { opacity: 0.62; }
+.inviteCodeCard[data-status="2"] { opacity: 0.38; }
+.inviteCodeCard[data-status="3"] { opacity: 0.38; }
+
+.inviteCodeCard[data-status="1"] > header i,
+.inviteCodeCard[data-status="2"] > header i { background: var(--muted); }
+.inviteCodeCard[data-status="3"] > header i { background: var(--coral); }
+
+.inviteCodeCard[data-status="1"] footer b,
+.inviteCodeCard[data-status="2"] footer b { color: var(--muted); }
+.inviteCodeCard[data-status="3"] footer b { color: var(--coral); }
 .inviteCodeCard[data-copied="true"] { border-color: rgba(8, 223, 181, 0.65); }
 
 .inviteNavigation {
@@ -1297,7 +1321,7 @@
     min-width: 84px;
     padding: 0 14px;
   }
-  .gateFormMeta { align-items: flex-start; flex-direction: column; margin-left: 12px; }
+  .gateFormMeta { margin-left: 0; }
   .returningGate { align-items: flex-start; flex-direction: column; gap: 16px; }
   .returningGate > button { padding-left: 0; }
   .accountStrip { gap: 12px; }
