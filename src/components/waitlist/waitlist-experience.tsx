@@ -346,6 +346,8 @@ export function WaitlistExperience() {
   const inviteCodeRef = useRef(inviteCode);
   inviteCodeRef.current = inviteCode;
   const renewalCappedRef = useRef(false);
+  const shareDialogRef = useRef<HTMLDialogElement>(null);
+  const [selectedShareCode, setSelectedShareCode] = useState("");
   const [reserveWarning, setReserveWarning] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [shareCompleted, setShareCompleted] = useState(false);
@@ -641,6 +643,18 @@ export function WaitlistExperience() {
     }, INVITES_POLL_MS);
     return () => window.clearInterval(timer);
   }, [stage, userToken]);
+
+  useEffect(() => {
+    if (!selectedShareCode) return;
+    const selected = invitations.find((item) => item.code === selectedShareCode);
+    if (!selected || selected.status !== 0) setSelectedShareCode("");
+  }, [invitations, selectedShareCode]);
+
+  useEffect(() => {
+    if (stage === "result") return;
+    shareDialogRef.current?.close();
+    setSelectedShareCode("");
+  }, [stage]);
 
   const syncReservation = async () => {
     const code = inviteCodeRef.current;
@@ -991,12 +1005,33 @@ export function WaitlistExperience() {
     }
   };
 
+  const openSharePicker = async () => {
+    setSelectedShareCode("");
+    if (userToken) {
+      try {
+        const invites = await waitlistApi.getMyInvites(userToken);
+        setInvitations(invites.list);
+      } catch (error) {
+        if (handleUserApiError(error)) return;
+      }
+    }
+    shareDialogRef.current?.showModal();
+  };
+
+  const closeSharePicker = () => {
+    shareDialogRef.current?.close();
+    setSelectedShareCode("");
+  };
+
   const shareResult = async () => {
-    if (!ownOutcome) return;
+    if (!ownOutcome || !selectedShareCode) return;
+    const selected = invitations.find((item) => item.code === selectedShareCode);
+    if (!selected || selected.status !== 0) return;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
     shareUrl.searchParams.set("text", `My SmartX trader type is ${ownOutcome.persona.name}.${ownOutcome.persona.roast ? `\n\n“${ownOutcome.persona.roast}”` : ""}\n\nFind yours in six questions.`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(invitations.find((item) => item.status === 0)?.code, ownOutcome.resultId, true));
+    shareUrl.searchParams.set("url", makeInvitationUrl(selected.code, ownOutcome.resultId, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
+    closeSharePicker();
     if (!userToken || shareCompleted) return;
     try {
       await waitlistApi.shareComplete(userToken);
@@ -1331,7 +1366,7 @@ export function WaitlistExperience() {
                   </div>
                 </div>
                 <small>Priority improves your score; rank updates against the live waitlist.</small>
-                <WaitlistButton className={styles.shareButton} onAction={shareResult}>
+                <WaitlistButton className={styles.shareButton} onAction={openSharePicker}>
                   {shareCompleted ? "Share again" : "Share result"}
                 </WaitlistButton>
               </div>
@@ -1369,7 +1404,9 @@ export function WaitlistExperience() {
                             ? `Copy invite link ${invitation.code}`
                             : `Invite ${invitation.code} ${card.label.toLowerCase()}`
                         }
-                        onAction={() => copyInvitation(invitation.code)}
+                        onClick={() => {
+                          void copyInvitation(invitation.code);
+                        }}
                       >
                         <header>
                           <span>Invite {String(absoluteIndex + 1).padStart(2, "0")}</span>
@@ -1389,6 +1426,61 @@ export function WaitlistExperience() {
           </div>
         )}
       </section>
+      <dialog
+        ref={shareDialogRef}
+        className={styles.shareDialog}
+        aria-labelledby="share-invite-title"
+        onClose={() => setSelectedShareCode("")}
+        onClick={(event) => {
+          const box = event.currentTarget.getBoundingClientRect();
+          const outside = event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+          if (outside) event.currentTarget.close();
+        }}
+      >
+        <div className={styles.shareDialogPanel}>
+          <header>
+            <strong id="share-invite-title">Choose invite</strong>
+            <p>Unused codes only.</p>
+          </header>
+          {invitations.some((item) => item.status === 0) ? (
+            <div className={styles.shareInviteList} role="listbox" aria-label="Invite codes">
+              {invitations.map((invitation) => {
+                const card = inviteCardState(invitation.status);
+                const selected = selectedShareCode === invitation.code;
+                return (
+                  <WaitlistButton
+                    key={invitation.code}
+                    className={styles.shareInviteOption}
+                    type="button"
+                    role="option"
+                    lock={false}
+                    aria-selected={selected}
+                    data-selected={selected}
+                    data-status={invitation.status}
+                    disabled={!card.available}
+                    onClick={() => {
+                      if (!card.available) return;
+                      setSelectedShareCode(invitation.code);
+                    }}
+                  >
+                    <i aria-hidden="true" />
+                    <span>{invitation.code}</span>
+                    {card.label ? <b>{card.label}</b> : null}
+                  </WaitlistButton>
+                );
+              })}
+            </div>
+          ) : (
+            <p className={styles.shareInviteEmpty}>No unused invites left.</p>
+          )}
+          <div className={styles.shareDialogActions}>
+            <WaitlistButton className={styles.textButton} type="button" lock={false} onClick={closeSharePicker}>Cancel</WaitlistButton>
+            <WaitlistButton className={styles.shareDialogShare} type="button" disabled={!selectedShareCode} onAction={shareResult}>
+              Share
+            </WaitlistButton>
+          </div>
+        </div>
+      </dialog>
     </main>
     </WaitlistActionScope>
   );
