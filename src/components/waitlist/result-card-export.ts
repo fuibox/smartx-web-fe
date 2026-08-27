@@ -1,3 +1,5 @@
+import { isRiskMonk } from "@/lib/waitlist/persona";
+
 export type ResultCardFormat = "story" | "og";
 
 export type RenderedResultCard = {
@@ -144,12 +146,15 @@ function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData
   const width = 1080;
   drawBase(context, width, 1920, 42);
   drawHeader(context, width, 84, 98);
-  context.fillStyle = COLORS.mintStrong;
-  context.font = "700 17px JetBrainsMono, monospace";
-  context.fillText(data.poles.join(" · "), 84, 178);
+  const hidePoles = isRiskMonk(data.code);
+  if (!hidePoles) {
+    context.fillStyle = COLORS.mintStrong;
+    context.font = "700 17px JetBrainsMono, monospace";
+    context.fillText(data.poles.join(" · "), 84, 178);
+  }
   context.fillStyle = COLORS.text;
   context.font = "600 84px \"Playfair Display\", Georgia, serif";
-  wrapText(context, data.name, 84, 282, 912, 88, 2);
+  wrapText(context, data.name, 84, hidePoles ? 200 : 282, 912, 88, 2);
   drawArtwork(context, artwork, 84, 440, 912, 600);
   drawAxis(context, "Conviction", data.scores.conviction, 84, 1105, 278);
   drawAxis(context, "Instinct", data.scores.instinct, 400, 1105, 278);
@@ -177,12 +182,15 @@ function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, a
   const width = 1200;
   drawBase(context, width, 630, 24);
   drawHeader(context, width, 54, 70);
-  context.fillStyle = COLORS.mintStrong;
-  context.font = "700 13px JetBrainsMono, monospace";
-  context.fillText(data.poles.join(" · "), 54, 120);
+  const hidePoles = isRiskMonk(data.code);
+  if (!hidePoles) {
+    context.fillStyle = COLORS.mintStrong;
+    context.font = "700 13px JetBrainsMono, monospace";
+    context.fillText(data.poles.join(" · "), 54, 120);
+  }
   context.fillStyle = COLORS.text;
   context.font = "600 58px \"Playfair Display\", Georgia, serif";
-  wrapText(context, data.name, 54, 190, 590, 60, 2);
+  wrapText(context, data.name, 54, hidePoles ? 140 : 190, 590, 60, 2);
   context.fillStyle = COLORS.mint;
   context.font = "500 24px \"Playfair Display\", Georgia, serif";
   wrapText(context, `“${data.roast}”`, 54, 350, 560, 31, 3);

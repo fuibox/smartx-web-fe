@@ -10,7 +10,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
 import { notifyError } from "@/components/site/app-notice";
 import { isValidEmail, isValidInviteCode, normalizeEmail, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
-import { hydrateQuestions, mapCardToOutcome, PERSONAS_BY_CODE } from "@/lib/waitlist/persona";
+import { hydrateQuestions, isRiskMonk, mapCardToOutcome, PERSONAS_BY_CODE } from "@/lib/waitlist/persona";
 import {
   decideWaitlistEntry,
   isOwnResultAvailable,
@@ -273,7 +273,7 @@ function PersonaPoster({
         </header>
       )}
       <div className={styles.posterIdentity}>
-        <span>{outcome.poles.join(" · ")}</span>
+        {!isRiskMonk(outcome.persona.mark) && <span>{outcome.poles.join(" · ")}</span>}
         <h2>{outcome.persona.name}</h2>
       </div>
       <div className={styles.personaArt}>

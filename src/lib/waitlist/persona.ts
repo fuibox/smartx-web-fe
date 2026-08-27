@@ -75,6 +75,10 @@ export const PERSONAS_BY_CODE = Object.values(PERSONAS).reduce<Record<string, Pe
   return index;
 }, {});
 
+export function isRiskMonk(personaId: string | undefined) {
+  return personaId === "RSK";
+}
+
 const CHEMISTRY: Record<string, { best: string; rival: string }> = {
   LQD: { best: "DIP", rival: "LMT" }, AIM: { best: "DOC", rival: "CHN" },
   SIG: { best: "CHN", rival: "DOC" }, CND: { best: "LMT", rival: "DIP" },

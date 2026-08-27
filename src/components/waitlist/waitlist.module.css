@@ -845,6 +845,10 @@
   letter-spacing: 0.09em;
 }
 
+.posterIdentity:not(:has(> span)) h2 {
+  margin-top: 0;
+}
+
 .posterIdentity h2 {
   max-width: 100%;
   margin: 8px 0 4px;
