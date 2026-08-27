@@ -54,6 +54,8 @@ import styles from "./waitlist.module.css";
 
 const WAITLIST_URL = "https://smartx.io/waitlist/";
 const INVITES_PER_PAGE = 5;
+const PRIORITY_PER_FRIEND = 500;
+const PRIORITY_FRIEND_CAP = 5000;
 const NO_SAVED_RESULT = "No saved result is linked to this email. Use an invite to take the test.";
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 const RESERVE_EXPIRED = "Invite reservation expired. Reserve again.";
@@ -62,6 +64,7 @@ const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try 
 const INVITE_CLAIMED = "This invite has already been claimed. Ask for another one.";
 const RESERVE_CAP_HINT = "Your invite can’t be extended further. Finish the test to save it.";
 const RENEW_INTERVAL_MS = 90_000;
+const INVITES_POLL_MS = 10_000;
 const OTP_RESEND_SECONDS = 60;
 const OTP_EXPIRE_SECONDS = 300;
 const DEFAULT_COMMUNITY = {
@@ -75,6 +78,7 @@ type Workspace =
       outcome: Outcome;
       rank: number;
       shareCompleted: boolean;
+      verifiedFriends: number;
       invitations: InviteItem[];
       links: { telegram: string; x: string };
       telegramCompleted: boolean;
@@ -151,12 +155,16 @@ async function fetchWorkspace(token: string): Promise<Workspace> {
   const xCompleted = community.xCompleted === 1;
 
   const toResultWorkspace = async (card: ResultCard & { rank: number; shareCompleted: number }) => {
-    const invites = await waitlistApi.getMyInvites(token);
+    const [invites, friends] = await Promise.all([
+      waitlistApi.getMyInvites(token),
+      waitlistApi.getInviteFriends(token),
+    ]);
     return {
       kind: "result" as const,
       outcome: mapCardToOutcome(card),
       rank: card.rank,
       shareCompleted: card.shareCompleted === 1,
+      verifiedFriends: friends.total,
       invitations: invites.list,
       links,
       telegramCompleted,
@@ -321,6 +329,7 @@ export function WaitlistExperience() {
   const [reserveWarning, setReserveWarning] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [shareCompleted, setShareCompleted] = useState(false);
+  const [verifiedFriends, setVerifiedFriends] = useState(0);
   const [invitePage, setInvitePage] = useState(0);
   const [invitations, setInvitations] = useState<InviteItem[]>([]);
   const [rank, setRank] = useState<number | null>(null);
@@ -335,6 +344,11 @@ export function WaitlistExperience() {
   const invitePageCount = Math.max(1, Math.ceil(invitations.length / INVITES_PER_PAGE));
   const visibleInvitations = invitations.slice(invitePage * INVITES_PER_PAGE, (invitePage + 1) * INVITES_PER_PAGE);
   const verifiedEmail = userInfo?.email || sessionEmail || email;
+  const friendRewardApplied = verifiedFriends > 0;
+  const friendPriority = Math.min(
+    PRIORITY_FRIEND_CAP,
+    Math.max(PRIORITY_PER_FRIEND, PRIORITY_PER_FRIEND * verifiedFriends),
+  );
   const clock = nowMs || (otpExpireAt || otpResendAt ? Date.now() : 0);
   const otpCooldown = otpResendAt ? remainingSeconds(otpResendAt, clock) : 0;
   const otpExpiresIn = otpExpireAt ? remainingSeconds(otpExpireAt, clock) : 0;
@@ -364,11 +378,13 @@ export function WaitlistExperience() {
       setOwnOutcome(workspace.outcome);
       setRank(workspace.rank);
       setShareCompleted(workspace.shareCompleted);
+      setVerifiedFriends(workspace.verifiedFriends);
       setInvitations(workspace.invitations);
       setInvitePage(0);
       setStage("result");
       return;
     }
+    setVerifiedFriends(0);
     setStage("unlock");
   };
 
@@ -396,6 +412,7 @@ export function WaitlistExperience() {
     setInvitations([]);
     setRank(null);
     setShareCompleted(false);
+    setVerifiedFriends(0);
     setSessionEmail("");
     setEmail("");
     setOtp("");
@@ -426,6 +443,8 @@ export function WaitlistExperience() {
     purgeWaitlistClient(errorMessage(error));
     return true;
   };
+  const handleUserApiErrorRef = useRef(handleUserApiError);
+  handleUserApiErrorRef.current = handleUserApiError;
 
   useEffect(() => {
     let cancelled = false;
@@ -572,6 +591,36 @@ export function WaitlistExperience() {
     if (stage !== "quiz" && stage !== "email" && stage !== "verify") return;
     setQuizDraft({ answers, questionIndex });
   }, [answers, questionIndex, stage]);
+
+  useEffect(() => {
+    if (stage !== "result" || !userToken) return;
+    let inFlight = false;
+    const pollInvites = async () => {
+      if (inFlight || document.hidden) return;
+      inFlight = true;
+      try {
+        const [invites, friends, result] = await Promise.all([
+          waitlistApi.getMyInvites(userToken),
+          waitlistApi.getInviteFriends(userToken),
+          waitlistApi.getMyResult(userToken),
+        ]);
+        setInvitations(invites.list);
+        setVerifiedFriends(friends.total);
+        if (isUnlockedResult(result)) {
+          setRank(result.rank);
+          setShareCompleted(result.shareCompleted === 1);
+        }
+      } catch (error) {
+        handleUserApiErrorRef.current(error);
+      } finally {
+        inFlight = false;
+      }
+    };
+    const timer = window.setInterval(() => {
+      void pollInvites();
+    }, INVITES_POLL_MS);
+    return () => window.clearInterval(timer);
+  }, [stage, userToken]);
 
   const syncReservation = async () => {
     const code = inviteCodeRef.current;
@@ -1207,9 +1256,9 @@ export function WaitlistExperience() {
                     <span>{shareCompleted ? "Share recorded" : "First result share"}</span>
                     <b>+500 priority</b>
                   </div>
-                  <div>
-                    <span>Each verified friend</span>
-                    <b>+500 priority</b>
+                  <div data-applied={friendRewardApplied}>
+                    <span>Each verified friend{friendRewardApplied ? ` (+${verifiedFriends})` : ""}</span>
+                    <b>+{friendPriority.toLocaleString("en-US")} priority</b>
                   </div>
                 </div>
                 <small>Priority improves your score; rank updates against the live waitlist.</small>

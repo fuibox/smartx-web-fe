@@ -162,6 +162,17 @@ export type InviteItem = {
   usedAt: number | null;
 };
 
+export type InviteFriend = {
+  userId: string;
+  joinedAt: number;
+};
+
+export type InviteFriendsView = {
+  list: InviteFriend[];
+  total: number;
+  totalPages: number;
+};
+
 export type RankView = {
   rank: number;
   totalUsers: number;

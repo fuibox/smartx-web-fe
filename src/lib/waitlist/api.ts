@@ -3,6 +3,7 @@ import {
   type CommunityChannel,
   type CommunityCompleteResult,
   type CommunityInfo,
+  type InviteFriendsView,
   type InviteItem,
   type InviteView,
   type LoginResult,
@@ -210,6 +211,19 @@ export const waitlistApi = {
 
   getMyInvites(userToken: string) {
     return waitlistRequest<{ list: InviteItem[] }>("/user/my_invites", { userToken });
+  },
+
+  async getInviteFriends(userToken: string) {
+    const data = await waitlistRequest<InviteFriendsView>("/user/invite_friends", {
+      query: { pageIndex: 1, pageSize: 1 },
+      userToken,
+    });
+    const total = Number(data?.total);
+    return {
+      list: data?.list ?? [],
+      total: Number.isFinite(total) && total > 0 ? Math.floor(total) : 0,
+      totalPages: Number(data?.totalPages) || 0,
+    };
   },
 
   getUserInfo(userToken: string) {
