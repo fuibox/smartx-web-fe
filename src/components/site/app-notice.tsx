@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 import styles from "./app-notice.module.css";
 
@@ -22,6 +25,7 @@ export function notifyError(message: string) {
 
 export function AppNoticeHost() {
   const [notice, setNotice] = useState<Notice | null>(null);
+  useLingui();
 
   useEffect(() => {
     const listener = (next: Notice) => setNotice(next);
@@ -44,8 +48,8 @@ export function AppNoticeHost() {
   return (
     <div className={styles.host} role="alert" aria-live="assertive">
       <p>{notice.message}</p>
-      <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss notification">
-        Close
+      <button type="button" onClick={() => setNotice(null)} aria-label={t`Dismiss notification`}>
+        <Trans>Close</Trans>
       </button>
     </div>
   );

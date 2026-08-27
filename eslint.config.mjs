@@ -25,6 +25,7 @@ const eslintConfig = [
       "output/**",
       "public/**",
       "next-env.d.ts",
+      "src/locales/**/messages.ts",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

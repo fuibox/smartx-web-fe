@@ -1,21 +1,28 @@
 import Image from "next/image";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import type { MessageDescriptor } from "@lingui/core";
 
 import styles from "./consumer-home.module.css";
 
 const PRODUCT_ASSET_ROOT = "/assets/consumer-network/product-ui";
 
+// 产品切片里的 UI 标签走翻译；演示用户名/帖子正文/市场标题是内容数据，保持英文（与真实产品一致）。
+const VERIFIED_PROFILE = msg`Verified profile`;
+
 const rankedTraders = [
   {
     id: "quarterty",
     name: "North Index",
-    handle: "Verified profile",
+    handle: VERIFIED_PROFILE,
     pnl: "+$128.4K",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
   },
   {
     id: "rowdy",
     name: "Clear Signal",
-    handle: "Verified profile",
+    handle: VERIFIED_PROFILE,
     pnl: "+$219.8K",
     midPnl: "+$164.2K",
     previousPnl: "+$118.6K",
@@ -24,19 +31,21 @@ const rankedTraders = [
   {
     id: "smartx",
     name: "Open Ledger",
-    handle: "Verified profile",
+    handle: VERIFIED_PROFILE,
     pnl: "+$63.5K",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-smartx.png`,
   },
   {
     id: "macro",
     name: "Quiet Market",
-    handle: "Verified profile",
+    handle: VERIFIED_PROFILE,
     pnl: "+$58.2K",
   },
 ] as const;
 
 function LeaderboardPreview() {
+  const { i18n } = useLingui();
+
   return (
     <div className={styles.leaderboardPreview}>
       <div className={styles.rankingRanks} aria-hidden="true">
@@ -59,7 +68,7 @@ function LeaderboardPreview() {
             )}
             <span className={styles.rankingIdentity}>
               <strong>{trader.name}</strong>
-              <small>{trader.handle}</small>
+              <small>{i18n._(trader.handle)}</small>
             </span>
             <span className={styles.rankingPnl}>
               {"previousPnl" in trader ? (
@@ -71,7 +80,9 @@ function LeaderboardPreview() {
               ) : (
                 <strong>{trader.pnl}</strong>
               )}
-              <small>30D P&amp;L</small>
+              <small>
+                <Trans>30D P&L</Trans>
+              </small>
             </span>
           </article>
         ))}
@@ -83,15 +94,15 @@ function LeaderboardPreview() {
 type SquarePostProps = Readonly<{
   avatar: string;
   name: string;
-  handle: string;
+  handle: MessageDescriptor;
   body: string;
   socialAvatar: string;
-  socialProof: string;
+  socialProof: MessageDescriptor;
   asset: Readonly<{
     kind: "prediction" | "token" | "stock";
     image: string;
     title: string;
-    averageEntry: string;
+    averageEntry: MessageDescriptor;
     value: string;
     pnl: string;
   }>;
@@ -106,22 +117,28 @@ function SquarePost({
   socialProof,
   asset,
 }: SquarePostProps) {
+  const { i18n } = useLingui();
+
   return (
     <article className={styles.squarePost}>
       <header>
         <Image src={avatar} alt="" width={30} height={30} sizes="30px" />
         <span>
           <strong>{name}</strong>
-          <small>{handle} · now</small>
+          <small>
+            <Trans>{i18n._(handle)} · now</Trans>
+          </small>
         </span>
-        <em>Opinion</em>
+        <em>
+          <Trans>Opinion</Trans>
+        </em>
       </header>
       <p>{body}</p>
       <div className={styles.squarePosition} data-asset={asset.kind}>
         <Image src={asset.image} alt="" width={32} height={32} sizes="32px" />
         <span className={styles.squareAssetCopy}>
           <strong>{asset.title}</strong>
-          <small>{asset.averageEntry}</small>
+          <small>{i18n._(asset.averageEntry)}</small>
         </span>
         <span className={styles.squarePositionValue}>
           <strong>{asset.value}</strong>
@@ -131,7 +148,7 @@ function SquarePost({
       <footer className={styles.squareSocialProof}>
         <span>♡</span>
         <Image src={socialAvatar} alt="" width={16} height={16} sizes="16px" />
-        <small>{socialProof}</small>
+        <small>{i18n._(socialProof)}</small>
       </footer>
     </article>
   );
@@ -142,15 +159,15 @@ const squarePosts = [
     key: "north-index-primary",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
     name: "North Index",
-    handle: "Demo profile",
+    handle: msg`Demo profile`,
     body: "The committee still has room to wait. I am keeping the No position.",
     socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    socialProof: "A trader you follow liked this",
+    socialProof: msg`A trader you follow liked this`,
     asset: {
       kind: "prediction",
       image: `${PRODUCT_ASSET_ROOT}/market-fed.png`,
       title: "Will the Fed cut rates in September?",
-      averageEntry: "No · Avg entry 61¢",
+      averageEntry: msg`No · Avg entry 61¢`,
       value: "$18.4K",
       pnl: "+$2.3K PnL",
     },
@@ -159,15 +176,15 @@ const squarePosts = [
     key: "clear-signal",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
     name: "Clear Signal",
-    handle: "Demo profile",
+    handle: msg`Demo profile`,
     body: "Volume is improving without a matching spike in concentration.",
     socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
-    socialProof: "3 traders you follow liked this",
+    socialProof: msg`3 traders you follow liked this`,
     asset: {
       kind: "token",
       image: `${PRODUCT_ASSET_ROOT}/token-pump.svg`,
       title: "PUMP token",
-      averageEntry: "Avg entry · $1.52B MC",
+      averageEntry: msg`Avg entry · $1.52B MC`,
       value: "$31.9K",
       pnl: "+$4.9K PnL",
     },
@@ -176,15 +193,15 @@ const squarePosts = [
     key: "open-ledger-stock",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-smartx.png`,
     name: "Open Ledger",
-    handle: "Demo profile",
+    handle: msg`Demo profile`,
     body: "Onchain equity volume is holding above the weekly range.",
     socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    socialProof: "A verified trader liked this",
+    socialProof: msg`A verified trader liked this`,
     asset: {
       kind: "stock",
       image: `${PRODUCT_ASSET_ROOT}/token-aaplx.svg`,
       title: "AAPLx",
-      averageEntry: "Avg entry · $228.40",
+      averageEntry: msg`Avg entry · $228.40`,
       value: "$12.5K",
       pnl: "+$620 PnL",
     },
@@ -193,15 +210,15 @@ const squarePosts = [
     key: "north-index-loop",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
     name: "North Index",
-    handle: "Demo profile",
+    handle: msg`Demo profile`,
     body: "The committee still has room to wait. I am keeping the No position.",
     socialAvatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    socialProof: "A trader you follow liked this",
+    socialProof: msg`A trader you follow liked this`,
     asset: {
       kind: "prediction",
       image: `${PRODUCT_ASSET_ROOT}/market-fed.png`,
       title: "Will the Fed cut rates in September?",
-      averageEntry: "No · Avg entry 61¢",
+      averageEntry: msg`No · Avg entry 61¢`,
       value: "$18.4K",
       pnl: "+$2.3K PnL",
     },
@@ -212,7 +229,9 @@ function SquareForYouPreview() {
   return (
     <div className={styles.squarePreview}>
       <header className={styles.squareTopbar}>
-        <strong>Square</strong>
+        <strong>
+          <Trans>Square</Trans>
+        </strong>
         <i className={styles.squareFilter}>
           <span />
           <span />
@@ -220,9 +239,15 @@ function SquareForYouPreview() {
         </i>
       </header>
       <div className={styles.squareLanes}>
-        <b>For You</b>
-        <b>Newest</b>
-        <b>Friends</b>
+        <b>
+          <Trans>For You</Trans>
+        </b>
+        <b>
+          <Trans>Newest</Trans>
+        </b>
+        <b>
+          <Trans>Friends</Trans>
+        </b>
       </div>
       <div className={styles.squareFeed}>
         <div className={styles.squareFeedTrack}>
@@ -239,12 +264,12 @@ type SignalCardData = Readonly<{
   id: "fed" | "bitcoin";
   trader: string;
   avatar: string;
-  traderMeta: string;
+  traderMeta: MessageDescriptor;
   traderPnl: string;
   marketImage: string;
   marketTitle: string;
   opinion: string;
-  side: "Yes" | "No change";
+  side: MessageDescriptor;
   amount: string;
   positionValue: string;
   entry: string;
@@ -257,12 +282,12 @@ const tradeSignals: readonly SignalCardData[] = [
     id: "fed",
     trader: "North Index",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-quarterty.png`,
-    traderMeta: "30d 72% win · 982 trades",
+    traderMeta: msg`30d 72% win · 982 trades`,
     traderPnl: "+$220K",
     marketImage: `${PRODUCT_ASSET_ROOT}/market-fed.png`,
     marketTitle: "Fed Decision in September?",
     opinion: "Inflation is cooling too slowly for a cut. I am keeping the base case while labor data stays firm.",
-    side: "No change",
+    side: msg`No change`,
     amount: "$435.20",
     positionValue: "$18.4K",
     entry: "61¢",
@@ -273,12 +298,12 @@ const tradeSignals: readonly SignalCardData[] = [
     id: "bitcoin",
     trader: "Clear Signal",
     avatar: `${PRODUCT_ASSET_ROOT}/avatar-rowdy.png`,
-    traderMeta: "30d 68% win · 282 trades",
+    traderMeta: msg`30d 68% win · 282 trades`,
     traderPnl: "+$128.4K",
     marketImage: `${PRODUCT_ASSET_ROOT}/market-bitcoin.svg`,
     marketTitle: "Will Bitcoin reach $150K before 2027?",
     opinion: "The skew still favors a late-cycle breakout while price holds the recent range.",
-    side: "Yes",
+    side: msg`Yes`,
     amount: "$12.5K",
     positionValue: "$38.8K",
     entry: "34¢",
@@ -288,6 +313,8 @@ const tradeSignals: readonly SignalCardData[] = [
 ] as const;
 
 function SignalCard({ signal }: { signal: SignalCardData }) {
+  const { i18n } = useLingui();
+
   return (
     <article className={styles.tradeSignalCard}>
       <header>
@@ -300,11 +327,13 @@ function SignalCard({ signal }: { signal: SignalCardData }) {
         />
         <span>
           <strong>{signal.trader}</strong>
-          <small>{signal.traderMeta}</small>
+          <small>{i18n._(signal.traderMeta)}</small>
         </span>
         <span className={styles.tradeSignalPnl}>
           <strong>{signal.traderPnl}</strong>
-          <small>30D P&amp;L</small>
+          <small>
+            <Trans>30D P&L</Trans>
+          </small>
         </span>
       </header>
       <div className={styles.tradeSignalMarket}>
@@ -321,17 +350,19 @@ function SignalCard({ signal }: { signal: SignalCardData }) {
         <p>{signal.opinion}</p>
         <div className={styles.tradeSignalPosition}>
           <span>
-            <small>{signal.side}</small>
+            <small>{i18n._(signal.side)}</small>
             <strong>{signal.amount}</strong>
           </span>
           <span>
-            <small>Position value</small>
+            <small>
+              <Trans>Position value</Trans>
+            </small>
             <strong>{signal.positionValue}</strong>
           </span>
         </div>
         <footer>
           <small>
-            Entry <strong>{signal.entry}</strong>
+            <Trans>Entry</Trans> <strong>{signal.entry}</strong>
             <Image
               src={`${PRODUCT_ASSET_ROOT}/signal-chevron-right.svg`}
               alt=""
@@ -349,7 +380,7 @@ function SignalCard({ signal }: { signal: SignalCardData }) {
               height={11}
               sizes="11px"
             />
-            {signal.copied} copied
+            <Trans>{signal.copied} copied</Trans>
           </b>
         </footer>
       </div>
@@ -358,6 +389,9 @@ function SignalCard({ signal }: { signal: SignalCardData }) {
 }
 
 function TradePreview() {
+  const { i18n } = useLingui();
+  const firstSignal = tradeSignals[0];
+
   return (
     <div className={styles.tradePreview}>
       <div className={styles.tradeDeck}>
@@ -379,7 +413,9 @@ function TradePreview() {
               height={13}
               sizes="13px"
             />
-            <strong>Copy</strong>
+            <strong>
+              <Trans>Copy</Trans>
+            </strong>
             <small>5 USDC</small>
           </span>
           <span className={styles.tradeSwipeSkip}>
@@ -390,7 +426,9 @@ function TradePreview() {
               height={13}
               sizes="13px"
             />
-            <strong>Skip</strong>
+            <strong>
+              <Trans>Skip</Trans>
+            </strong>
           </span>
         </div>
         {tradeSignals.map((signal) => (
@@ -400,12 +438,16 @@ function TradePreview() {
         ))}
       </div>
       <span className={styles.tradeGesture} />
-      <div className={styles.tradeToast} data-toast={tradeSignals[0].id}>
+      <div className={styles.tradeToast} data-toast={firstSignal.id}>
         <i>✓</i>
         <span>
-          <strong>Order submitted</strong>
+          <strong>
+            <Trans>Order submitted</Trans>
+          </strong>
           <small>
-            5 USDC · {tradeSignals[0].side} at {tradeSignals[0].current}
+            <Trans>
+              5 USDC · {i18n._(firstSignal.side)} at {firstSignal.current}
+            </Trans>
           </small>
         </span>
       </div>

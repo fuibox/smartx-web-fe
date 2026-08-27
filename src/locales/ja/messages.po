@@ -1,0 +1,993 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-08-27 18:24+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ja\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. placeholder {0}: i18n._(handle)
+#: src/components/consumer-network/network-product-previews.tsx:129
+msgid "{0} · now"
+msgstr "{0} · たった今"
+
+#. placeholder {0}: signal.copied
+#: src/components/consumer-network/network-product-previews.tsx:383
+msgid "{0} copied"
+msgstr "{0}人がコピー"
+
+#: src/components/blog/blog-i18n.tsx:47
+msgid "{minutes} min read"
+msgstr "{minutes}分で読了"
+
+#: src/components/waitlist/waitlist-experience.tsx:1299
+#: src/components/waitlist/waitlist-experience.tsx:1373
+msgid "← Back"
+msgstr "← 戻る"
+
+#. placeholder {0}: friendPriority.toLocaleString("en-US")
+#: src/components/waitlist/waitlist-experience.tsx:1494
+msgid "+{0} priority"
+msgstr "+{0} 優先度"
+
+#: src/components/waitlist/waitlist-experience.tsx:1484
+msgid "+500 priority"
+msgstr "+500 優先度"
+
+#: src/components/consumer-network/consumer-home.tsx:209
+msgid "<0>The social trading app for memes, perps,</0><1>stocks and prediction markets. Follow</1><2>verified traders and trade in one tap.</2>"
+msgstr "<0>予測市場が中心のソーシャル取引。</0><1>ミーム、無期限、株式にも対応。</1><2>実取引トレーダーをフォローして、ワンタップでコピー。</2>"
+
+#: src/components/consumer-network/network-product-previews.tsx:182
+msgid "3 traders you follow liked this"
+msgstr "フォロー中のトレーダー3人がこのマーケットをいいねしました"
+
+#: src/components/consumer-network/network-product-previews.tsx:301
+msgid "30d 68% win · 282 trades"
+msgstr "30日 勝率68% · 282回"
+
+#: src/components/consumer-network/network-product-previews.tsx:285
+msgid "30d 72% win · 982 trades"
+msgstr "30日 勝率72% · 982回"
+
+#: src/components/consumer-network/network-product-previews.tsx:84
+#: src/components/consumer-network/network-product-previews.tsx:335
+msgid "30D P&L"
+msgstr "30日損益"
+
+#: src/app/not-found.tsx:20
+msgid "404 / SIGNAL LOST"
+msgstr "404 / マーケットロスト"
+
+#. placeholder {0}: i18n._(firstSignal.side)
+#. placeholder {1}: firstSignal.current
+#: src/components/consumer-network/network-product-previews.tsx:448
+msgid "5 USDC · {0} at {1}"
+msgstr "5 USDC · {0} @ {1}"
+
+#: src/components/waitlist/waitlist-experience.tsx:1118
+msgid "8-character code"
+msgstr "8桁のコード"
+
+#. placeholder {0}: localizedPersonaName(referralOutcome.persona)
+#: src/components/waitlist/waitlist-experience.tsx:1183
+msgid "A friend trades like <0>{0}.</0>"
+msgstr "友達の取引タイプは<0>{0}。</0>"
+
+#: src/components/waitlist/waitlist-experience.tsx:1180
+msgid "A result was shared with you"
+msgstr "結果がシェアされました"
+
+#: src/components/consumer-network/network-product-previews.tsx:165
+#: src/components/consumer-network/network-product-previews.tsx:216
+msgid "A trader you follow liked this"
+msgstr "フォロー中のトレーダーがこのマーケットをいいねしました"
+
+#: src/components/consumer-network/network-product-previews.tsx:199
+msgid "A verified trader liked this"
+msgstr "実取引トレーダーがこのマーケットをいいねしました"
+
+#: src/components/waitlist/waitlist-experience.tsx:1338
+msgid "Already tested?"
+msgstr "テスト済みですか？"
+
+#: src/components/waitlist/waitlist-experience.tsx:1227
+#: src/components/waitlist/waitlist-experience.tsx:1260
+msgid "Already tested? View my result"
+msgstr "テスト済み？結果を見る"
+
+#: src/components/consumer-network/consumer-home.tsx:478
+#: src/components/site/site-footer.tsx:74
+msgid "App"
+msgstr "アプリ"
+
+#: src/components/blog/article-contents.tsx:67
+msgid "Article contents"
+msgstr "目次"
+
+#: src/components/consumer-network/consumer-home.tsx:45
+msgid "Audience"
+msgstr "フォロワー"
+
+#: src/components/consumer-network/network-product-previews.tsx:187
+msgid "Avg entry · $1.52B MC"
+msgstr "平均エントリー · 時価総額 $1.52B"
+
+#: src/components/consumer-network/network-product-previews.tsx:204
+msgid "Avg entry · $228.40"
+msgstr "平均エントリー · $228.40"
+
+#: src/components/waitlist/waitlist-experience.tsx:1280
+msgid "Back to invite"
+msgstr "招待画面に戻る"
+
+#: src/components/consumer-network/consumer-home.tsx:422
+msgid "Be early"
+msgstr "先に入る"
+
+#: src/components/waitlist/waitlist-experience.tsx:1139
+msgid "Begin"
+msgstr "はじめる"
+
+#: src/components/waitlist/waitlist-experience.tsx:332
+msgid "Best match"
+msgstr "ベストマッチ"
+
+#: src/components/waitlist/waitlist-experience.tsx:1340
+msgid "Bind an email to keep it and create your waitlist position."
+msgstr "メールアドレスを連携して結果を保存し、ウェイトリストの順番を確保しましょう。"
+
+#: src/components/consumer-network/consumer-header.tsx:75
+#: src/components/consumer-network/consumer-header.tsx:141
+#: src/components/consumer-network/consumer-home.tsx:484
+#: src/components/site/site-footer.tsx:80
+#: src/components/site/site-header.tsx:76
+#: src/components/site/site-header.tsx:155
+msgid "Blog"
+msgstr "ブログ"
+
+#: src/components/waitlist/waitlist-experience.tsx:1465
+msgid "Both steps are required to continue."
+msgstr "続行には両方のステップが必要です。"
+
+#: src/components/blog/blog-i18n.tsx:32
+msgid "Campaign"
+msgstr "キャンペーン"
+
+#: src/components/waitlist/waitlist-experience.tsx:1623
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/components/waitlist/waitlist-experience.tsx:1425
+msgid "Change email"
+msgstr "メールアドレスを変更"
+
+#: src/components/waitlist/waitlist-experience.tsx:1383
+msgid "Check your inbox"
+msgstr "受信トレイを確認"
+
+#: src/components/waitlist/waitlist-experience.tsx:1170
+msgid "Checking invite, result, and sign-in state."
+msgstr "招待・結果・ログイン状態を確認しています。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1582
+msgid "Choose invite"
+msgstr "招待コードを選択"
+
+#: src/components/site/app-notice.tsx:52
+msgid "Close"
+msgstr "閉じる"
+
+#: src/components/consumer-network/consumer-header.tsx:82
+#: src/components/site/site-header.tsx:98
+msgid "Close navigation"
+msgstr "ナビゲーションを閉じる"
+
+#: src/components/waitlist/waitlist-experience.tsx:1422
+msgid "Code sent again"
+msgstr "コードを再送しました"
+
+#: src/components/blog/blog-i18n.tsx:33
+#: src/components/consumer-network/consumer-header.tsx:72
+#: src/components/consumer-network/consumer-header.tsx:138
+#: src/components/site/site-header.tsx:69
+#: src/components/site/site-header.tsx:147
+msgid "Community"
+msgstr "コミュニティ"
+
+#: src/components/waitlist/waitlist-experience.tsx:1364
+#: src/components/waitlist/waitlist-experience.tsx:1413
+msgid "Continue"
+msgstr "続ける"
+
+#: src/components/waitlist/waitlist-experience.tsx:326
+msgid "Conviction"
+msgstr "確信"
+
+#: src/components/waitlist/waitlist-experience.tsx:1529
+msgid "Copied"
+msgstr "コピーしました"
+
+#: src/components/consumer-network/network-product-previews.tsx:417
+msgid "Copy"
+msgstr "コピー"
+
+#. placeholder {0}: invitation.code
+#: src/components/waitlist/waitlist-experience.tsx:1541
+msgid "Copy invite link {0}"
+msgstr "招待リンク {0} をコピー"
+
+#: src/components/waitlist/waitlist-experience.tsx:1096
+msgid "Couldn’t copy the invite link. Try again."
+msgstr "招待リンクをコピーできませんでした。もう一度お試しください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1273
+msgid "Couldn’t load the test."
+msgstr "テストを読み込めませんでした。"
+
+#: src/components/consumer-network/network-product-previews.tsx:162
+#: src/components/consumer-network/network-product-previews.tsx:179
+#: src/components/consumer-network/network-product-previews.tsx:196
+#: src/components/consumer-network/network-product-previews.tsx:213
+msgid "Demo profile"
+msgstr "デモプロフィール"
+
+#: src/components/waitlist/waitlist-experience.tsx:1191
+msgid "Different score, same type—or something else entirely? Six decisions reveal how you trade when it gets real."
+msgstr "同じタイプか、まったく別か？6つの決断が、本番のマーケットでどう張るかを明らかにします。"
+
+#: src/components/consumer-network/consumer-home.tsx:357
+msgid "Discover · Follow · Copy"
+msgstr "発見 · フォロー · コピー"
+
+#: src/components/site/app-notice.tsx:51
+msgid "Dismiss notification"
+msgstr "通知を閉じる"
+
+#: src/components/waitlist/waitlist-experience.tsx:1453
+#: src/components/waitlist/waitlist-experience.tsx:1458
+msgid "Done ✓"
+msgstr "完了 ✓"
+
+#: src/components/waitlist/waitlist-experience.tsx:337
+msgid "Download result"
+msgstr "結果カードを保存"
+
+#: src/components/waitlist/waitlist-experience.tsx:336
+msgid "Download result card"
+msgstr "結果カードをダウンロード"
+
+#: src/components/waitlist/waitlist-experience.tsx:1512
+msgid "Each link can be claimed once."
+msgstr "各リンクは1回のみ使用できます。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1491
+msgid "Each verified friend"
+msgstr "認証済みフレンド1人につき"
+
+#: src/components/waitlist/waitlist-experience.tsx:1490
+msgid "Each verified friend (+{verifiedFriends})"
+msgstr "認証済みフレンド1人につき（+{verifiedFriends}）"
+
+#: src/components/waitlist/waitlist-experience.tsx:1343
+msgid "Email address"
+msgstr "メールアドレス"
+
+#: src/components/waitlist/waitlist-experience.tsx:281
+msgid "Email verified"
+msgstr "メール認証済み"
+
+#: src/components/waitlist/waitlist-experience.tsx:1389
+msgid "Enter the code sent to <0>{email}</0>."
+msgstr "<0>{email}</0> に送信されたコードを入力してください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1340
+msgid "Enter the email you used. We’ll send a six-digit code."
+msgstr "使用したメールアドレスを入力してください。6桁のコードをお送りします。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1452
+msgid "Enter the SmartX community"
+msgstr "SmartX コミュニティに参加"
+
+#: src/components/consumer-network/network-product-previews.tsx:365
+msgid "Entry"
+msgstr "エントリー価格"
+
+#: src/lib/waitlist/persona.ts:92
+msgid "Every all-in starts with enlightenment and ends with reincarnation."
+msgstr "すべてのオールインは悟りに始まり、輪廻に終わる。"
+
+#: src/lib/waitlist/persona.ts:108
+msgid "Every symptom diagnosed. Every loss professionally explained."
+msgstr "症状はすべて診断済み。損失にはいつもプロの解説付き。"
+
+#: src/components/consumer-network/consumer-home.tsx:25
+msgid "Every track record comes from real positions, real PnL, real history."
+msgstr "すべての戦績は、実際のポジション・損益・約定から。"
+
+#: src/components/consumer-network/consumer-home.tsx:238
+msgid "Every trader on SmartX is verified by real trades — and your feed is shaped by how you trade."
+msgstr "SmartX のトレーダーは全員、実取引で検証済み。フィードはよく見るマーケットに合わせて形づくられます。"
+
+#: src/components/consumer-network/consumer-home.tsx:402
+msgid "Fiat in · Markets open · Chains invisible"
+msgstr "法定通貨で入金 · マーケットはそのまま · チェーンは意識せず"
+
+#: src/components/waitlist/waitlist-experience.tsx:1212
+#: src/components/waitlist/waitlist-experience.tsx:1218
+msgid "Find my trader type"
+msgstr "自分の取引タイプを診断"
+
+#: src/components/waitlist/waitlist-experience.tsx:1339
+msgid "Find your result."
+msgstr "結果を探す。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1072
+msgid "Find yours in six questions."
+msgstr "6つの質問であなたの取引タイプを見つけよう。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1482
+msgid "First result share"
+msgstr "初回の結果シェア"
+
+#: src/components/waitlist/waitlist-experience.tsx:1457
+msgid "Follow product updates"
+msgstr "プロダクト情報をフォロー"
+
+#: src/components/waitlist/waitlist-experience.tsx:1457
+msgid "Follow SmartX on X"
+msgstr "X で SmartX をフォロー"
+
+#: src/components/consumer-network/consumer-home.tsx:235
+msgid "Follow the best. Not the loudest."
+msgstr "声の大きい人ではなく、いちばん精度の高い人をフォローしよう。"
+
+#: src/components/consumer-network/consumer-home.tsx:205
+msgid "Follow verified traders and trade in one tap."
+msgstr "実取引トレーダーをフォローして、ワンタップでコピー。"
+
+#: src/components/consumer-network/network-product-previews.tsx:243
+msgid "For You"
+msgstr "おすすめ"
+
+#: src/components/consumer-network/network-product-previews.tsx:249
+msgid "Friends"
+msgstr "フレンド"
+
+#: src/components/blog/blog-i18n.tsx:21
+msgid "From the journal"
+msgstr "ジャーナルの他の記事"
+
+#: src/components/consumer-network/consumer-home.tsx:396
+msgid "Fund with fiat. Skip gas and bridging. Trade across markets with one SmartX balance."
+msgstr "法定通貨で入金。ガス代もブリッジも不要。ひとつの SmartX 残高で、予測市場もその他の市場も取引。"
+
+#: src/components/blog/blog-i18n.tsx:34
+msgid "Guide"
+msgstr "ガイド"
+
+#: src/components/waitlist/waitlist-experience.tsx:91
+msgid "Held"
+msgstr "予約中"
+
+#: src/components/consumer-network/consumer-header.tsx:51
+#: src/components/consumer-network/consumer-header.tsx:114
+#: src/components/site/site-header.tsx:48
+#: src/components/site/site-header.tsx:123
+msgid "Home"
+msgstr "ホーム"
+
+#: src/components/waitlist/waitlist-experience.tsx:1250
+msgid "How do you trade<0/>when it gets <1>real?</1>"
+msgstr "マーケットが本番になったとき、<0/>あなたは<1>どう張る？</1>"
+
+#: src/components/blog/blog-i18n.tsx:20
+msgid "In this dispatch"
+msgstr "この記事の目次"
+
+#: src/components/consumer-network/consumer-home.tsx:45
+msgid "Income"
+msgstr "収益"
+
+#: src/components/waitlist/waitlist-experience.tsx:327
+msgid "Instinct"
+msgstr "直感"
+
+#: src/components/blog/blog-i18n.tsx:35
+msgid "Intelligence"
+msgstr "インテリジェンス"
+
+#: src/components/waitlist/waitlist-experience.tsx:93
+msgid "Invalid"
+msgstr "無効"
+
+#: src/components/waitlist/waitlist-experience.tsx:1542
+msgid "Invite"
+msgstr "招待"
+
+#. placeholder {0}: String(absoluteIndex + 1).padStart(2, "0")
+#: src/components/waitlist/waitlist-experience.tsx:1550
+msgid "Invite {0}"
+msgstr "招待 {0}"
+
+#: src/components/waitlist/waitlist-experience.tsx:1105
+msgid "Invite code"
+msgstr "招待コード"
+
+#: src/components/waitlist/waitlist-experience.tsx:106
+msgid "Invite code not recognized. Check the code and try again."
+msgstr "招待コードを認識できません。コードを確認して再試行してください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1589
+msgid "Invite codes"
+msgstr "招待コード一覧"
+
+#: src/components/waitlist/waitlist-experience.tsx:1509
+msgid "Invite friends"
+msgstr "友達を招待"
+
+#: src/components/waitlist/waitlist-experience.tsx:111
+msgid "Invite reservation time limit reached."
+msgstr "招待コードの確保時間が上限に達しました。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1452
+msgid "Join Telegram"
+msgstr "Telegram に参加"
+
+#: src/components/waitlist/waitlist-experience.tsx:1441
+msgid "Join the SmartX community and follow product updates before your trader type is revealed."
+msgstr "取引タイプの公開前に、SmartX コミュニティに参加してプロダクト情報をフォローしてください。"
+
+#: src/components/blog/article-cta.tsx:32
+#: src/components/consumer-network/consumer-home.tsx:121
+msgid "Join the Waitlist"
+msgstr "ウェイトリストに参加"
+
+#: src/components/blog/blog-i18n.tsx:19
+msgid "Journal"
+msgstr "ジャーナル"
+
+#: src/components/site/language-switcher.tsx:55
+#: src/components/site/language-switcher.tsx:77
+#: src/components/site/language-switcher.tsx:85
+msgid "Language"
+msgstr "言語"
+
+#: src/components/consumer-network/consumer-header.tsx:98
+#: src/components/site/site-header.tsx:93
+msgid "Launch Alpha"
+msgstr "Launch Alpha"
+
+#: src/components/waitlist/waitlist-experience.tsx:1167
+msgid "Loading your session."
+msgstr "セッションを読み込んでいます。"
+
+#: src/components/consumer-network/consumer-header.tsx:105
+#: src/components/site/site-header.tsx:114
+msgid "Mobile site navigation"
+msgstr "モバイルサイトナビゲーション"
+
+#: src/components/waitlist/waitlist-experience.tsx:1072
+msgid "My SmartX trader type is {shareName}."
+msgstr "私の SmartX 取引タイプは{shareName}でした。"
+
+#: src/components/waitlist/waitlist-experience.tsx:333
+msgid "Natural rival"
+msgstr "宿命のライバル"
+
+#: src/components/blog/blog-i18n.tsx:16
+msgid "Newer"
+msgstr "新しい記事"
+
+#: src/components/consumer-network/network-product-previews.tsx:246
+msgid "Newest"
+msgstr "新着"
+
+#: src/components/waitlist/waitlist-experience.tsx:1519
+msgid "Next five invites"
+msgstr "次の招待5件"
+
+#: src/components/consumer-network/network-product-previews.tsx:170
+#: src/components/consumer-network/network-product-previews.tsx:221
+msgid "No · Avg entry 61¢"
+msgstr "No · 平均エントリー 61¢"
+
+#: src/components/consumer-network/consumer-home.tsx:385
+msgid "No barriers for new users"
+msgstr "新規ユーザーの壁ゼロ"
+
+#: src/components/consumer-network/network-product-previews.tsx:290
+msgid "No change"
+msgstr "No change"
+
+#: src/components/consumer-network/consumer-home.tsx:351
+msgid "No more scrolling through noise. SmartX learns what you trade and shows you the traders and markets that fit"
+msgstr "ノイズをスクロールするのはもう終わり。SmartX がよく見るマーケットを学習し、合うトレーダーと市場を届けます"
+
+#: src/components/waitlist/waitlist-experience.tsx:103
+msgid "No saved result is linked to this email. Use an invite to take the test."
+msgstr "このメールに紐づく結果がありません。招待コードでテストを受けてください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1618
+msgid "No unused invites left."
+msgstr "未使用の招待コードがありません。"
+
+#: src/components/blog/blog-i18n.tsx:14
+msgid "Notes on product, markets, and the systems reshaping how people trade."
+msgstr "プロダクト、予測市場、そして取引のあり方を変えるシステムについてのノート。"
+
+#: src/components/blog/blog-i18n.tsx:17
+msgid "Older"
+msgstr "過去の記事"
+
+#: src/components/consumer-network/consumer-home.tsx:388
+msgid "One Account.<0/>Every Market."
+msgstr "ひとつのアカウント。<0/>すべての市場。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1435
+msgid "One last step"
+msgstr "最後のステップ"
+
+#: src/components/consumer-network/consumer-home.tsx:38
+msgid "One tap to trade"
+msgstr "ワンタップでコピー"
+
+#: src/components/waitlist/waitlist-experience.tsx:1505
+msgid "One-time invitation cards"
+msgstr "使い切り招待カード"
+
+#: src/components/waitlist/waitlist-experience.tsx:1453
+#: src/components/waitlist/waitlist-experience.tsx:1458
+msgid "Open ↗"
+msgstr "開く ↗"
+
+#: src/components/consumer-network/consumer-header.tsx:82
+#: src/components/site/site-header.tsx:98
+msgid "Open navigation"
+msgstr "ナビゲーションを開く"
+
+#: src/components/consumer-network/network-product-previews.tsx:133
+msgid "Opinion"
+msgstr "見立て"
+
+#: src/components/consumer-network/network-product-previews.tsx:445
+msgid "Order submitted"
+msgstr "注文完了"
+
+#: src/components/consumer-network/consumer-home.tsx:45
+msgid "Performance"
+msgstr "戦績"
+
+#: src/components/waitlist/waitlist-experience.tsx:331
+msgid "Persona chemistry"
+msgstr "タイプ相性"
+
+#: src/components/consumer-network/consumer-home.tsx:344
+msgid "Personalized for you"
+msgstr "よく見るマーケットに合わせて"
+
+#: src/components/consumer-network/consumer-home.tsx:31
+msgid "Picked for you"
+msgstr "あなたのマーケット向け"
+
+#: src/components/waitlist/waitlist-experience.tsx:104
+msgid "Please enter a valid email address."
+msgstr "有効なメールアドレスを入力してください。"
+
+#: src/components/consumer-network/network-product-previews.tsx:358
+msgid "Position value"
+msgstr "ポジション価値"
+
+#: src/components/consumer-network/consumer-home.tsx:293
+msgid "Post opinions backed by your real positions. Climb the leaderboard, grow your following, and earn a share of the revenue you create."
+msgstr "実際のポジションに裏打ちされた見立てを投稿。リーダーボードを駆け上がり、フォロワーを増やし、生み出した収益の分配を受け取ろう。"
+
+#: src/components/waitlist/waitlist-experience.tsx:339
+#: src/components/waitlist/waitlist-experience.tsx:340
+msgid "Preparing…"
+msgstr "準備中…"
+
+#: src/components/waitlist/waitlist-experience.tsx:1518
+msgid "Previous five invites"
+msgstr "前の招待5件"
+
+#: src/components/waitlist/waitlist-experience.tsx:1499
+msgid "Priority improves your score; rank updates against the live waitlist."
+msgstr "優先度はスコアを押し上げ、順位はリアルタイムのウェイトリストに対して更新されます。"
+
+#: src/components/blog/blog-i18n.tsx:36
+#: src/components/consumer-network/consumer-home.tsx:471
+#: src/components/site/site-footer.tsx:67
+msgid "Product"
+msgstr "プロダクト"
+
+#. placeholder {0}: questionIndex + 1
+#. placeholder {1}: questions.length
+#: src/components/waitlist/waitlist-experience.tsx:1304
+msgid "Question {0} of {1}"
+msgstr "質問 {0} / {1}"
+
+#: src/components/consumer-network/consumer-home.tsx:45
+msgid "Rank"
+msgstr "ランク"
+
+#: src/components/blog/blog-i18n.tsx:15
+msgid "Read the dispatch"
+msgstr "記事を読む"
+
+#: src/components/site/site-header.tsx:160
+msgid "Reading theme"
+msgstr "リーディングテーマ"
+
+#: src/components/waitlist/waitlist-experience.tsx:1422
+msgid "Resend code"
+msgstr "コードを再送"
+
+#: src/components/waitlist/waitlist-experience.tsx:1422
+msgid "Resend in {otpCooldown}s"
+msgstr "{otpCooldown}秒後に再送可能"
+
+#: src/components/waitlist/waitlist-experience.tsx:1324
+msgid "Reserve again"
+msgstr "もう一度確保"
+
+#: src/components/waitlist/waitlist-experience.tsx:328
+msgid "Resilience"
+msgstr "回復力"
+
+#: src/app/not-found.tsx:29
+msgid "Return to SmartX"
+msgstr "SmartX に戻る"
+
+#: src/components/waitlist/waitlist-experience.tsx:1462
+msgid "Reveal my result"
+msgstr "結果を公開する"
+
+#: src/components/waitlist/waitlist-experience.tsx:1339
+msgid "Save your result."
+msgstr "結果を保存しよう。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1364
+msgid "Send code"
+msgstr "コードを送信"
+
+#: src/components/waitlist/waitlist-experience.tsx:1626
+msgid "Share"
+msgstr "シェア"
+
+#: src/components/waitlist/waitlist-experience.tsx:1502
+msgid "Share again"
+msgstr "もう一度シェア"
+
+#: src/components/waitlist/waitlist-experience.tsx:1482
+msgid "Share recorded"
+msgstr "シェア済み"
+
+#: src/components/waitlist/waitlist-experience.tsx:1502
+msgid "Share result"
+msgstr "結果をシェア"
+
+#: src/components/waitlist/waitlist-experience.tsx:284
+msgid "Sign out"
+msgstr "サインアウト"
+
+#: src/components/waitlist/waitlist-experience.tsx:1474
+msgid "Signed in as"
+msgstr "ログイン中"
+
+#: src/components/consumer-network/consumer-header.tsx:45
+#: src/components/site/site-header.tsx:42
+msgid "Site navigation"
+msgstr "サイトナビゲーション"
+
+#: src/components/waitlist/waitlist-experience.tsx:1253
+msgid "Six decisions reveal your risk, signal, and social instincts."
+msgstr "6つの決断が、リスクの取り方、マーケット判断、ソーシャルの本能を明らかにします。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1386
+msgid "Six digits."
+msgstr "6桁の数字。"
+
+#: src/components/consumer-network/network-product-previews.tsx:430
+msgid "Skip"
+msgstr "スキップ"
+
+#: src/components/blog/blog-i18n.tsx:18
+msgid "Skip to article"
+msgstr "本文へスキップ"
+
+#: src/components/blog/blog-i18n.tsx:12
+msgid "Skip to latest stories"
+msgstr "最新記事へスキップ"
+
+#: src/components/consumer-network/consumer-home.tsx:502
+msgid "Skip to the SmartX network story"
+msgstr "SmartX ネットワークストーリーへスキップ"
+
+#: src/components/waitlist/waitlist-experience.tsx:1153
+msgid "Skip to waitlist"
+msgstr "ウェイトリストへスキップ"
+
+#: src/components/blog/article-cta.tsx:20
+msgid "SmartX / Early access"
+msgstr "SmartX / 先行アクセス"
+
+#: src/components/consumer-network/consumer-header.tsx:31
+#: src/components/site/site-footer.tsx:22
+#: src/components/site/site-header.tsx:30
+#: src/components/waitlist/waitlist-experience.tsx:307
+msgid "SmartX home"
+msgstr "SmartX ホーム"
+
+#: src/components/blog/blog-i18n.tsx:13
+msgid "SmartX Journal."
+msgstr "SmartX ジャーナル。"
+
+#: src/components/consumer-network/consumer-home.tsx:334
+msgid "SmartX mobile signals feed on a dark trading console"
+msgstr "ダークなトレーディングコンソールに映る SmartX モバイルシグナルフィード"
+
+#: src/components/consumer-network/consumer-home.tsx:455
+msgid "SmartX on Telegram"
+msgstr "SmartX の Telegram"
+
+#: src/components/consumer-network/consumer-home.tsx:447
+msgid "SmartX on X"
+msgstr "SmartX の X"
+
+#: src/components/consumer-network/consumer-home.tsx:442
+#: src/components/site/site-footer.tsx:32
+msgid "SmartX social links"
+msgstr "SmartX ソーシャルリンク"
+
+#: src/components/consumer-network/consumer-home.tsx:276
+msgid "SmartX Square and People screens showing a verified social feed and trader leaderboard"
+msgstr "認証済みソーシャルフィードとトレーダーリーダーボードを表示する SmartX の Square・People 画面"
+
+#: src/components/waitlist/waitlist-experience.tsx:105
+msgid "Something went wrong. Please try again."
+msgstr "問題が発生しました。もう一度お試しください。"
+
+#: src/components/consumer-network/network-product-previews.tsx:233
+msgid "Square"
+msgstr "スクエア"
+
+#: src/components/waitlist/waitlist-experience.tsx:339
+msgid "Story"
+msgstr "ストーリー"
+
+#: src/components/waitlist/waitlist-experience.tsx:1143
+msgid "Strictly invite-only. Your code is reserved when the test begins."
+msgstr "完全招待制。テスト開始時にコードが確保されます。"
+
+#: src/lib/waitlist/persona.ts:91
+msgid "The All-In Mystic"
+msgstr "オールイン仙人"
+
+#: src/lib/waitlist/persona.ts:99
+msgid "The Candle Prophet"
+msgstr "ローソク足教祖"
+
+#. placeholder {0}: formatClock(otpExpiresIn)
+#: src/components/waitlist/waitlist-experience.tsx:1417
+msgid "The code expires in {0}."
+msgstr "コードの有効期限まで {0}。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1417
+msgid "The code has expired. Resend to get a new one."
+msgstr "コードの有効期限が切れました。再送して新しいコードを取得してください。"
+
+#: src/components/blog/article-cta.tsx:23
+#: src/components/consumer-network/consumer-home.tsx:425
+msgid "The Consumer Trading Network is taking shape."
+msgstr "個人向けトレーディングネットワークが形になりつつあります。"
+
+#: src/lib/waitlist/persona.ts:103
+msgid "The Dip Ringleader"
+msgstr "押し目買い番長"
+
+#: src/lib/waitlist/persona.ts:116
+msgid "The limit order was perfect. Shame you two never met again."
+msgstr "指値は完璧だった。ただ、君たちが再会することはなかった。"
+
+#: src/lib/waitlist/persona.ts:115
+msgid "The Limit Sniper"
+msgstr "指値スナイパー"
+
+#: src/lib/waitlist/persona.ts:87
+msgid "The Liquidity Donor"
+msgstr "流動性ドナー"
+
+#: src/lib/waitlist/persona.ts:107
+msgid "The Market Doctor"
+msgstr "相場のお医者さん"
+
+#: src/components/consumer-network/consumer-home.tsx:347
+msgid "The next opportunity finds you."
+msgstr "次のチャンスが、向こうからやってくる。"
+
+#: src/lib/waitlist/persona.ts:111
+msgid "The Onchain Detective"
+msgstr "オンチェーン探偵"
+
+#: src/app/not-found.tsx:26
+msgid "The page you requested is no longer at this address."
+msgstr "お探しのページはこのアドレスにはもうありません。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1276
+msgid "The questions didn’t come through. Check your connection and try again."
+msgstr "質問を取得できませんでした。接続を確認して再試行してください。"
+
+#: src/lib/waitlist/persona.ts:119
+msgid "The Risk Monk"
+msgstr "リスク僧侶"
+
+#: src/lib/waitlist/persona.ts:95
+msgid "The Signal General"
+msgstr "見立て軍師"
+
+#: src/components/waitlist/waitlist-experience.tsx:1247
+msgid "The SmartX trader type test"
+msgstr "SmartX 取引タイプ診断"
+
+#: src/components/consumer-network/consumer-home.tsx:200
+msgid "The social trading app for memes, perps, stocks and prediction markets."
+msgstr "予測市場が中心のソーシャル取引アプリ。ミーム、無期限、株式にも対応。"
+
+#: src/components/consumer-network/consumer-home.tsx:286
+msgid "The trader content economy"
+msgstr "トレーダーのコンテンツ経済"
+
+#: src/components/consumer-network/consumer-home.tsx:32
+msgid "The traders and markets in your feed match what you trade."
+msgstr "フィードのトレーダーと市場は、よく見るマーケットに合わせて選ばれます。"
+
+#: src/lib/waitlist/persona.ts:120
+msgid "They study how to double once. You study how to stay in the game."
+msgstr "彼らは一度で倍にする方法を学ぶ。君はゲームに残り続ける方法を学ぶ。"
+
+#: src/components/waitlist/waitlist-experience.tsx:107
+msgid "This invite has already been claimed. Ask for another one."
+msgstr "この招待コードはすでに使用されています。別のコードをもらってください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:109
+msgid "This invite has expired. Ask for another one."
+msgstr "この招待コードは期限切れです。別のコードをもらってください。"
+
+#: src/components/waitlist/waitlist-experience.tsx:108
+msgid "This invite is being used in another session. Try again shortly."
+msgstr "この招待コードは別のセッションで使用中です。しばらくしてから再試行してください。"
+
+#: src/app/not-found.tsx:23
+msgid "This market moved."
+msgstr "このマーケットはもう動いた。"
+
+#: src/lib/waitlist/persona.ts:96
+msgid "Three hours of research. Two-word thesis: send it."
+msgstr "リサーチ3時間。結論は一言、「行け」。"
+
+#: src/components/consumer-network/consumer-home.tsx:39
+msgid "Trade as smoothly as shopping."
+msgstr "買い物するように、そのまま張れる。"
+
+#: src/components/consumer-network/consumer-home.tsx:195
+msgid "Trade your edge."
+msgstr "見立てを取引しよう。"
+
+#: src/components/consumer-network/consumer-home.tsx:289
+msgid "Turn influence into income"
+msgstr "影響力を収益に"
+
+#: src/components/waitlist/waitlist-experience.tsx:339
+#: src/components/waitlist/waitlist-experience.tsx:340
+msgid "Unavailable"
+msgstr "利用不可"
+
+#: src/components/waitlist/waitlist-experience.tsx:1438
+msgid "Unlock your result."
+msgstr "結果をアンロック。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1585
+msgid "Unused codes only."
+msgstr "未使用のコードのみ。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1233
+msgid "Use another invite"
+msgstr "別の招待コードを使う"
+
+#: src/components/blog/blog-theme-toggle.tsx:37
+msgid "Use dark reading theme"
+msgstr "ダークテーマで読む"
+
+#: src/components/blog/blog-theme-toggle.tsx:37
+msgid "Use light reading theme"
+msgstr "ライトテーマで読む"
+
+#: src/components/waitlist/waitlist-experience.tsx:92
+msgid "Used"
+msgstr "使用済み"
+
+#: src/components/waitlist/waitlist-experience.tsx:1393
+msgid "Verification code"
+msgstr "認証コード"
+
+#: src/components/waitlist/waitlist-experience.tsx:1196
+#: src/components/waitlist/waitlist-experience.tsx:1291
+#: src/components/waitlist/waitlist-experience.tsx:1445
+msgid "Verified as"
+msgstr "認証済み"
+
+#: src/components/consumer-network/network-product-previews.tsx:12
+msgid "Verified profile"
+msgstr "実取引で検証"
+
+#: src/components/consumer-network/consumer-home.tsx:24
+msgid "Verified, not claimed"
+msgstr "自称ではなく、実取引で検証"
+
+#: src/components/waitlist/waitlist-experience.tsx:1204
+msgid "View my result"
+msgstr "自分の結果を見る"
+
+#: src/components/consumer-network/consumer-header.tsx:58
+#: src/components/consumer-network/consumer-header.tsx:122
+#: src/components/consumer-network/consumer-home.tsx:481
+#: src/components/site/site-footer.tsx:77
+#: src/components/site/site-header.tsx:55
+#: src/components/site/site-header.tsx:131
+#: src/components/waitlist/waitlist-experience.tsx:1164
+#: src/components/waitlist/waitlist-experience.tsx:1270
+msgid "Waitlist"
+msgstr "ウェイトリスト"
+
+#: src/components/waitlist/waitlist-experience.tsx:1477
+msgid "Waitlist rank"
+msgstr "ウェイトリスト順位"
+
+#: src/components/waitlist/waitlist-experience.tsx:1368
+msgid "We’ll use this to save your result and send waitlist updates."
+msgstr "結果の保存とウェイトリストの最新情報のお知らせに使用します。"
+
+#: src/components/consumer-network/network-product-previews.tsx:306
+msgid "Yes"
+msgstr "Yes"
+
+#: src/lib/waitlist/persona.ts:100
+msgid "You can chart every line except the one marking enough exposure."
+msgstr "どんなラインも引けるのに、ポジションの引き際だけは引けない。"
+
+#: src/lib/waitlist/persona.ts:112
+msgid "You know everyone’s position except, occasionally, your own."
+msgstr "全員のポジションを把握している。たまに自分のだけ抜けるけど。"
+
+#: src/lib/waitlist/persona.ts:104
+msgid "You’re not buying the dip. You’re giving the downtrend a demo."
+msgstr "押し目買いじゃない。下落トレンドにお手本を見せているんだ。"
+
+#: src/lib/waitlist/persona.ts:88
+msgid "You’re not trading. You’re funding the ecosystem."
+msgstr "それはトレードじゃない。エコシステムへの資金提供だ。"
+
+#: src/components/waitlist/waitlist-experience.tsx:110
+msgid "Your invite is reserved for this session."
+msgstr "招待コードはこのセッションで確保済みです。"
+
+#: src/components/waitlist/waitlist-experience.tsx:1338
+msgid "Your result is ready"
+msgstr "結果の準備ができました"
+
+#: src/components/waitlist/waitlist-experience.tsx:1207
+msgid "Your result is saved as {savedPersonaName}."
+msgstr "結果は{savedPersonaName}として保存されています。"
+
+#: src/components/waitlist/waitlist-experience.tsx:403
+msgid "your trader type"
+msgstr "あなたの取引タイプ"
+

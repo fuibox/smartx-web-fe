@@ -5,6 +5,8 @@ import "@fontsource/ibm-plex-serif/500.css";
 import "@fontsource/ibm-plex-serif/600.css";
 
 import { AppNoticeHost } from "@/components/site/app-notice";
+import { LinguiProvider } from "@/lingui";
+import { LOCALE_BOOT_SCRIPT } from "@/lingui/boot-script";
 import {
   SMARTX_DEFAULT_SOCIAL_IMAGE,
   SMARTX_OPEN_GRAPH_DEFAULTS,
@@ -58,9 +60,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }}
+        />
+      </head>
       <body>
-        <AppNoticeHost />
-        {children}
+        <LinguiProvider>
+          <AppNoticeHost />
+          {children}
+        </LinguiProvider>
       </body>
     </html>
   );

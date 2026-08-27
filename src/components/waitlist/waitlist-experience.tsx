@@ -4,13 +4,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import { FaTelegramPlane } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
 import { notifyError } from "@/components/site/app-notice";
 import { isValidEmail, isValidInviteCode, normalizeEmail, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
-import { hydrateQuestions, isRiskMonk, mapCardToOutcome, PERSONAS_BY_CODE } from "@/lib/waitlist/persona";
+import {
+  hydrateQuestions,
+  localizedPersonaName,
+  localizedPersonaRoast,
+  mapCardToOutcome,
+  PERSONAS_BY_CODE,
+} from "@/lib/waitlist/persona";
+import { i18n } from "@/lingui";
 import {
   decideWaitlistEntry,
   isOwnResultAvailable,
@@ -63,7 +74,6 @@ const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try 
 const INVITE_CLAIMED = "This invite has already been claimed. Ask for another one.";
 const INVITE_BUSY = "This invite is being used in another session. Try again shortly.";
 const INVITE_EXPIRED = "This invite has expired. Ask for another one.";
-const INVITE_RESERVED = "Your invite is reserved for this session.";
 const RESERVE_EXPIRED_API = "Invite reservation expired. Reserve again.";
 const RESERVE_LIMIT_API = "Invite reservation time limit reached.";
 const RENEW_INTERVAL_MS = 90_000;
@@ -76,14 +86,33 @@ const DEFAULT_COMMUNITY = {
 };
 
 const INVITE_CARD_STATES = {
-  0: { label: "", mark: "↗", available: true },
-  1: { label: "Held", mark: "—", available: false },
-  2: { label: "Used", mark: "—", available: false },
-  3: { label: "Invalid", mark: "—", available: false },
-} as const;
+  0: { label: null, mark: "↗", available: true },
+  1: { label: msg`Held`, mark: "—", available: false },
+  2: { label: msg`Used`, mark: "—", available: false },
+  3: { label: msg`Invalid`, mark: "—", available: false },
+} as const satisfies Record<number, { label: MessageDescriptor | null; mark: string; available: boolean }>;
 
 function inviteCardState(status: number) {
   return INVITE_CARD_STATES[status as 0 | 1 | 2 | 3] ?? INVITE_CARD_STATES[3];
+}
+
+// 状态与分支逻辑始终使用英文规范文案（与 API 返回值精确比较）；
+// 只在渲染时经此映射表转成当前语言，未知文案原样透出。
+const WAITLIST_MESSAGE_L10N: Record<string, MessageDescriptor> = {
+  [NO_SAVED_RESULT]: msg`No saved result is linked to this email. Use an invite to take the test.`,
+  [INVALID_EMAIL]: msg`Please enter a valid email address.`,
+  [GENERIC_ERROR]: msg`Something went wrong. Please try again.`,
+  [INVITE_UNRECOGNIZED]: msg`Invite code not recognized. Check the code and try again.`,
+  [INVITE_CLAIMED]: msg`This invite has already been claimed. Ask for another one.`,
+  [INVITE_BUSY]: msg`This invite is being used in another session. Try again shortly.`,
+  [INVITE_EXPIRED]: msg`This invite has expired. Ask for another one.`,
+  [RESERVE_LIMIT_API]: msg`Invite reservation time limit reached.`,
+};
+
+function localizeWaitlistMessage(message: string) {
+  if (!message) return message;
+  const descriptor = WAITLIST_MESSAGE_L10N[message];
+  return descriptor ? i18n._(descriptor) : message;
 }
 
 type Workspace =
@@ -241,13 +270,17 @@ function AccountSession({
   place?: "copy" | "scene";
   onSignOut: () => void;
 }) {
+  useLingui();
+
   return (
     <div className={styles.accountStrip} data-compact={compact ? "true" : undefined} data-place={place}>
       <div>
         <span>{label}</span>
-        <strong>{email || "Email verified"}</strong>
+        <strong>{email || t`Email verified`}</strong>
       </div>
-      <WaitlistButton type="button" onClick={onSignOut}>Sign out</WaitlistButton>
+      <WaitlistButton type="button" onClick={onSignOut}>
+        <Trans>Sign out</Trans>
+      </WaitlistButton>
     </div>
   );
 }
@@ -263,18 +296,20 @@ function PersonaPoster({
   exportError?: boolean;
   preview?: boolean;
 }) {
+  useLingui();
+
   return (
     <article className={styles.personaPoster} data-preview={preview}>
       {preview && (
         <header>
-          <Link href="/" aria-label="SmartX home" className={styles.posterLogo}>
+          <Link href="/" aria-label={t`SmartX home`} className={styles.posterLogo}>
             <Brand />
           </Link>
         </header>
       )}
       <div className={styles.posterIdentity}>
-        {!isRiskMonk(outcome.persona.mark) && <span>{outcome.poles.join(" · ")}</span>}
-        <h2>{outcome.persona.name}</h2>
+        <span>{outcome.poles.join(" · ")}</span>
+        <h2>{localizedPersonaName(outcome.persona)}</h2>
       </div>
       <div className={styles.personaArt}>
         <Image
@@ -286,21 +321,21 @@ function PersonaPoster({
         />
       </div>
       <div className={styles.posterScores}>
-        <ScoreAxis label="Conviction" score={outcome.stats.conviction} />
-        <ScoreAxis label="Instinct" score={outcome.stats.instinct} />
-        <ScoreAxis label="Resilience" score={outcome.stats.resilience} />
+        <ScoreAxis label={t`Conviction`} score={outcome.stats.conviction} />
+        <ScoreAxis label={t`Instinct`} score={outcome.stats.instinct} />
+        <ScoreAxis label={t`Resilience`} score={outcome.stats.resilience} />
       </div>
-      {outcome.persona.roast ? <blockquote>“{outcome.persona.roast}”</blockquote> : null}
-      <section className={styles.chemistryBlock} aria-label="Persona chemistry">
-        <div><span>Best match</span><strong>{outcome.bestMatch.name}</strong></div>
-        <div><span>Natural rival</span><strong>{outcome.rival.name}</strong></div>
+      {outcome.persona.roast ? <blockquote>“{localizedPersonaRoast(outcome.persona)}”</blockquote> : null}
+      <section className={styles.chemistryBlock} aria-label={t`Persona chemistry`}>
+        <div><span><Trans>Best match</Trans></span><strong>{localizedPersonaName(outcome.bestMatch)}</strong></div>
+        <div><span><Trans>Natural rival</Trans></span><strong>{localizedPersonaName(outcome.rival)}</strong></div>
       </section>
       {!preview && (
-        <section className={styles.cardDownloads} aria-label="Download result card">
-          <span>Download result</span>
+        <section className={styles.cardDownloads} aria-label={t`Download result card`}>
+          <span><Trans>Download result</Trans></span>
           <div>
-            {preparedCards?.story ? <a href={preparedCards.story.href} download={preparedCards.story.filename}>Story <small>1080 × 1920</small></a> : <span>{exportError ? "Unavailable" : "Preparing…"}</span>}
-            {preparedCards?.og ? <a href={preparedCards.og.href} download={preparedCards.og.filename}>X / OG <small>1200 × 630</small></a> : <span>{exportError ? "Unavailable" : "Preparing…"}</span>}
+            {preparedCards?.story ? <a href={preparedCards.story.href} download={preparedCards.story.filename}><Trans>Story</Trans> <small>1080 × 1920</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
+            {preparedCards?.og ? <a href={preparedCards.og.href} download={preparedCards.og.filename}>X / OG <small>1200 × 630</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
           </div>
         </section>
       )}
@@ -309,6 +344,7 @@ function PersonaPoster({
 }
 
 export function WaitlistExperience() {
+  useLingui();
   const router = useRouter();
   const pathname = usePathname();
   const shareParams = useSearchParams();
@@ -361,7 +397,8 @@ export function WaitlistExperience() {
   const loggedIn = Boolean(userToken && userInfo);
   const hasOwnResult = isOwnResultAvailable({ loggedIn, submitted: Boolean(userInfo?.submitted && userInfo.resultId) });
   const inviteReady = isValidInviteCode(inviteCode);
-  const savedPersonaName = ownOutcome?.persona.name ?? PERSONAS_BY_CODE[userInfo?.personaId ?? ""]?.name ?? "your trader type";
+  const savedPersona = ownOutcome?.persona ?? PERSONAS_BY_CODE[userInfo?.personaId ?? ""];
+  const savedPersonaName = savedPersona ? localizedPersonaName(savedPersona) : t`your trader type`;
   const currentQuestion = questions[questionIndex];
   const invitePageCount = Math.max(1, Math.ceil(invitations.length / INVITES_PER_PAGE));
   const visibleInvitations = invitations.slice(invitePage * INVITES_PER_PAGE, (invitePage + 1) * INVITES_PER_PAGE);
@@ -793,7 +830,7 @@ export function WaitlistExperience() {
     try {
       applyWorkspace(await fetchWorkspace(userToken));
     } catch (error) {
-      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+      if (!handleUserApiError(error)) notifyError(localizeWaitlistMessage(errorMessage(error)));
     }
   };
 
@@ -992,7 +1029,7 @@ export function WaitlistExperience() {
       setTelegramOpened(result.telegramCompleted === 1);
       setXOpened(result.xCompleted === 1);
     } catch (error) {
-      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+      if (!handleUserApiError(error)) notifyError(localizeWaitlistMessage(errorMessage(error)));
     }
   };
 
@@ -1001,7 +1038,7 @@ export function WaitlistExperience() {
     try {
       applyWorkspace(await fetchWorkspace(userToken));
     } catch (error) {
-      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+      if (!handleUserApiError(error)) notifyError(localizeWaitlistMessage(errorMessage(error)));
     }
   };
 
@@ -1028,7 +1065,9 @@ export function WaitlistExperience() {
     const selected = invitations.find((item) => item.code === selectedShareCode);
     if (!selected || selected.status !== 0) return;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
-    shareUrl.searchParams.set("text", `My SmartX trader type is ${ownOutcome.persona.name}.${ownOutcome.persona.roast ? `\n\n“${ownOutcome.persona.roast}”` : ""}\n\nFind yours in six questions.`);
+    const shareName = localizedPersonaName(ownOutcome.persona);
+    const shareRoast = localizedPersonaRoast(ownOutcome.persona);
+    shareUrl.searchParams.set("text", `${t`My SmartX trader type is ${shareName}.`}${shareRoast ? `\n\n“${shareRoast}”` : ""}\n\n${t`Find yours in six questions.`}`);
     shareUrl.searchParams.set("url", makeInvitationUrl(selected.code, ownOutcome.resultId, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     closeSharePicker();
@@ -1039,7 +1078,7 @@ export function WaitlistExperience() {
       setShareCompleted(true);
       setRank(nextRank.rank);
     } catch (error) {
-      if (!handleUserApiError(error)) notifyError(errorMessage(error));
+      if (!handleUserApiError(error)) notifyError(localizeWaitlistMessage(errorMessage(error)));
     }
   };
 
@@ -1050,13 +1089,19 @@ export function WaitlistExperience() {
       setCopiedCode(code);
       window.setTimeout(() => setCopiedCode(null), 1400);
     } catch (error) {
-      notifyError(errorMessage(error) === GENERIC_ERROR ? "Couldn’t copy the invite link. Try again." : errorMessage(error));
+      notifyError(
+        errorMessage(error) === GENERIC_ERROR
+          ? t`Couldn’t copy the invite link. Try again.`
+          : localizeWaitlistMessage(errorMessage(error)),
+      );
     }
   };
 
   const inviteForm = (
     <>
-      <label htmlFor="invite-code">Invite code</label>
+      <label htmlFor="invite-code">
+        <Trans>Invite code</Trans>
+      </label>
       <div className={styles.inlineField}>
         <input
           id="invite-code"
@@ -1068,7 +1113,7 @@ export function WaitlistExperience() {
           spellCheck={false}
           maxLength={8}
           pattern="[a-z0-9]{8}"
-          placeholder="8-character code"
+          placeholder={t`8-character code`}
           value={inviteCode}
           onChange={(event) => {
             const next = sanitizeInviteCodeInput(event.target.value);
@@ -1089,18 +1134,22 @@ export function WaitlistExperience() {
           disabled={!inviteReady}
           onAction={() => startQuiz({ reserve: true })}
         >
-          Begin
+          <Trans>Begin</Trans>
         </WaitlistButton>
       </div>
-      <small id="invite-note" className={styles.formHint}>Strictly invite-only. Your code is reserved when the test begins.</small>
-      {gateError ? <small className={styles.formError} id="invite-error" role="alert">{gateError}</small> : null}
+      <small id="invite-note" className={styles.formHint}>
+        <Trans>Strictly invite-only. Your code is reserved when the test begins.</Trans>
+      </small>
+      {gateError ? <small className={styles.formError} id="invite-error" role="alert">{localizeWaitlistMessage(gateError)}</small> : null}
     </>
   );
 
   return (
     <WaitlistActionScope>
     <main className={styles.page} data-stage={stage} data-referral={Boolean(referralOutcome)}>
-      <a className={styles.skipLink} href="#waitlist-content">Skip to waitlist</a>
+      <a className={styles.skipLink} href="#waitlist-content">
+        <Trans>Skip to waitlist</Trans>
+      </a>
       <div className={styles.ambientBackdrop} aria-hidden="true">
         <Image src="/assets/consumer-network/hero-product.png" alt="" fill sizes="100vw" priority />
       </div>
@@ -1109,9 +1158,15 @@ export function WaitlistExperience() {
       <section className={styles.stage} id="waitlist-content" aria-live="polite">
         {stage === "boot" && (
           <div className={styles.formStage}>
-            <span className={styles.eyebrow}>Waitlist</span>
-            <h1>Loading your session.</h1>
-            <p>Checking invite, result, and sign-in state.</p>
+            <span className={styles.eyebrow}>
+              <Trans>Waitlist</Trans>
+            </span>
+            <h1>
+              <Trans>Loading your session.</Trans>
+            </h1>
+            <p>
+              <Trans>Checking invite, result, and sign-in state.</Trans>
+            </p>
           </div>
         )}
 
@@ -1119,13 +1174,24 @@ export function WaitlistExperience() {
           <div className={styles.referralStage}>
             <PersonaPoster outcome={referralOutcome} preview />
             <div className={styles.referralCopy}>
-              <span className={styles.eyebrow}>A result was shared with you</span>
-              <h1>A friend trades like <span className={styles.referralPersona}>{referralOutcome.persona.name}.</span></h1>
-              <p>Different score, same type—or something else entirely? Six decisions reveal how you trade when it gets real.</p>
+              <span className={styles.eyebrow}>
+                <Trans>A result was shared with you</Trans>
+              </span>
+              <h1>
+                <Trans>
+                  A friend trades like{" "}
+                  <span className={styles.referralPersona}>
+                    {localizedPersonaName(referralOutcome.persona)}.
+                  </span>
+                </Trans>
+              </h1>
+              <p>
+                <Trans>Different score, same type—or something else entirely? Six decisions reveal how you trade when it gets real.</Trans>
+              </p>
               {loggedIn && (
                 <AccountSession
                   email={verifiedEmail}
-                  label="Verified as"
+                  label={t`Verified as`}
                   place="copy"
                   onSignOut={signOutWaitlist}
                 />
@@ -1133,19 +1199,21 @@ export function WaitlistExperience() {
               {hasOwnResult ? (
                 <div className={styles.referralReturn}>
                   <WaitlistButton className={styles.primaryButton} onAction={viewSavedResult}>
-                    View my result
+                    <Trans>View my result</Trans>
                   </WaitlistButton>
-                  <small>Your result is saved as {savedPersonaName}.</small>
+                  <small>
+                    <Trans>Your result is saved as {savedPersonaName}.</Trans>
+                  </small>
                 </div>
               ) : loggedIn ? (
                 <WaitlistButton className={styles.primaryButton} onAction={beginFromReferral}>
-                  Find my trader type
+                  <Trans>Find my trader type</Trans>
                 </WaitlistButton>
               ) : (
                 <>
                   {!showInviteSwitch && (
                     <WaitlistButton className={styles.primaryButton} disabled={!inviteReady} onAction={beginFromReferral}>
-                      Find my trader type
+                      <Trans>Find my trader type</Trans>
                     </WaitlistButton>
                   )}
                   {showInviteSwitch && (
@@ -1153,11 +1221,15 @@ export function WaitlistExperience() {
                       {inviteForm}
                     </form>
                   )}
-                  <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>Already tested? View my result</WaitlistButton>
+                  <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>
+                    <Trans>Already tested? View my result</Trans>
+                  </WaitlistButton>
                   {gateError && !showInviteSwitch && (
                     <div className={styles.referralError} role="alert">
-                      <small>{gateError}</small>
-                      <WaitlistButton className={styles.textButton} onClick={() => setShowInviteSwitch(true)}>Use another invite</WaitlistButton>
+                      <small>{localizeWaitlistMessage(gateError)}</small>
+                      <WaitlistButton className={styles.textButton} onClick={() => setShowInviteSwitch(true)}>
+                        <Trans>Use another invite</Trans>
+                      </WaitlistButton>
                     </div>
                   )}
                 </>
@@ -1169,14 +1241,22 @@ export function WaitlistExperience() {
         {stage === "gate" && !referralOutcome && (
           <div className={styles.gateStage}>
             <div className={styles.gateCopy}>
-              <span className={styles.eyebrow}>The SmartX trader type test</span>
-              <h1>How do you trade<br />when it gets <em>real?</em></h1>
-              <p>Six decisions reveal your risk, signal, and social instincts.</p>
+              <span className={styles.eyebrow}>
+                <Trans>The SmartX trader type test</Trans>
+              </span>
+              <h1>
+                <Trans>How do you trade<br />when it gets <em>real?</em></Trans>
+              </h1>
+              <p>
+                <Trans>Six decisions reveal your risk, signal, and social instincts.</Trans>
+              </p>
             </div>
             <form className={styles.gateForm} onSubmit={(event) => event.preventDefault()}>
               {inviteForm}
               <div className={styles.gateFormMeta}>
-                <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>Already tested? View my result</WaitlistButton>
+                <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>
+                  <Trans>Already tested? View my result</Trans>
+                </WaitlistButton>
               </div>
             </form>
           </div>
@@ -1184,11 +1264,19 @@ export function WaitlistExperience() {
 
         {stage === "quiz" && !currentQuestion && (
           <div className={styles.formStage}>
-            <span className={styles.eyebrow}>Waitlist</span>
-            <h1>Couldn’t load the test.</h1>
-            <p>The questions didn’t come through. Check your connection and try again.</p>
+            <span className={styles.eyebrow}>
+              <Trans>Waitlist</Trans>
+            </span>
+            <h1>
+              <Trans>Couldn’t load the test.</Trans>
+            </h1>
+            <p>
+              <Trans>The questions didn’t come through. Check your connection and try again.</Trans>
+            </p>
             <form onSubmit={(event) => event.preventDefault()}>
-              <WaitlistButton className={styles.primaryButton} onClick={() => setStage("gate")}>Back to invite</WaitlistButton>
+              <WaitlistButton className={styles.primaryButton} onClick={() => setStage("gate")}>
+                <Trans>Back to invite</Trans>
+              </WaitlistButton>
             </form>
           </div>
         )}
@@ -1198,14 +1286,20 @@ export function WaitlistExperience() {
             {loggedIn && (
               <AccountSession
                 email={verifiedEmail}
-                label="Verified as"
+                label={t`Verified as`}
                 place="scene"
                 onSignOut={signOutWaitlist}
               />
             )}
             <div className={styles.quizTopline}>
-              {questionIndex > 0 ? <WaitlistButton type="button" onClick={goBack}>← Back</WaitlistButton> : <span />}
-              <div className={styles.progress} aria-label={`Question ${questionIndex + 1} of ${questions.length}`}>
+              {questionIndex > 0 ? (
+                <WaitlistButton type="button" onClick={goBack}>
+                  <Trans>← Back</Trans>
+                </WaitlistButton>
+              ) : (
+                <span />
+              )}
+              <div className={styles.progress} aria-label={t`Question ${questionIndex + 1} of ${questions.length}`}>
                 {questions.map((question, index) => <i key={question.questionId} data-active={index <= questionIndex} />)}
               </div>
             </div>
@@ -1215,21 +1309,27 @@ export function WaitlistExperience() {
                 <h1>{currentQuestion.prompt}</h1>
                 <div className={styles.optionList}>
                   {currentQuestion.options.map((option) => (
-                    <WaitlistButton type="button" key={option.optionId} onAction={() => answerQuestion(option.optionId)}>
+                    <WaitlistButton
+                      type="button"
+                      key={option.optionId}
+                      onClick={() => {
+                        void answerQuestion(option.optionId);
+                      }}
+                    >
                       <i aria-hidden="true" /><span>{option.label}</span>
                     </WaitlistButton>
                   ))}
                 </div>
                 {reserveWarning ? (
                   <div className={styles.quizWarning} role="alert">
-                    <small>{reserveWarning}</small>
+                    <small>{localizeWaitlistMessage(reserveWarning)}</small>
                     {reserveWarning === INVITE_EXPIRED && (
-                      <WaitlistButton className={styles.textButton} onAction={reReserveInvite}>Reserve again</WaitlistButton>
+                      <WaitlistButton className={styles.textButton} onAction={reReserveInvite}>
+                        <Trans>Reserve again</Trans>
+                      </WaitlistButton>
                     )}
                   </div>
-                ) : (
-                  <small className={styles.quizHint}>{INVITE_RESERVED}</small>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -1237,11 +1337,13 @@ export function WaitlistExperience() {
 
         {stage === "email" && (
           <div className={styles.formStage}>
-            <span className={styles.eyebrow}>{authIntent === "recover" ? "Already tested?" : "Your result is ready"}</span>
-            <h1>{authIntent === "recover" ? "Find your result." : "Save your result."}</h1>
-            <p>{authIntent === "recover" ? "Enter the email you used. We’ll send a six-digit code." : "Bind an email to keep it and create your waitlist position."}</p>
+            <span className={styles.eyebrow}>{authIntent === "recover" ? t`Already tested?` : t`Your result is ready`}</span>
+            <h1>{authIntent === "recover" ? t`Find your result.` : t`Save your result.`}</h1>
+            <p>{authIntent === "recover" ? t`Enter the email you used. We’ll send a six-digit code.` : t`Bind an email to keep it and create your waitlist position.`}</p>
             <form onSubmit={(event) => event.preventDefault()}>
-              <label htmlFor="waitlist-email">Email address</label>
+              <label htmlFor="waitlist-email">
+                <Trans>Email address</Trans>
+              </label>
               <div className={styles.inlineField}>
                 <input
                   id="waitlist-email"
@@ -1261,14 +1363,16 @@ export function WaitlistExperience() {
                   required
                 />
                 <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitEmail}>
-                  {authIntent === "recover" ? "Send code" : "Continue"}
+                  {authIntent === "recover" ? t`Send code` : t`Continue`}
                 </WaitlistButton>
               </div>
-              <small className={styles.formHint}>We’ll use this to save your result and send waitlist updates.</small>
-              {recoveryError ? <small className={styles.formError} role="alert">{recoveryError}</small> : null}
+              <small className={styles.formHint}>
+                <Trans>We’ll use this to save your result and send waitlist updates.</Trans>
+              </small>
+              {recoveryError ? <small className={styles.formError} role="alert">{localizeWaitlistMessage(recoveryError)}</small> : null}
               {authIntent === "recover" && (
                 <WaitlistButton className={styles.recoveryBack} onClick={() => { setRecoveryError(""); setStage("gate"); }}>
-                  ← Back
+                  <Trans>← Back</Trans>
                 </WaitlistButton>
               )}
             </form>
@@ -1277,11 +1381,19 @@ export function WaitlistExperience() {
 
         {stage === "verify" && (
           <div className={styles.formStage}>
-            <span className={styles.eyebrow}>Check your inbox</span>
-            <h1>Six digits.</h1>
-            <p>Enter the code sent to <b>{email}</b>.</p>
+            <span className={styles.eyebrow}>
+              <Trans>Check your inbox</Trans>
+            </span>
+            <h1>
+              <Trans>Six digits.</Trans>
+            </h1>
+            <p>
+              <Trans>Enter the code sent to <b>{email}</b>.</Trans>
+            </p>
             <form onSubmit={(event) => event.preventDefault()}>
-              <label htmlFor="waitlist-otp">Verification code</label>
+              <label htmlFor="waitlist-otp">
+                <Trans>Verification code</Trans>
+              </label>
               <div className={styles.inlineField}>
                 <input
                   className={styles.otpInput}
@@ -1300,18 +1412,20 @@ export function WaitlistExperience() {
                   required
                 />
                 <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitOtp}>
-                  Continue
+                  <Trans>Continue</Trans>
                 </WaitlistButton>
               </div>
               <small id="otp-note" className={styles.formHint} aria-live="polite">
-                {otpExpiresIn > 0 ? `The code expires in ${formatClock(otpExpiresIn)}.` : "The code has expired. Resend to get a new one."}
+                {otpExpiresIn > 0 ? t`The code expires in ${formatClock(otpExpiresIn)}.` : t`The code has expired. Resend to get a new one.`}
               </small>
-              {otpError ? <small className={styles.formError} id="otp-error" role="alert">{otpError}</small> : null}
+              {otpError ? <small className={styles.formError} id="otp-error" role="alert">{localizeWaitlistMessage(otpError)}</small> : null}
               <div className={styles.formMeta}>
                 <WaitlistButton type="button" disabled={otpCooldown > 0} onAction={resendCode}>
-                  {otpCooldown > 0 ? `Resend in ${otpCooldown}s` : otpResent ? "Code sent again" : "Resend code"}
+                  {otpCooldown > 0 ? t`Resend in ${otpCooldown}s` : otpResent ? t`Code sent again` : t`Resend code`}
                 </WaitlistButton>
-                <WaitlistButton type="button" onClick={() => setStage("email")}>Change email</WaitlistButton>
+                <WaitlistButton type="button" onClick={() => setStage("email")}>
+                  <Trans>Change email</Trans>
+                </WaitlistButton>
               </div>
             </form>
           </div>
@@ -1319,31 +1433,39 @@ export function WaitlistExperience() {
 
         {stage === "unlock" && (
           <div className={styles.unlockStage}>
-            <span className={styles.eyebrow}>One last step</span>
-            <h1>Unlock your result.</h1>
-            <p>Join the SmartX community and follow product updates before your trader type is revealed.</p>
+            <span className={styles.eyebrow}>
+              <Trans>One last step</Trans>
+            </span>
+            <h1>
+              <Trans>Unlock your result.</Trans>
+            </h1>
+            <p>
+              <Trans>Join the SmartX community and follow product updates before your trader type is revealed.</Trans>
+            </p>
             <AccountSession
               email={verifiedEmail}
-              label="Verified as"
+              label={t`Verified as`}
               compact
               onSignOut={signOutWaitlist}
             />
             <div className={styles.unlockTasks}>
               <WaitlistButton type="button" aria-pressed={telegramOpened} data-complete={telegramOpened} onAction={() => openCommunity("telegram")}>
                 <FaTelegramPlane aria-hidden="true" />
-                <span><b>Join Telegram</b><small>Enter the SmartX community</small></span>
-                <strong>{telegramOpened ? "Done ✓" : "Open ↗"}</strong>
+                <span><b><Trans>Join Telegram</Trans></b><small><Trans>Enter the SmartX community</Trans></small></span>
+                <strong>{telegramOpened ? t`Done ✓` : t`Open ↗`}</strong>
               </WaitlistButton>
               <WaitlistButton type="button" aria-pressed={xOpened} data-complete={xOpened} onAction={() => openCommunity("x")}>
                 <FaXTwitter aria-hidden="true" />
-                <span><b>Follow SmartX on X</b><small>Follow product updates</small></span>
-                <strong>{xOpened ? "Done ✓" : "Open ↗"}</strong>
+                <span><b><Trans>Follow SmartX on X</Trans></b><small><Trans>Follow product updates</Trans></small></span>
+                <strong>{xOpened ? t`Done ✓` : t`Open ↗`}</strong>
               </WaitlistButton>
             </div>
             <WaitlistButton className={styles.primaryButton} disabled={!telegramOpened || !xOpened} onAction={revealResult}>
-              Reveal my result
+              <Trans>Reveal my result</Trans>
             </WaitlistButton>
-            <small>Both steps are required to continue.</small>
+            <small>
+              <Trans>Both steps are required to continue.</Trans>
+            </small>
           </div>
         )}
 
@@ -1351,36 +1473,52 @@ export function WaitlistExperience() {
           <div className={styles.resultStage}>
             <PersonaPoster outcome={ownOutcome} preparedCards={preparedCards} exportError={exportError} />
             <aside className={styles.resultPanel}>
-              <AccountSession email={verifiedEmail} label="Signed in as" onSignOut={signOutWaitlist} />
+              <AccountSession email={verifiedEmail} label={t`Signed in as`} onSignOut={signOutWaitlist} />
               <div className={styles.rankBlock} data-boosted={shareCompleted}>
-                <span>Waitlist rank</span>
+                <span>
+                  <Trans>Waitlist rank</Trans>
+                </span>
                 <strong key={rank ?? "pending"}>#{(rank ?? 0).toLocaleString("en-US")}</strong>
                 <div className={styles.rankRewards}>
                   <div data-applied={shareCompleted}>
-                    <span>{shareCompleted ? "Share recorded" : "First result share"}</span>
-                    <b>+500 priority</b>
+                    <span>{shareCompleted ? t`Share recorded` : t`First result share`}</span>
+                    <b>
+                      <Trans>+500 priority</Trans>
+                    </b>
                   </div>
                   <div data-applied={friendRewardApplied}>
-                    <span>Each verified friend{friendRewardApplied ? ` (+${verifiedFriends})` : ""}</span>
-                    <b>+{friendPriority.toLocaleString("en-US")} priority</b>
+                    <span>
+                      {friendRewardApplied
+                        ? t`Each verified friend (+${verifiedFriends})`
+                        : t`Each verified friend`}
+                    </span>
+                    <b>
+                      <Trans>+{friendPriority.toLocaleString("en-US")} priority</Trans>
+                    </b>
                   </div>
                 </div>
-                <small>Priority improves your score; rank updates against the live waitlist.</small>
+                <small>
+                  <Trans>Priority improves your score; rank updates against the live waitlist.</Trans>
+                </small>
                 <WaitlistButton className={styles.shareButton} onAction={openSharePicker}>
-                  {shareCompleted ? "Share again" : "Share result"}
+                  {shareCompleted ? t`Share again` : t`Share result`}
                 </WaitlistButton>
               </div>
-              <section className={styles.invitationDeck} aria-label="One-time invitation cards">
+              <section className={styles.invitationDeck} aria-label={t`One-time invitation cards`}>
                 <header>
                   <div>
-                    <span>Invite friends</span>
-                    <p>Each link can be claimed once.</p>
+                    <span>
+                      <Trans>Invite friends</Trans>
+                    </span>
+                    <p>
+                      <Trans>Each link can be claimed once.</Trans>
+                    </p>
                   </div>
                   {invitePageCount > 1 && (
                     <div className={styles.inviteNavigation}>
                       <b>{invitePage * INVITES_PER_PAGE + 1}–{Math.min((invitePage + 1) * INVITES_PER_PAGE, invitations.length)}</b>
-                      <WaitlistButton type="button" aria-label="Previous five invites" disabled={invitePage === 0} onClick={() => setInvitePage((current) => current - 1)}>←</WaitlistButton>
-                      <WaitlistButton type="button" aria-label="Next five invites" disabled={invitePage === invitePageCount - 1} onClick={() => setInvitePage((current) => current + 1)}>→</WaitlistButton>
+                      <WaitlistButton type="button" aria-label={t`Previous five invites`} disabled={invitePage === 0} onClick={() => setInvitePage((current) => current - 1)}>←</WaitlistButton>
+                      <WaitlistButton type="button" aria-label={t`Next five invites`} disabled={invitePage === invitePageCount - 1} onClick={() => setInvitePage((current) => current + 1)}>→</WaitlistButton>
                     </div>
                   )}
                 </header>
@@ -1389,7 +1527,8 @@ export function WaitlistExperience() {
                     const card = inviteCardState(invitation.status);
                     const isCopied = card.available && copiedCode === invitation.code;
                     const absoluteIndex = invitePage * INVITES_PER_PAGE + index;
-                    const statusLabel = isCopied ? "Copied" : card.label;
+                    const cardLabel = card.label ? i18n._(card.label) : "";
+                    const statusLabel = isCopied ? t`Copied` : cardLabel;
                     return (
                       <WaitlistButton
                         className={styles.inviteCodeCard}
@@ -1401,15 +1540,17 @@ export function WaitlistExperience() {
                         lock={false}
                         aria-label={
                           card.available
-                            ? `Copy invite link ${invitation.code}`
-                            : `Invite ${invitation.code} ${card.label.toLowerCase()}`
+                            ? t`Copy invite link ${invitation.code}`
+                            : `${t`Invite`} ${invitation.code} ${cardLabel.toLowerCase()}`
                         }
                         onClick={() => {
                           void copyInvitation(invitation.code);
                         }}
                       >
                         <header>
-                          <span>Invite {String(absoluteIndex + 1).padStart(2, "0")}</span>
+                          <span>
+                            <Trans>Invite {String(absoluteIndex + 1).padStart(2, "0")}</Trans>
+                          </span>
                           <i aria-hidden="true" />
                         </header>
                         <div aria-hidden="true"><strong>{isCopied ? "✓" : card.mark}</strong></div>
@@ -1439,11 +1580,15 @@ export function WaitlistExperience() {
       >
         <div className={styles.shareDialogPanel}>
           <header>
-            <strong id="share-invite-title">Choose invite</strong>
-            <p>Unused codes only.</p>
+            <strong id="share-invite-title">
+              <Trans>Choose invite</Trans>
+            </strong>
+            <p>
+              <Trans>Unused codes only.</Trans>
+            </p>
           </header>
           {invitations.some((item) => item.status === 0) ? (
-            <div className={styles.shareInviteList} role="listbox" aria-label="Invite codes">
+            <div className={styles.shareInviteList} role="listbox" aria-label={t`Invite codes`}>
               {invitations.map((invitation) => {
                 const card = inviteCardState(invitation.status);
                 const selected = selectedShareCode === invitation.code;
@@ -1465,18 +1610,22 @@ export function WaitlistExperience() {
                   >
                     <i aria-hidden="true" />
                     <span>{invitation.code}</span>
-                    {card.label ? <b>{card.label}</b> : null}
+                    {card.label ? <b>{i18n._(card.label)}</b> : null}
                   </WaitlistButton>
                 );
               })}
             </div>
           ) : (
-            <p className={styles.shareInviteEmpty}>No unused invites left.</p>
+            <p className={styles.shareInviteEmpty}>
+              <Trans>No unused invites left.</Trans>
+            </p>
           )}
           <div className={styles.shareDialogActions}>
-            <WaitlistButton className={styles.textButton} type="button" lock={false} onClick={closeSharePicker}>Cancel</WaitlistButton>
+            <WaitlistButton className={styles.textButton} type="button" lock={false} onClick={closeSharePicker}>
+              <Trans>Cancel</Trans>
+            </WaitlistButton>
             <WaitlistButton className={styles.shareDialogShare} type="button" disabled={!selectedShareCode} onAction={shareResult}>
-              Share
+              <Trans>Share</Trans>
             </WaitlistButton>
           </div>
         </div>

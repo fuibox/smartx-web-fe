@@ -1,3 +1,8 @@
+import { msg } from "@lingui/core/macro";
+import type { MessageDescriptor } from "@lingui/core";
+
+import { i18n } from "@/lingui";
+
 import { resolveWaitlistAssetUrl } from "./api";
 import type {
   ApiQuizQuestion,
@@ -75,8 +80,62 @@ export const PERSONAS_BY_CODE = Object.values(PERSONAS).reduce<Record<string, Pe
   return index;
 }, {});
 
-export function isRiskMonk(personaId: string | undefined) {
-  return personaId === "RSK";
+// 人格文案的多语言目录（按 mark 索引）。API 只提供 nameEn/nameZh/roastEn，
+// ko/ja（以及 zh 的 roast）由本地目录补齐；未知人格回退 API 英文原文。
+const PERSONA_L10N: Record<string, { name: MessageDescriptor; roast: MessageDescriptor }> = {
+  LQD: {
+    name: msg`The Liquidity Donor`,
+    roast: msg`You’re not trading. You’re funding the ecosystem.`,
+  },
+  AIM: {
+    name: msg`The All-In Mystic`,
+    roast: msg`Every all-in starts with enlightenment and ends with reincarnation.`,
+  },
+  SIG: {
+    name: msg`The Signal General`,
+    roast: msg`Three hours of research. Two-word thesis: send it.`,
+  },
+  CND: {
+    name: msg`The Candle Prophet`,
+    roast: msg`You can chart every line except the one marking enough exposure.`,
+  },
+  DIP: {
+    name: msg`The Dip Ringleader`,
+    roast: msg`You’re not buying the dip. You’re giving the downtrend a demo.`,
+  },
+  DOC: {
+    name: msg`The Market Doctor`,
+    roast: msg`Every symptom diagnosed. Every loss professionally explained.`,
+  },
+  CHN: {
+    name: msg`The Onchain Detective`,
+    roast: msg`You know everyone’s position except, occasionally, your own.`,
+  },
+  LMT: {
+    name: msg`The Limit Sniper`,
+    roast: msg`The limit order was perfect. Shame you two never met again.`,
+  },
+  RSK: {
+    name: msg`The Risk Monk`,
+    roast: msg`They study how to double once. You study how to stay in the game.`,
+  },
+};
+
+function personaL10n(persona: Pick<Persona, "mark" | "code">) {
+  return PERSONA_L10N[persona.mark] ?? PERSONA_L10N[persona.code];
+}
+
+export function localizedPersonaName(persona: Persona): string {
+  if (i18n.locale === "en") return persona.name;
+  if (i18n.locale === "zh-CN" && persona.cn) return persona.cn;
+  const entry = personaL10n(persona);
+  return entry ? i18n._(entry.name) : persona.name;
+}
+
+export function localizedPersonaRoast(persona: Persona): string {
+  if (!persona.roast || i18n.locale === "en") return persona.roast;
+  const entry = personaL10n(persona);
+  return entry ? i18n._(entry.roast) : persona.roast;
 }
 
 const CHEMISTRY: Record<string, { best: string; rival: string }> = {

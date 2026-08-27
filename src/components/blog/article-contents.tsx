@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
 
 import { formatBlogIndex } from "@/lib/blog-format";
 
@@ -15,6 +17,7 @@ type ArticleContentsProps = {
 
 export function ArticleContents({ sections }: ArticleContentsProps) {
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
+  useLingui();
 
   useEffect(() => {
     let frame = 0;
@@ -61,7 +64,7 @@ export function ArticleContents({ sections }: ArticleContentsProps) {
   }, [sections]);
 
   return (
-    <nav className={styles.articleContents} aria-label="Article contents">
+    <nav className={styles.articleContents} aria-label={t`Article contents`}>
       {sections.map((section, index) => (
         <a
           key={section.id}

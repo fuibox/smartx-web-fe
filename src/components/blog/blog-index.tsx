@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  BlogCategoryLabel,
+  BlogDate,
+  BlogReadTime,
+  BlogUiText,
+} from "@/components/blog/blog-i18n";
 import { BlogVisual } from "@/components/blog/blog-visual";
 import styles from "@/components/blog/blog-list.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import type { BlogPostSummary } from "@/content/blog-types";
 import { listBlogPosts } from "@/content/blog-repository";
-import {
-  formatBlogDate,
-  formatBlogIndex,
-  formatBlogReadTime,
-  formatBlogShortDate,
-} from "@/lib/blog-format";
+import { formatBlogDate, formatBlogIndex } from "@/lib/blog-format";
 
 type BlogIndexProps = {
   pageNumber: number;
@@ -25,8 +26,12 @@ function getPageHref(pageNumber: number) {
 function StoryMeta({ post }: { post: BlogPostSummary }) {
   return (
     <div className={styles.storyMeta}>
-      <span>{post.category}</span>
-      <small>{formatBlogReadTime(post.readingMinutes)}</small>
+      <span>
+        <BlogCategoryLabel category={post.category} />
+      </span>
+      <small>
+        <BlogReadTime minutes={post.readingMinutes} />
+      </small>
     </div>
   );
 }
@@ -43,18 +48,19 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
   return (
     <div className={styles.page}>
       <a className={styles.skipLink} href="#latest-stories">
-        Skip to latest stories
+        <BlogUiText k="skipToLatest" />
       </a>
       <SiteHeader active="blog" allowThemeToggle />
 
       <main>
         <section className={styles.masthead} aria-labelledby="journal-title">
-          <h1 id="journal-title">SmartX Journal.</h1>
+          <h1 id="journal-title">
+            <BlogUiText k="journalTitle" />
+          </h1>
 
           <div className={styles.mastheadIntro}>
             <p>
-              Notes on product, markets, and the systems reshaping how people
-              trade.
+              <BlogUiText k="mastheadIntro" />
             </p>
           </div>
         </section>
@@ -84,13 +90,15 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
                     dateTime={featuredPost.publishedAt}
                     aria-label={formatBlogDate(featuredPost.publishedAt)}
                   >
-                    {formatBlogShortDate(featuredPost.publishedAt)}
+                    <BlogDate date={featuredPost.publishedAt} variant="short" />
                   </time>
                   <StoryMeta post={featuredPost} />
                 </div>
                 <h2>{featuredPost.title}</h2>
                 <p>{featuredPost.excerpt}</p>
-                <span className={styles.readStory}>Read the dispatch</span>
+                <span className={styles.readStory}>
+                  <BlogUiText k="readDispatch" />
+                </span>
               </div>
             </Link>
           </article>
@@ -108,7 +116,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
                       dateTime={post.publishedAt}
                       aria-label={formatBlogDate(post.publishedAt)}
                     >
-                      {formatBlogShortDate(post.publishedAt)}
+                      <BlogDate date={post.publishedAt} variant="short" />
                     </time>
                     <div className={styles.storyCopy}>
                       <StoryMeta post={post} />
@@ -131,7 +139,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
             <nav className={styles.pagination} aria-label="Journal pages">
               {pageNumber > 1 ? (
                 <Link href={getPageHref(pageNumber - 1)}>
-                  <i aria-hidden="true">←</i> Newer
+                  <i aria-hidden="true">←</i> <BlogUiText k="newer" />
                 </Link>
               ) : (
                 <span
@@ -161,7 +169,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
 
               {pageNumber < totalPages ? (
                 <Link href={getPageHref(pageNumber + 1)}>
-                  Older <i aria-hidden="true">→</i>
+                  <BlogUiText k="older" /> <i aria-hidden="true">→</i>
                 </Link>
               ) : (
                 <span

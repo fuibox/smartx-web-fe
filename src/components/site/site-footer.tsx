@@ -1,5 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
@@ -8,11 +13,13 @@ import styles from "./site-chrome.module.css";
 const ASSET_ROOT = "/assets/consumer-network";
 
 export function SiteFooter() {
+  useLingui();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.footerDirectory}>
         <div className={styles.footerBrand}>
-          <Link className={styles.footerBrandLink} href="/" aria-label="SmartX home">
+          <Link className={styles.footerBrandLink} href="/" aria-label={t`SmartX home`}>
             <Image
               src={`${ASSET_ROOT}/logo-black.svg`}
               alt=""
@@ -22,7 +29,7 @@ export function SiteFooter() {
             <span>SmartX</span>
           </Link>
 
-          <div className={styles.socialLinks} aria-label="SmartX social links">
+          <div className={styles.socialLinks} aria-label={t`SmartX social links`}>
             <a
               href="https://x.com/SmartXTerminal"
               target="_blank"
@@ -56,16 +63,22 @@ export function SiteFooter() {
 
         <div className={styles.footerLinks}>
           <nav className={styles.footerGroup} aria-labelledby="footer-product-title">
-            <h2 id="footer-product-title">Product</h2>
+            <h2 id="footer-product-title">
+              <Trans>Product</Trans>
+            </h2>
             <a
               href={createSmartXAppHref("footer_link")}
               target="_blank"
               rel="noopener noreferrer"
             >
-              App
+              <Trans>App</Trans>
             </a>
-            <Link href="/waitlist/">Waitlist</Link>
-            <Link href="/blog">Blog</Link>
+            <Link href="/waitlist/">
+              <Trans>Waitlist</Trans>
+            </Link>
+            <Link href="/blog">
+              <Trans>Blog</Trans>
+            </Link>
           </nav>
         </div>
       </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
 import { FiMoon, FiSun } from "react-icons/fi";
 
 import styles from "@/components/site/site-chrome.module.css";
@@ -17,6 +19,7 @@ function getCurrentTheme(): BlogTheme {
 
 export function BlogThemeToggle() {
   const [theme, setTheme] = useState<BlogTheme | null>(null);
+  useLingui();
 
   useEffect(() => {
     setTheme(getCurrentTheme());
@@ -30,15 +33,16 @@ export function BlogThemeToggle() {
     setTheme(nextTheme);
   };
 
-  const targetTheme = theme === "light" ? "dark" : "light";
+  const toggleLabel =
+    theme === "light" ? t`Use dark reading theme` : t`Use light reading theme`;
 
   return (
     <button
       className={styles.themeToggle}
       type="button"
       onClick={toggleTheme}
-      aria-label={`Use ${targetTheme} reading theme`}
-      title={`Use ${targetTheme} reading theme`}
+      aria-label={toggleLabel}
+      title={toggleLabel}
     >
       <FiSun className={styles.themeSun} aria-hidden="true" />
       <FiMoon className={styles.themeMoon} aria-hidden="true" />

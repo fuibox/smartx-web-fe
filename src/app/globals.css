@@ -135,6 +135,11 @@ body {
 
 html {
   scroll-behavior: smooth;
+  background: #030807;
+}
+
+html[data-i18n-pending] body {
+  opacity: 0;
 }
 
 body {

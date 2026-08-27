@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
@@ -18,30 +21,28 @@ const ASSET_ROOT = "/assets/consumer-network";
 const networkFeatures = [
   {
     number: "No. 01",
-    title: "Verified, not claimed",
-    description:
-      "Every track record comes from real positions, real PnL, real history.",
+    title: msg`Verified, not claimed`,
+    description: msg`Every track record comes from real positions, real PnL, real history.`,
     preview: "verified" satisfies NetworkPreviewKind,
     motion: "performance",
   },
   {
     number: "No. 02",
-    title: "Picked for you",
-    description:
-      "The traders and markets in your feed match what you trade.",
+    title: msg`Picked for you`,
+    description: msg`The traders and markets in your feed match what you trade.`,
     preview: "personalized" satisfies NetworkPreviewKind,
     motion: "discovery",
   },
   {
     number: "No. 03",
-    title: "One tap to trade",
-    description: "Trade as smoothly as shopping.",
+    title: msg`One tap to trade`,
+    description: msg`Trade as smoothly as shopping.`,
     preview: "trade" satisfies NetworkPreviewKind,
     motion: "account",
   },
 ] as const;
 
-const performanceSteps = ["Performance", "Rank", "Audience", "Income"];
+const performanceSteps = [msg`Performance`, msg`Rank`, msg`Audience`, msg`Income`];
 
 function useSectionReveals() {
   useEffect(() => {
@@ -117,7 +118,7 @@ function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
       href="/waitlist/"
       data-placement={placement}
     >
-      Join the Waitlist
+      <Trans>Join the Waitlist</Trans>
     </Link>
   );
 }
@@ -190,18 +191,26 @@ function Hero() {
       <ConsumerHeader />
 
       <div className={styles.heroCopy}>
-        <h1 id="consumer-hero-title">Trade your edge.</h1>
+        <h1 id="consumer-hero-title">
+          <Trans>Trade your edge.</Trans>
+        </h1>
         <div className={styles.heroSubcopy}>
           <p className={styles.heroLedeDesktop}>
             <span>
-              The social trading app for memes, perps, stocks and prediction markets.
+              <Trans>
+                The social trading app for memes, perps, stocks and prediction markets.
+              </Trans>
             </span>
-            <span>Follow verified traders and trade in one tap.</span>
+            <span>
+              <Trans>Follow verified traders and trade in one tap.</Trans>
+            </span>
           </p>
           <p className={styles.heroLedeMobile}>
-            <span>The social trading app for memes, perps,</span>
-            <span>stocks and prediction markets. Follow</span>
-            <span>verified traders and trade in one tap.</span>
+            <Trans>
+              <span>The social trading app for memes, perps,</span>
+              <span>stocks and prediction markets. Follow</span>
+              <span>verified traders and trade in one tap.</span>
+            </Trans>
           </p>
           <WaitlistButton placement="hero" />
         </div>
@@ -211,6 +220,8 @@ function Hero() {
 }
 
 function NetworkSection() {
+  const { i18n } = useLingui();
+
   return (
     <section
       id="network"
@@ -220,10 +231,14 @@ function NetworkSection() {
       data-looping="true"
     >
       <h2 id="network-title">
-        <strong>Follow the best. Not the loudest.</strong>{" "}
+        <strong>
+          <Trans>Follow the best. Not the loudest.</Trans>
+        </strong>{" "}
         <span>
-          Every trader on SmartX is verified by real trades — and your feed is
-          shaped by how you trade.
+          <Trans>
+            Every trader on SmartX is verified by real trades — and your feed is
+            shaped by how you trade.
+          </Trans>
         </span>
       </h2>
 
@@ -235,8 +250,8 @@ function NetworkSection() {
               <NetworkProductPreview kind={feature.preview} />
             </div>
             <div className={styles.featureCopy}>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
+              <h3>{i18n._(feature.title)}</h3>
+              <p>{i18n._(feature.description)}</p>
             </div>
           </article>
         ))}
@@ -246,6 +261,8 @@ function NetworkSection() {
 }
 
 function PerformanceSection() {
+  const { i18n } = useLingui();
+
   return (
     <section
       id="product"
@@ -256,7 +273,7 @@ function PerformanceSection() {
       <div className={styles.performanceProduct}>
         <Image
           src={`${ASSET_ROOT}/performance-product-latest.webp`}
-          alt="SmartX Square and People screens showing a verified social feed and trader leaderboard"
+          alt={t`SmartX Square and People screens showing a verified social feed and trader leaderboard`}
           width={2894}
           height={3943}
           sizes="(max-width: 620px) 100vw, (min-width: 1440px) 678px, 47vw"
@@ -265,17 +282,26 @@ function PerformanceSection() {
 
       <div className={styles.storyCopy}>
         <div>
-          <span className={styles.eyebrow}>The trader content economy</span>
-          <h2 id="performance-title">Turn influence into income</h2>
+          <span className={styles.eyebrow}>
+            <Trans>The trader content economy</Trans>
+          </span>
+          <h2 id="performance-title">
+            <Trans>Turn influence into income</Trans>
+          </h2>
         </div>
         <p>
-          Post opinions backed by your real positions. Climb the leaderboard,
-          grow your following, and earn a share of the revenue you create.
+          <Trans>
+            Post opinions backed by your real positions. Climb the leaderboard,
+            grow your following, and earn a share of the revenue you create.
+          </Trans>
         </p>
-        <div className={styles.performanceFlow} aria-label={performanceSteps.join(" to ")}>
+        <div
+          className={styles.performanceFlow}
+          aria-label={performanceSteps.map((step) => i18n._(step)).join(" to ")}
+        >
           {performanceSteps.map((step, index) => (
-            <span className={styles.performanceStep} key={step}>
-              <span>{step}</span>
+            <span className={styles.performanceStep} key={step.id}>
+              <span>{i18n._(step)}</span>
               {index < performanceSteps.length - 1 ? (
                 <Image
                   src={`${ASSET_ROOT}/flow-arrow.svg`}
@@ -293,6 +319,8 @@ function PerformanceSection() {
 }
 
 function DiscoverySection() {
+  useLingui();
+
   return (
     <section
       className={`${styles.storySection} ${styles.discovery}`}
@@ -303,7 +331,7 @@ function DiscoverySection() {
         <Image
           className={styles.discoveryScene}
           src={`${ASSET_ROOT}/discovery-scene-latest.webp`}
-          alt="SmartX mobile signals feed on a dark trading console"
+          alt={t`SmartX mobile signals feed on a dark trading console`}
           width={2492}
           height={1600}
           sizes="(max-width: 620px) 720px, 1246px"
@@ -312,14 +340,22 @@ function DiscoverySection() {
 
       <div className={`${styles.storyCopy} ${styles.discoveryCopy}`}>
         <div>
-          <span className={styles.eyebrow}>Personalized for you</span>
-          <h2 id="discovery-title">The next opportunity finds you.</h2>
+          <span className={styles.eyebrow}>
+            <Trans>Personalized for you</Trans>
+          </span>
+          <h2 id="discovery-title">
+            <Trans>The next opportunity finds you.</Trans>
+          </h2>
         </div>
         <p>
-          No more scrolling through noise. SmartX learns what you trade and
-          shows you the traders and markets that fit
+          <Trans>
+            No more scrolling through noise. SmartX learns what you trade and
+            shows you the traders and markets that fit
+          </Trans>
         </p>
-        <p className={styles.storyTrail}>Discover · Follow · Copy</p>
+        <p className={styles.storyTrail}>
+          <Trans>Discover · Follow · Copy</Trans>
+        </p>
       </div>
     </section>
   );
@@ -345,18 +381,26 @@ function AccountSection() {
 
       <div className={`${styles.storyCopy} ${styles.accountCopy}`}>
         <div>
-          <span className={styles.eyebrow}>No barriers for new users</span>
+          <span className={styles.eyebrow}>
+            <Trans>No barriers for new users</Trans>
+          </span>
           <h2 id="account-title">
-            One Account.
-            <br />
-            Every Market.
+            <Trans>
+              One Account.
+              <br />
+              Every Market.
+            </Trans>
           </h2>
         </div>
         <p>
-          Fund with fiat. Skip gas and bridging. Trade across markets with one
-          SmartX balance.
+          <Trans>
+            Fund with fiat. Skip gas and bridging. Trade across markets with one
+            SmartX balance.
+          </Trans>
         </p>
-        <p className={styles.storyTrail}>Fiat in · Markets open · Chains invisible</p>
+        <p className={styles.storyTrail}>
+          <Trans>Fiat in · Markets open · Chains invisible</Trans>
+        </p>
       </div>
     </section>
   );
@@ -374,8 +418,12 @@ function ClosingSection() {
       </div>
       <div className={styles.closingCopy}>
         <div>
-          <h2 id="closing-title">Be early</h2>
-          <p>The Consumer Trading Network is taking shape.</p>
+          <h2 id="closing-title">
+            <Trans>Be early</Trans>
+          </h2>
+          <p>
+            <Trans>The Consumer Trading Network is taking shape.</Trans>
+          </p>
         </div>
         <WaitlistButton placement="closing" />
       </div>
@@ -384,17 +432,19 @@ function ClosingSection() {
 }
 
 function ConsumerFooter() {
+  useLingui();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.footerDirectory}>
         <div className={styles.footerBrand}>
           <Brand tone="dark" />
-          <div className={styles.socialLinks} aria-label="SmartX social links">
+          <div className={styles.socialLinks} aria-label={t`SmartX social links`}>
             <a
               href="https://x.com/SmartXTerminal"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="SmartX on X"
+              aria-label={t`SmartX on X`}
             >
               <Image src={`${ASSET_ROOT}/social-x.svg`} alt="" width={16} height={16} />
             </a>
@@ -402,7 +452,7 @@ function ConsumerFooter() {
               href="https://t.me/+CTeuBkpOxSNkN2Y0"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="SmartX on Telegram"
+              aria-label={t`SmartX on Telegram`}
             >
               <Image
                 src={`${ASSET_ROOT}/social-telegram.svg`}
@@ -417,16 +467,22 @@ function ConsumerFooter() {
 
         <div className={styles.footerLinks}>
           <nav aria-labelledby="consumer-footer-product">
-            <h2 id="consumer-footer-product">Product</h2>
+            <h2 id="consumer-footer-product">
+              <Trans>Product</Trans>
+            </h2>
             <a
               href={createSmartXAppHref("footer_link")}
               target="_blank"
               rel="noopener noreferrer"
             >
-              App
+              <Trans>App</Trans>
             </a>
-            <Link href="/waitlist/">Waitlist</Link>
-            <Link href="/blog">Blog</Link>
+            <Link href="/waitlist/">
+              <Trans>Waitlist</Trans>
+            </Link>
+            <Link href="/blog">
+              <Trans>Blog</Trans>
+            </Link>
           </nav>
         </div>
       </div>
@@ -443,7 +499,7 @@ export function ConsumerHome() {
   return (
     <main className={styles.page}>
       <a className={styles.skipLink} href="#network">
-        Skip to the SmartX network story
+        <Trans>Skip to the SmartX network story</Trans>
       </a>
       <Hero />
       <NetworkSection />

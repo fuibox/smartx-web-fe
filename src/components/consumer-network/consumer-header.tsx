@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
+import { LanguageSwitcher } from "@/components/site/language-switcher";
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
 import styles from "./consumer-home.module.css";
@@ -20,10 +24,11 @@ export function ConsumerHeader({
   placement = "overlay",
 }: ConsumerHeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  useLingui();
 
   return (
     <header className={styles.header} data-placement={placement}>
-      <Link href="/" className={styles.headerBrand} aria-label="SmartX home">
+      <Link href="/" className={styles.headerBrand} aria-label={t`SmartX home`}>
         <span className={styles.brand}>
           <Image
             src={`${ASSET_ROOT}/logo-white.svg`}
@@ -37,20 +42,20 @@ export function ConsumerHeader({
       </Link>
 
       <div className={styles.headerActions}>
-        <nav className={styles.primaryNav} aria-label="Site navigation">
+        <nav className={styles.primaryNav} aria-label={t`Site navigation`}>
           <Link
             href="/"
             className={active === "home" ? styles.activeLink : undefined}
             aria-current={active === "home" ? "page" : undefined}
           >
-            Home
+            <Trans>Home</Trans>
           </Link>
           <Link
             href="/waitlist/"
             className={active === "waitlist" ? styles.activeLink : undefined}
             aria-current={active === "waitlist" ? "page" : undefined}
           >
-            Waitlist
+            <Trans>Waitlist</Trans>
           </Link>
           <a
             href="https://x.com/SmartXTerminal"
@@ -64,37 +69,42 @@ export function ConsumerHeader({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Community
+            <Trans>Community</Trans>
           </a>
-          <Link href="/blog">Blog</Link>
+          <Link href="/blog">
+            <Trans>Blog</Trans>
+          </Link>
         </nav>
-        <button
-          className={styles.mobileMenuButton}
-          type="button"
-          aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={mobileNavOpen}
-          aria-controls="consumer-site-navigation"
-          data-open={mobileNavOpen ? "true" : "false"}
-          onClick={() => setMobileNavOpen((open) => !open)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-        <a
-          className={styles.waitlistButton}
-          href={createSmartXAppHref("hero_cta")}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Launch Alpha
-        </a>
+        <LanguageSwitcher />
+        <div className={styles.headerTools}>
+          <button
+            className={styles.mobileMenuButton}
+            type="button"
+            aria-label={mobileNavOpen ? t`Close navigation` : t`Open navigation`}
+            aria-expanded={mobileNavOpen}
+            aria-controls="consumer-site-navigation"
+            data-open={mobileNavOpen ? "true" : "false"}
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <a
+            className={styles.waitlistButton}
+            href={createSmartXAppHref("hero_cta")}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Trans>Launch Alpha</Trans>
+          </a>
+        </div>
       </div>
 
       <nav
         id="consumer-site-navigation"
         className={styles.mobileNav}
-        aria-label="Mobile site navigation"
+        aria-label={t`Mobile site navigation`}
         hidden={!mobileNavOpen}
       >
         <Link
@@ -103,7 +113,7 @@ export function ConsumerHeader({
           aria-current={active === "home" ? "page" : undefined}
           onClick={() => setMobileNavOpen(false)}
         >
-          Home
+          <Trans>Home</Trans>
         </Link>
         <Link
           href="/waitlist/"
@@ -111,7 +121,7 @@ export function ConsumerHeader({
           aria-current={active === "waitlist" ? "page" : undefined}
           onClick={() => setMobileNavOpen(false)}
         >
-          Waitlist
+          <Trans>Waitlist</Trans>
         </Link>
         <a
           href="https://x.com/SmartXTerminal"
@@ -127,11 +137,12 @@ export function ConsumerHeader({
           rel="noopener noreferrer"
           onClick={() => setMobileNavOpen(false)}
         >
-          Community
+          <Trans>Community</Trans>
         </a>
         <Link href="/blog" onClick={() => setMobileNavOpen(false)}>
-          Blog
+          <Trans>Blog</Trans>
         </Link>
+        <LanguageSwitcher variant="inline" />
       </nav>
     </header>
   );

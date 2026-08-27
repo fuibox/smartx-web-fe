@@ -3,8 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 import { BlogThemeToggle } from "@/components/blog/blog-theme-toggle";
+import { LanguageSwitcher } from "@/components/site/language-switcher";
 import { createSmartXAppHref } from "@/lib/smartx-links";
 
 import styles from "./site-chrome.module.css";
@@ -19,10 +23,11 @@ export function SiteHeader({
   allowThemeToggle = false,
 }: SiteHeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  useLingui();
 
   return (
     <header className={styles.header}>
-      <Link className={styles.headerBrand} href="/" aria-label="SmartX home">
+      <Link className={styles.headerBrand} href="/" aria-label={t`SmartX home`}>
         <Image
           src="/assets/consumer-network/logo-white.svg"
           alt=""
@@ -34,20 +39,20 @@ export function SiteHeader({
       </Link>
 
       <div className={styles.headerActions}>
-        <nav className={styles.headerNav} aria-label="Site navigation">
+        <nav className={styles.headerNav} aria-label={t`Site navigation`}>
           <Link
             href="/"
             className={active === "home" ? styles.activeLink : undefined}
             aria-current={active === "home" ? "page" : undefined}
           >
-            Home
+            <Trans>Home</Trans>
           </Link>
           <Link
             href="/waitlist/"
             className={active === "waitlist" ? styles.activeLink : undefined}
             aria-current={active === "waitlist" ? "page" : undefined}
           >
-            Waitlist
+            <Trans>Waitlist</Trans>
           </Link>
           <a
             href="https://x.com/SmartXTerminal"
@@ -61,17 +66,18 @@ export function SiteHeader({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Community
+            <Trans>Community</Trans>
           </a>
           <Link
             href="/blog"
             className={active === "blog" ? styles.activeLink : undefined}
             aria-current={active === "blog" ? "page" : undefined}
           >
-            Blog
+            <Trans>Blog</Trans>
           </Link>
         </nav>
 
+        <LanguageSwitcher />
         <div className={styles.headerTools}>
           {allowThemeToggle ? (
             <span className={styles.desktopThemeToggle}>
@@ -84,12 +90,12 @@ export function SiteHeader({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Launch Alpha
+            <Trans>Launch Alpha</Trans>
           </a>
           <button
             className={styles.mobileMenuButton}
             type="button"
-            aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+            aria-label={mobileNavOpen ? t`Close navigation` : t`Open navigation`}
             aria-expanded={mobileNavOpen}
             aria-controls="blog-mobile-site-navigation"
             data-open={mobileNavOpen ? "true" : "false"}
@@ -105,7 +111,7 @@ export function SiteHeader({
       <nav
         id="blog-mobile-site-navigation"
         className={styles.mobileNav}
-        aria-label="Mobile site navigation"
+        aria-label={t`Mobile site navigation`}
         hidden={!mobileNavOpen}
       >
         <Link
@@ -114,7 +120,7 @@ export function SiteHeader({
           aria-current={active === "home" ? "page" : undefined}
           onClick={() => setMobileNavOpen(false)}
         >
-          Home
+          <Trans>Home</Trans>
         </Link>
         <Link
           href="/waitlist/"
@@ -122,7 +128,7 @@ export function SiteHeader({
           aria-current={active === "waitlist" ? "page" : undefined}
           onClick={() => setMobileNavOpen(false)}
         >
-          Waitlist
+          <Trans>Waitlist</Trans>
         </Link>
         <a
           href="https://x.com/SmartXTerminal"
@@ -138,7 +144,7 @@ export function SiteHeader({
           rel="noopener noreferrer"
           onClick={() => setMobileNavOpen(false)}
         >
-          Community
+          <Trans>Community</Trans>
         </a>
         <Link
           href="/blog"
@@ -146,14 +152,17 @@ export function SiteHeader({
           aria-current={active === "blog" ? "page" : undefined}
           onClick={() => setMobileNavOpen(false)}
         >
-          Blog
+          <Trans>Blog</Trans>
         </Link>
         {allowThemeToggle ? (
           <div className={styles.mobileThemeControl}>
-            <span>Reading theme</span>
+            <span>
+              <Trans>Reading theme</Trans>
+            </span>
             <BlogThemeToggle />
           </div>
         ) : null}
+        <LanguageSwitcher variant="inline" />
       </nav>
     </header>
   );

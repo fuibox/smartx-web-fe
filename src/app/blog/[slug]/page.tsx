@@ -4,6 +4,12 @@ import { notFound } from "next/navigation";
 
 import { ArticleContents } from "@/components/blog/article-contents";
 import { ArticleCta } from "@/components/blog/article-cta";
+import {
+  BlogCategoryLabel,
+  BlogDate,
+  BlogReadTime,
+  BlogUiText,
+} from "@/components/blog/blog-i18n";
 import { BlogVisual } from "@/components/blog/blog-visual";
 import styles from "@/components/blog/blog-article.module.css";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -15,11 +21,7 @@ import {
   listAllPublishedBlogPosts,
 } from "@/content/blog-repository";
 import type { BlogContentBlock } from "@/content/blog-types";
-import {
-  formatBlogDate,
-  formatBlogIndex,
-  formatBlogReadTime,
-} from "@/lib/blog-format";
+import { formatBlogIndex } from "@/lib/blog-format";
 import {
   resolveSmartXUrl,
   SMARTX_INDEXABLE_ROBOTS,
@@ -140,7 +142,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const relatedPosts = await getRelatedBlogPosts(post.slug);
   const readingStats = getBlogReadingStats(post);
-  const readTime = formatBlogReadTime(readingStats.minutes);
   const articleUrl = `https://smartx.io/blog/${post.slug}/`;
   const socialImage = post.seo?.image ?? post.cover;
   const structuredData = {
@@ -194,7 +195,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         }}
       />
       <a className={styles.skipLink} href="#article-body">
-        Skip to article
+        <BlogUiText k="skipToArticle" />
       </a>
       <SiteHeader active="blog" allowThemeToggle />
 
@@ -204,13 +205,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className={styles.articleMeta}>
               <Link className={styles.articleMetaBack} href="/blog">
                 <i aria-hidden="true">←</i>
-                Journal
+                <BlogUiText k="journal" />
               </Link>
-              <span className={styles.articleCategory}>{post.category}</span>
+              <span className={styles.articleCategory}>
+                <BlogCategoryLabel category={post.category} />
+              </span>
               <time dateTime={post.publishedAt}>
-                {formatBlogDate(post.publishedAt)}
+                <BlogDate date={post.publishedAt} />
               </time>
-              <span className={styles.articleReadTime}>{readTime}</span>
+              <span className={styles.articleReadTime}>
+                <BlogReadTime minutes={readingStats.minutes} />
+              </span>
             </div>
             <h1>{post.title}</h1>
             {post.dek ? <p>{post.dek}</p> : null}
@@ -218,7 +223,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div id="article-body" className={styles.articleLayout}>
             <aside className={styles.articleRail}>
-              <p className={styles.articleRailLabel}>In this dispatch</p>
+              <p className={styles.articleRailLabel}>
+                <BlogUiText k="inThisDispatch" />
+              </p>
               <ArticleContents
                 sections={post.sections.map(({ id, heading }) => ({
                   id,
@@ -259,7 +266,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           aria-labelledby="related-stories-title"
         >
           <header>
-            <h2 id="related-stories-title">From the journal</h2>
+            <h2 id="related-stories-title">
+              <BlogUiText k="fromTheJournal" />
+            </h2>
           </header>
           <div className={styles.relatedGrid}>
             {relatedPosts.slice(0, 3).map((related, index) => (
@@ -277,9 +286,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     </span>
                     <div>
                       <div className={styles.relatedMeta}>
-                        <span>{related.category}</span>
+                        <span>
+                          <BlogCategoryLabel category={related.category} />
+                        </span>
                         <time dateTime={related.publishedAt}>
-                          {formatBlogDate(related.publishedAt)}
+                          <BlogDate date={related.publishedAt} />
                         </time>
                       </div>
                       <h3>{related.title}</h3>
