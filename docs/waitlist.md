@@ -1,6 +1,6 @@
 # SmartX Waitlist PRD
 
-> 状态：活动流程和首版产品规则待确认。题目加点、人格中英文文案和关系配置保留调整空间；人格插画方向已确定为拟人化 SmartX Owl 交易梗插画。
+> 状态：活动流程和首版产品规则待确认。题目加点、人格文案、关系文案和视觉资产保留调整空间，不影响后端先行开发。
 
 ## 1. 活动是什么
 
@@ -17,8 +17,8 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 ~~~text
 邀请码进入 → 完成六道题 → 验证邮箱
-→ 完成 Telegram 和 X 社群动作 → 揭示结果、排名和邀请码
-→ 可选分享 → 排名优先值提升
+→ 完成 Telegram 和 X 社群动作 → 揭示结果与排名
+→ 发起分享 → 排名提升并解锁邀请码
 → 好友完成邮箱验证 → 邀请人排名再次提升
 ~~~
 
@@ -39,13 +39,12 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 → 完成六道题
 → 输入邮箱并完成验证码验证
 → Join Telegram 并 Follow SmartX on X
-→ 查看人格、三项属性、搭档、天敌、waitlist 排名和 5 或 10 个邀请码
-→ 可选分享并获得排名奖励
+→ 查看人格、三项属性、搭档、天敌和 waitlist 排名
+→ 发起分享
+→ 获得排名奖励并解锁 5 或 10 个邀请码
 ~~~
 
 没有有效邀请码，不能开始答题。六道题完成后才要求邮箱；邮箱验证成功代表正式加入 waitlist。
-
-如果当前用户有有效登录态且已经有结果，直接入口不再展示落地页，而是自动返回该用户原有结果、排名和邀请码。没有登录态的老用户从落地页的 `Already tested? View my result` 进入邮箱 OTP 找回流程。
 
 ### 2.2 从朋友分享进入
 
@@ -62,8 +61,6 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 邀请码有效时，点击按钮后直接开始答题。
 - 邀请码无效、已使用或过期时，朋友结果仍然可见，访问者可以输入其他邀请码。
 - 用户可以只分享结果，也可以在结果链接中附带一个邀请码。
-- 如果访问者有有效登录态且已经有自己的结果，朋友结果仍然完整展示，但主按钮改为 `View my result`；页面不再提供重测入口。
-- 没有登录态的访问者仍可以选择测试，同时通过 `Already tested? View my result` 用邮箱 OTP 找回原结果。
 
 ### 2.3 从答题到结果
 
@@ -85,14 +82,6 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 验证码为 6 位数字，10 分钟有效，60 秒后可以重新发送。
 - 同一个验证码最多尝试 5 次；新验证码发出后，旧验证码失效。
 - 同一邮箱只能完成一次测试。结果生成后不允许重测；再次验证该邮箱时直接返回原结果。
-- 有有效登录态且已有结果的用户，从直接入口进入时自动返回原结果；从好友分享入口进入时仍先看朋友结果，再主动切换到自己的结果。
-- 没有登录态时，页面不能仅凭本地结果图片或公开 result ID 认定用户身份。用户必须完成邮箱 OTP，才能查看自己的私有结果、排名和邀请码。
-- 用户在完成一轮新答题后提交了已有结果的邮箱，OTP 验证成功后直接返回原结果；本轮新答案不生成结果，正在占用的邀请码立即释放，也不计为邀请人的有效邀请。
-- OTP 验证前不提示邮箱是否存在；验证后若没有对应结果，返回入口并提示使用邀请码开始测试。
-- 正式产品以服务端会话和邮箱记录为准；本地原型分别用当前浏览器的会话索引与邮箱结果索引模拟。
-- Waitlist 登录态与 SmartX 主站登录态相互独立。正式实现的会话仅作用于 `/waitlist`，不改变官网导航或其他页面的登录状态。
-- 私人结果页右侧显示 `Signed in as {email}` 和 `Sign out`。邮箱不进入公开分享页、人格海报或下载卡。
-- `Sign out` 只清除当前 waitlist 会话，不删除邮箱绑定、结果、排名或邀请码。退出后，直接入口回到活动落地页；如果用户从好友分享页切到自己的结果，退出后回到好友结果页。
 
 ### 3.2 结果如何生成
 
@@ -142,7 +131,7 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 用户在两道风险题中都选择最克制的答案，并且另外两个维度都没有走到最极端时，常规人格会被隐藏款 Risk Monk 覆盖。
 
-- Risk Monk 生成结果时获得 10 个邀请码，其他人格获得 5 个。
+- Risk Monk 分享后解锁 10 个邀请码，其他人格解锁 5 个。
 - Risk Monk 的排名奖励与其他人格相同。
 - 精确触发条件见附录 C。
 
@@ -151,15 +140,14 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - 邮箱验证成功后生成并保存结果，同时激活用户的真实 waitlist 排名。
 - 结果生成后先进入社群解锁页；Telegram 和 X 两项都完成，才向用户展示结果和排名。
 - 如果用户尚未完成两项社群动作，再次进入时回到社群解锁页；已经完成则直接返回原结果。
-- 社群动作本身不增加排名或额外邀请码；完成结果揭示后按人格发放邀请码。
+- 社群动作不增加排名，也不解锁邀请码。
 
 ### 3.4 分享、邀请码与排名
 
-- 用户完成结果揭示后立即获得邀请码，不以分享作为解锁条件。
-- 普通人格获得 5 个邀请码，Risk Monk 获得 10 个。
-- 用户第一次点击分享按钮并打开分享页面，即视为完成分享任务并增加 500 优先值。活动不校验用户是否实际发帖。
+- 用户第一次点击分享按钮并打开分享页面，即视为完成分享任务：增加 500 优先值，同时解锁邀请码。活动不校验用户是否实际发帖。
+- 普通人格解锁 5 个邀请码，Risk Monk 解锁 10 个。
 - 每位好友使用邀请码完成邮箱验证后，邀请人再增加 500 优先值。
-- 重复分享、换渠道分享或下载结果卡，不会重复获得排名奖励或额外邀请码。
+- 重复分享、换渠道分享或下载结果卡，不会重复获得邀请码或排名奖励。
 - 排名按用户获得的优先值和加入时间重新计算。
 - 页面展示实际排名和实际变化，不承诺固定前进 500 名。
 - 其他用户获得奖励后，当前排名可能发生变化。
@@ -177,158 +165,49 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 ## 4. 页面与内容要求
 
-本节列出用户会直接看到的首版暂定文案，供运营集中审核。运营可以调整具体措辞，但页面顺序、按钮作用和奖励规则不随文案调整。题目和选项见附录 B，人格判词见附录 C，异常提示见附录 A，邮件见附录 F。
-
-运营文案交付优先级：
-
-1. P0：直接入口与好友分享入口的 Kicker、H1、Lede 和 CTA。
-2. P0：人格中英文名和唯一一句自嘲判词。
-3. P1：Best Match / Natural Rival 的关系解释，以及结果页排名、分享和邀请码说明。
-4. P1：邮箱、验证码、社群动作、错误提示和邮件通知。
-
-邀请码保留时间、奖励数值和系统状态不得被改写成营销承诺；例如“增加 500 优先值”不能写成“前进 500 名”。
-
 ### 4.1 入口页
 
-入口分为两种页面状态，并按登录态继续分流：
+- Kicker: THE SMARTX TRADER TYPE TEST
+- H1: How do you trade when it gets real?
+- Lede: Six decisions reveal your risk, signal, and social instincts.
+- CTA: Begin
 
-| 入口 | 有有效登录态且已有结果 | 没有登录态 |
-| --- | --- | --- |
-| 直接入口 | 自动进入自己的结果页 | 展示邀请码主流程，并提供邮箱 OTP 找回入口 |
-| 好友分享入口 | 先展示朋友结果，提供 `View my result`，不提供重测 | 展示朋友结果，提供测试主按钮和邮箱 OTP 找回入口 |
+### 4.2 邮箱页
 
-只有直接入口允许自动跳转。好友分享入口必须保留用户“查看朋友结果”的原始意图。
+- Kicker: YOUR RESULT IS READY
+- H1: Save your result.
+- Lede: Bind an email to keep it and create your waitlist position.
 
-#### 4.1.1 直接入口
+### 4.3 社群解锁页
 
-用户直接打开活动链接时，没有预带朋友结果或邀请码，先看到活动介绍和邀请码输入框。
+- Kicker: ONE LAST STEP
+- H1: Unlock your result.
+- Lede: Join the SmartX community and follow product updates before your trader type is revealed.
+- CTA: Reveal my result
 
-首版英文文案：
-
-- Kicker：THE SMARTX TRADER TYPE TEST
-- H1：How do you trade when it gets real?
-- Lede：Six decisions reveal your risk, signal, and social instincts.
-- 输入框：Invite code
-- 主按钮：Begin
-- 输入框下方：Strictly invite-only. Your code is reserved when the test begins.
-- 找回入口：Already tested? View my result
-
-有有效登录态且已有结果时不展示本页，直接进入结果页。没有登录态时无法预先判断是否为老用户，因此保留邀请码主流程和找回入口并存。
-
-#### 4.1.2 好友分享入口
-
-用户从朋友分享链接进入时，先看到朋友的真实结果，再决定是否开始自己的测试。
-
-- Kicker：A RESULT WAS SHARED WITH YOU
-- H1：A friend trades like {persona_name}.
-- Lede：Same type, different score—or something else entirely? Take the test to find yours.
-- 主按钮：Find my trader type
-- 找回入口：Already tested? View my result
-
-朋友的邀请码不可用时，朋友结果继续显示，显示具体错误，并额外出现 `Use another invite`。
-
-已测用户仍先看到朋友结果，但操作区改为：
-
-- 主按钮：View my result
-- 辅助说明：Your result is saved as {persona_name}.
-- 不展示 `Find my trader type`、找回入口和 `Use another invite`，避免形成重测路径。
-
-### 4.2 答题页
-
-- 每屏展示一道题、一张主图和四个选项。
-- 固定文案只有 `Back` 和 `Question {current} of 6`；题目与选项由附录 B 提供。
-- 用户选择后进入下一题，返回时可以修改上一题答案。
-
-### 4.3 邮箱与验证码
-
-六道题完成后进入邮箱页，不提前打断答题。
-
-邮箱 OTP 同时承担结果找回。找回入口的首版文案：
-
-- Kicker：ALREADY TESTED?
-- H1：Find your result.
-- Lede：Enter the email you used. We’ll send a six-digit code.
-- 主按钮：Send code
-- 返回：Back
-- 验证后无结果：No saved result is linked to this email. Use an invite to take the test.
-
-#### 4.3.1 邮箱页
-
-- Kicker：YOUR RESULT IS READY
-- H1：Save your result.
-- Lede：Bind an email to save your result and join the waitlist.
-- 输入框：Email address
-- 主按钮：Continue
-
-#### 4.3.2 验证码页
-
-- Kicker：CHECK YOUR INBOX
-- H1：Enter the 6-digit code.
-- Lede：We sent a verification code to {email}.
-- 输入框：Verification code
-- 主按钮：Continue
-- 重发：Resend code
-- 修改邮箱：Change email
-
-### 4.4 社群解锁页
-
-- Kicker：ONE LAST STEP
-- H1：Unlock your result.
-- Lede：Join the SmartX community and follow product updates before your trader type is revealed.
-- 任务一：Join Telegram · Enter the SmartX community
-- 任务二：Follow SmartX on X · Follow product updates
-- 主按钮：Reveal my result
-- 按钮下方：Both steps are required to continue.
-- 已验证身份：Verified as {email} · Sign out
-
-### 4.5 结果页
+### 4.4 结果页
 
 结果页按以下顺序展示：
 
 1. 人格名和三个判型标签。
 2. 信仰、嗅觉、复原力。
-3. 附录 C 中对应的唯一一句自嘲判词。
+3. 一句人格解释和 roast。
 4. Best Match / Natural Rival。
-5. 真实 waitlist 排名与奖励规则。
-6. 分享结果操作。
-7. 已经生成的一次性邀请码。
-8. 结果卡下载。
+5. Waitlist 排名和主要分享按钮。
+6. 分享后解锁的一次性邀请码。
+7. 结果卡下载。
 
-桌面端采用左右两栏：左侧承载人格、插画、属性、判词、关系和下载；右侧在同一首屏内承载排名、奖励说明、分享操作和五张窄竖向邀请码卡。邀请码不追加为结果页下方的第二段内容。
+结果链接必须能恢复人格、三项属性、搭档和天敌。公开结果不显示邮箱、原始邀请码或其他身份信息。
 
-右侧操作区最上方展示当前 waitlist 身份：`Signed in as {email}` 与低存在感的 `Sign out`。这一行只存在于用户自己的私人结果页，不进入公开结果页或任何导出图片。
-
-固定文案：
-
-- 排名标题：Waitlist rank
-- 首次分享奖励：First result share · +500 priority
-- 邀请奖励：Each verified friend · +500 priority
-- 规则说明：Priority improves your score; rank updates against the live waitlist.
-- 关系标签：Best match / Natural rival
-- 分享按钮：Share result
-- 下载结果卡：Download result
-
-页面展示分享后的真实排名变化，不写成“前进 500 名”。结果链接需要恢复人格、三项属性、搭档和天敌；公开结果不显示邮箱、原始邀请码或其他身份信息。
-
-### 4.6 邀请码与结果卡
-
-邀请码区域暂定文案，需运营确认：
-
-- 标题：Invite friends
-- 说明：Each link can be claimed once.
-- 已使用状态：Used
+### 4.5 邀请码区域
 
 - 每屏横向展示 5 张竖向卡片。
-- 邀请码在结果生成后立即出现，不要求用户先分享。
-- 桌面端邀请码位于结果页右栏，不在页面下方另起一个区域。
 - 普通人格只有一屏；Risk Monk 的 10 个邀请码分为两屏，通过前后箭头切换。
+- 卡片需要区分可用和已使用状态。
 - 可用邀请码排在前面，已使用邀请码统一移动到列表末尾。
-- 可用卡片不显示 `Available`，正常亮度即代表可用；整张卡片点击后复制邀请链接，并短暂显示 `Copied`。
-- 邀请码短码只作为卡片底部的小型识别信息，不作为卡片视觉主角。
 - 已使用卡片保留作为记录，但不能再次复制或发送。
-- 结果页和结果卡复用附录 C 的同一句自嘲判词，不另配卡片解释或第二套文案。
 
-结果卡的内容范围见附录 F；视觉边界见附录 G。
+结果卡、邮件和其他具体文案见附录 F；视觉边界见附录 G。
 
 ## 5. 数据观察与隐私
 
@@ -337,7 +216,7 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 ~~~text
 进入活动 → 邀请码通过 → 开始答题 → 完成六题
 → 提交邮箱 → 邮箱验证 → 完成 Telegram 和 X
-→ 查看结果与邀请码 → 复制邀请码或可选分享 → 好友完成验证
+→ 查看结果 → 发起分享 → 复制邀请码 → 好友完成验证
 ~~~
 
 核心埋点及其“用人话说明监测什么”见附录 E。
@@ -356,13 +235,8 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 - [ ] 六题完成前不要求邮箱；同一邮箱只保留一个结果且不允许重测。
 - [ ] 邮箱验证后必须完成 Telegram 和 X，未完成时不能查看结果和排名。
 - [ ] 好友分享入口先展示朋友结果；邀请码失效不影响结果查看。
-- [ ] 有有效登录态且已有结果时，直接入口自动进入自己的结果页；好友分享入口保留朋友结果并提供 `View my result`。
-- [ ] 没有登录态时，直接入口和好友分享入口都有邮箱 OTP 找回入口；OTP 通过前不暴露邮箱是否存在。
-- [ ] 新答题流程验证到已有邮箱时返回原结果、释放当前邀请码，不生成第二结果且不产生邀请奖励。
-- [ ] 私人结果页显示当前邮箱并可退出 waitlist 会话；邮箱不会进入公开分享页或结果卡，退出不会删除任何结果数据。
 - [ ] 所有答案组合都能得到一种有效人格和三项有效属性。
-- [ ] Risk Monk 只按隐藏规则产生，并获得 10 个邀请码；其他人格获得 5 个。
-- [ ] 邀请码在结果生成后立即可用，不依赖分享；分享只影响排名优先值。
+- [ ] Risk Monk 只按隐藏规则产生，并解锁 10 个邀请码；其他人格解锁 5 个。
 - [ ] 首次分享与好友完成验证分别增加 500 优先值，重复分享不重复奖励。
 - [ ] 页面只展示真实排名和实际变化。
 - [ ] 邀请码每屏展示 5 张竖卡，Risk Monk 可以切换两屏，已使用卡片统一后置。
@@ -396,7 +270,7 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 | 普通人格邀请码 | 5 个 |
 | Risk Monk 邀请码 | 10 个 |
 | 结果揭示条件 | 邮箱验证 + Join Telegram + Follow X |
-| 邀请码发放条件 | 结果生成并完成揭示 |
+| 邀请码解锁条件 | 第一次发起分享 |
 | 邀请码每屏展示 | 5 张竖卡 |
 | 首次分享奖励 | +500 优先值 |
 | 好友完成验证奖励 | 每人 +500 优先值 |
@@ -523,9 +397,7 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 
 ## 附录 C：人格配置
 
-人格名称和判词来自[运营原始资料](https://docs.google.com/document/d/1WTJraroBjYy4XgoXqjVePK7k0EmfM8TB/edit)。结果页只展示一句判词；中英文需要共同审核，不再维护长解释、卡片解释和多套版本。
-
-| persona_id | 中文人格 | 英文人格（待运营确认） | 三维组合 | 隐藏款 | 邀请码 |
+| persona_id | 中文人格 | 英文人格 | 三维组合 | 隐藏款 | 邀请码 |
 | --- | --- | --- | --- | --- | ---: |
 | LQD | 送钱者 | The Liquidity Donor | DEGEN · GUT · PACK | 否 | 5 |
 | AIM | 梭哈仙人 | The All-In Mystic | DEGEN · GUT · LONE | 否 | 5 |
@@ -537,20 +409,6 @@ Waitlist 是用户从官网进入 SmartX 的第一段轻量产品体验，不是
 | LMT | 潜伏狙击手 | The Limit Sniper | SNIPER · DATA · LONE | 否 | 5 |
 | RSK | 风控大师 | The Risk Monk | 隐藏规则覆盖 | 是 | 10 |
 
-### C.1 唯一判词
-
-| persona_id | 中文 | English |
-| --- | --- | --- |
-| LQD | 你不是在交易，你是在给市场做慈善。 | You’re not trading. You’re funding the ecosystem. |
-| AIM | 每次梭之前都觉得自己悟了，梭完就圆寂。 | Every all-in starts with enlightenment and ends with reincarnation. |
-| SIG | 分析了三小时，结论两个字：开冲。 | Three hours of research. Two-word thesis: send it. |
-| CND | 什么线都会画，就是画不出自己的仓位该多大。 | You can chart every line except the one marking enough exposure. |
-| DIP | 你不是在抄底，你是在给下跌打样。 | You’re not buying the dip. You’re giving the downtrend a demo. |
-| DOC | 每个症状都看懂了，每笔亏损也解释得明明白白。 | Every symptom diagnosed. Every loss professionally explained. |
-| CHN | 全世界的仓位你都门儿清，就自己那单偶尔看不明白。 | You know everyone’s position except, occasionally, your own. |
-| LMT | 你的限价单很完美，可惜你和它再也没见过。 | The limit order was perfect. Shame you two never met again. |
-| RSK | 别人研究怎么一把翻倍，你研究怎么还有下一把。 | They study how to double once. You study how to stay in the game. |
-
 Risk Monk 的精确触发条件：
 
 1. Risk posture 两道题都选择最克制的答案，合计为 -4。
@@ -559,10 +417,12 @@ Risk Monk 的精确触发条件：
 每个人格还需配置：
 
 - 中英文名称。
-- 本节中的唯一一句中英文判词。
-- 结果图。
+- 中英文人格解释。
+- 中英文 roast。
+- 结果图和颜色标记。
+- 人格文案配置。
 
-结果页和结果卡统一复用这句判词，不另外维护卡片解释或第二套文案。
+人格长文不在 PRD 中重复维护，以内容配置为准。
 
 ## 附录 D：搭档与天敌
 
@@ -578,19 +438,14 @@ Risk Monk 的精确触发条件：
 | LMT | CND | LQD |
 | RSK | CHN | LQD |
 
-首版只展示关系标签与人格名称，不增加第二段关系解释。关系调整后，只影响新生成的结果，历史结果不变化。
+每组关系需要一条不超过两行的解释。关系调整后，只影响新生成的结果，历史结果不变化。
 
 ## 附录 E：核心埋点
 
 | 事件 | 用人话说明监测什么 | 关键属性 |
 | --- | --- | --- |
-| waitlist_landing_view | 有多少人进入活动，来自官网还是朋友分享 | entry_type、session_state、result_present、invite_present |
+| waitlist_landing_view | 有多少人进入活动，来自官网还是朋友分享 | entry_type、result_present、invite_present |
 | referral_result_view | 分享人的结果有没有被打开，哪类人格带来访问 | result_id、persona_id |
-| result_recovery_started | 没有登录态的用户从哪个入口尝试找回结果 | entry_type |
-| result_recovery_verified | OTP 通过后是否找到已有结果 | entry_type、result_found |
-| existing_result_restored | 用户通过自动分流、好友页按钮或 OTP 返回原结果 | restore_source、result_id |
-| duplicate_result_prevented | 新答题流程验证到已有邮箱时是否阻止第二结果并释放邀请码 | invite_released、referral_reward_blocked |
-| waitlist_signed_out | 用户主动退出仅限 waitlist 的会话 | entry_type |
 | invite_submit | 用户看到邀请码门槛后是否尝试进入 | entry_type |
 | invite_reserve_success | 有多少人持有效邀请码通过入口 | entry_type |
 | invite_reserve_failed | 用户被挡在入口的原因 | reason |
@@ -605,15 +460,15 @@ Risk Monk 的精确触发条件：
 | result_viewed | 结果揭示后是否被正常看到 | result_id、persona_id |
 | share_clicked | 有多少人发起分享，以及选择了哪个渠道 | result_id、channel |
 | result_shared | 在渠道能够确认时，有多少人真正完成分享 | result_id、channel |
-| invite_grant_created | 有多少人在结果生成后获得 5 或 10 个邀请码 | result_id、persona_id、quota |
-| invite_link_copied | 获得邀请码后，有多少人复制了邀请链接 | result_id |
+| invite_grant_unlocked | 有多少人成功解锁 5 或 10 个邀请码 | result_id、persona_id、quota |
+| invite_link_copied | 解锁邀请码后，有多少人复制了邀请链接 | result_id |
 | invite_redeemed | 邀请链接带来了多少完成邮箱验证的好友 | source_result_id |
 | rank_reward_applied | 分享和好友邀请带来的排名奖励是否正常发放 | reward_type、priority_delta |
 | result_card_downloaded | 哪种尺寸的结果卡更常被下载 | result_id、format |
 
 埋点不得包含邮箱、完整邀请码、验证码或自由输入文本。
 
-## 附录 F：结果卡与邮件
+## 附录 F：结果卡、页面文案与邮件
 
 ### F.1 结果卡
 
@@ -627,7 +482,7 @@ Risk Monk 的精确触发条件：
 - SmartX logo。
 - 人格名称和三个判型标签。
 - 信仰、嗅觉、复原力。
-- 与结果页相同的唯一一句自嘲判词。
+- 一句 roast。
 - Best Match / Natural Rival。
 - Waitlist 入口。
 - For entertainment only. Not financial advice.
@@ -646,26 +501,19 @@ Risk Monk 的精确触发条件：
 
 当前已经确认：
 
-- 不使用旧像素 Owl、塔罗或旧神兽资产；人格图改用拟人化 SmartX Owl 交易梗插画。
-- 人格插画采用黑色 hoodie、teal Owl、粗线条 2D editorial meme illustration；每张图只表达一个清晰的交易行为笑点，不在图片内生成标题或长文案。
-- 九张人格图保持角色比例、线条、配色和黑底一致，但通过动作、行情和道具区分人格，不要求沿用旧猫头鹰侦探造型。
+- 不使用旧像素 Owl、动物拟人、塔罗或旧神兽资产。
 - 每题只使用一张主图，不为每个选项分别配图。
 - 桌面端图片与答题区左右排列；移动端图片在上、选项在下。
-- 视觉基准继承官网 `codex/consumer-network-stage-20260825`：黑色画布 `#010101`、SmartX teal `#08DFB5`、白色主文字、灰色辅助文字和近黑产品表面。
-- 使用官网新版 Owl 图标与 Lexend `SmartX` 字标，不再使用旧像素字标。
-- Playfair Display 只用于入口主标题、好友分享标题和人格名称；题目、选项、表单、解锁任务与结果信息使用 IBM Plex Sans。
-- 题目图片不使用明显外框，通过遮罩和背景渐隐融入页面；当前图片仍是可替换占位资产。
-- 入口可以使用官网 Hero 影像作为低对比环境承接，但 Waitlist 不复制官网的长滚动营销结构。
-- 人格插画使用与页面一致的近黑背景无缝融入结果页，不单独放进明显图片容器；只有好友分享结果卡和可下载结果图保留明确卡片边界。
-- 一次性邀请码保持每屏五张窄竖卡，使用官网产品切片的近黑表面、细边线和圆角；桌面端直接放入结果页右栏，不向下扩展为第二屏。
-- 大屏只扩展背景，核心内容保持 `1280–1360px` 最大阅读宽度；字体不做整页等比例放大。
+- 问题标题使用展示型 Serif，正文和控件使用 Sans Serif。
+- Waitlist 与官网共享 navy、teal、正式 logo 和产品承接。
 - 不复制官网长页面结构和整套像素动效。
-- 动效只解释答题推进、结果揭示、排名变化和邀请码发放。
+- 动效只解释答题推进、结果揭示、排名变化和邀请解锁。
 
 仍待确认：
 
-- 问题图的最终媒介与九张人格图的逐张运营审定。
-- 结果卡动效。
+- 明暗主题和最终字体。
+- 问题图与人格图的最终媒介。
+- 结果卡插图和动效。
 
 视觉未冻结不影响活动规则和后端开发。
 

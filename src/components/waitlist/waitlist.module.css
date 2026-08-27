@@ -486,6 +486,14 @@
   line-height: 1.45;
 }
 
+.quizHint {
+  display: block;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
 .quizStage {
   width: min(100%, var(--quiz-width));
   container-type: inline-size;

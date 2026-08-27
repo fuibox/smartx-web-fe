@@ -57,18 +57,19 @@ const INVITES_PER_PAGE = 5;
 const PRIORITY_PER_FRIEND = 500;
 const PRIORITY_FRIEND_CAP = 5000;
 const NO_SAVED_RESULT = "No saved result is linked to this email. Use an invite to take the test.";
-const ALREADY_REGISTERED = "This email is already registered. Sign in to view your result.";
 const INVALID_EMAIL = "Please enter a valid email address.";
 const GENERIC_ERROR = "Something went wrong. Please try again.";
-const RESERVE_EXPIRED = "Invite reservation expired. Reserve again.";
-const RESERVE_LIMIT = "Invite reservation time limit reached.";
 const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try again.";
 const INVITE_CLAIMED = "This invite has already been claimed. Ask for another one.";
-const RESERVE_CAP_HINT = "Your invite can’t be extended further. Finish the test to save it.";
+const INVITE_BUSY = "This invite is being used in another session. Try again shortly.";
+const INVITE_EXPIRED = "This invite has expired. Ask for another one.";
+const INVITE_RESERVED = "Your invite is reserved for this session.";
+const RESERVE_EXPIRED_API = "Invite reservation expired. Reserve again.";
+const RESERVE_LIMIT_API = "Invite reservation time limit reached.";
 const RENEW_INTERVAL_MS = 90_000;
 const INVITES_POLL_MS = 10_000;
 const OTP_RESEND_SECONDS = 60;
-const OTP_EXPIRE_SECONDS = 300;
+const OTP_EXPIRE_SECONDS = 600;
 const DEFAULT_COMMUNITY = {
   telegram: "https://t.me/+CTeuBkpOxSNkN2Y0",
   x: "https://x.com/SmartXTerminal",
@@ -122,8 +123,14 @@ function formatClock(total: number) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+function formatWaitlistCopy(message: string) {
+  if (message === RESERVE_EXPIRED_API || message === INVITE_EXPIRED) return INVITE_EXPIRED;
+  if (message === INVITE_UNRECOGNIZED || message === INVITE_CLAIMED || message === INVITE_BUSY) return message;
+  return message;
+}
+
 function errorMessage(error: unknown) {
-  if (isWaitlistApiError(error)) return error.message || GENERIC_ERROR;
+  if (isWaitlistApiError(error)) return formatWaitlistCopy(error.message) || GENERIC_ERROR;
   return GENERIC_ERROR;
 }
 
@@ -545,7 +552,7 @@ export function WaitlistExperience() {
         setGateError(errorMessage(inviteStatusResult.reason));
         if (friendCard) setShowInviteSwitch(true);
       } else if (inviteView && inviteView.status !== 0 && !ownReservation) {
-        setGateError(inviteView.message);
+        setGateError(formatWaitlistCopy(inviteView.message));
         if (matchingSession && (inviteView.status === 2 || inviteView.status === 3)) dropReservation();
         if (friendCard) setShowInviteSwitch(true);
       }
@@ -643,12 +650,12 @@ export function WaitlistExperience() {
       if (reservationToken(renewed)) persistReservation({ ...renewed, inviteCode: code });
       setReserveWarning("");
     } catch (error) {
-      if (isWaitlistApiError(error) && error.message === RESERVE_LIMIT) {
+      if (isWaitlistApiError(error) && error.message === RESERVE_LIMIT_API) {
         renewalCappedRef.current = true;
-        setReserveWarning(RESERVE_CAP_HINT);
+        setReserveWarning(errorMessage(error));
         return;
       }
-      if (isWaitlistApiError(error) && error.message === RESERVE_EXPIRED) {
+      if (isWaitlistApiError(error) && error.message === RESERVE_EXPIRED_API) {
         try {
           persistReservation({ ...(await waitlistApi.reserveInvite(code)), inviteCode: code });
           setReserveWarning("");
@@ -811,7 +818,7 @@ export function WaitlistExperience() {
           setOtp("");
           setOtpError("");
           setAuthIntent("recover");
-          setRecoveryError(ALREADY_REGISTERED);
+          setRecoveryError("");
           setStage("email");
           return;
         }
@@ -901,7 +908,7 @@ export function WaitlistExperience() {
       }
       if (authIntent === "create" && isWaitlistApiError(error) && error.message === INVITE_CLAIMED) {
         dropReservation();
-        setGateError(error.message);
+        setGateError(errorMessage(error));
         setStage("gate");
         return;
       }
@@ -1178,13 +1185,15 @@ export function WaitlistExperience() {
                     </WaitlistButton>
                   ))}
                 </div>
-                {reserveWarning && (
+                {reserveWarning ? (
                   <div className={styles.quizWarning} role="alert">
                     <small>{reserveWarning}</small>
-                    {/expired|reserve again/i.test(reserveWarning) && (
+                    {reserveWarning === INVITE_EXPIRED && (
                       <WaitlistButton className={styles.textButton} onAction={reReserveInvite}>Reserve again</WaitlistButton>
                     )}
                   </div>
+                ) : (
+                  <small className={styles.quizHint}>{INVITE_RESERVED}</small>
                 )}
               </div>
             </div>
@@ -1195,7 +1204,7 @@ export function WaitlistExperience() {
           <div className={styles.formStage}>
             <span className={styles.eyebrow}>{authIntent === "recover" ? "Already tested?" : "Your result is ready"}</span>
             <h1>{authIntent === "recover" ? "Find your result." : "Save your result."}</h1>
-            <p>{authIntent === "recover" ? "Enter the email you used. We’ll send a six-digit code." : "Bind an email to save your result and join the waitlist."}</p>
+            <p>{authIntent === "recover" ? "Enter the email you used. We’ll send a six-digit code." : "Bind an email to keep it and create your waitlist position."}</p>
             <form onSubmit={(event) => event.preventDefault()}>
               <label htmlFor="waitlist-email">Email address</label>
               <div className={styles.inlineField}>
