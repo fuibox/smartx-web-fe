@@ -328,14 +328,8 @@ function AccountSession({
 
 function PersonaPoster({
   outcome,
-  preparedCards,
-  exportError,
-  downloads = true,
 }: {
   outcome: Outcome;
-  preparedCards?: Partial<Record<ResultCardFormat, RenderedResultCard>>;
-  exportError?: boolean;
-  downloads?: boolean;
 }) {
   useLingui();
 
@@ -366,15 +360,6 @@ function PersonaPoster({
         <div><span><Trans>Best match</Trans></span><strong>{localizedPersonaName(outcome.bestMatch)}</strong></div>
         <div><span><Trans>Natural rival</Trans></span><strong>{localizedPersonaName(outcome.rival)}</strong></div>
       </section>
-      {downloads && (
-        <section className={styles.cardDownloads} aria-label={t`Download result card`}>
-          <span><Trans>Download result</Trans></span>
-          <div>
-            {preparedCards?.story ? <a href={preparedCards.story.href} download={preparedCards.story.filename}><Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" /><Trans>Story</Trans> <small>1080 × 1920</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
-            {preparedCards?.og ? <a href={preparedCards.og.href} download={preparedCards.og.filename}><Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" /><Trans>X / TG</Trans> <small>1200 × 630</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
-          </div>
-        </section>
-      )}
     </article>
   );
 }
@@ -748,7 +733,6 @@ export function WaitlistExperience() {
       conviction: t`Conviction`,
       instinct: t`Instinct`,
       resilience: t`Resilience`,
-      disclaimer: t`For entertainment only`,
     },
   });
 
@@ -1375,7 +1359,7 @@ export function WaitlistExperience() {
 
         {stage === "gate" && referralOutcome && (
           <div className={styles.resultStage} data-shared-result="true">
-            <PersonaPoster outcome={referralOutcome} downloads={false} />
+            <PersonaPoster outcome={referralOutcome} />
             <aside className={`${styles.resultPanel} ${styles.referralResultPanel}`}>
               <span className={styles.eyebrow}>
                 <Trans>A result was shared with you</Trans>
@@ -1704,7 +1688,7 @@ export function WaitlistExperience() {
 
         {stage === "result" && ownOutcome && (
           <div className={styles.resultStage}>
-            <PersonaPoster outcome={ownOutcome} downloads={false} />
+            <PersonaPoster outcome={ownOutcome} />
             <aside className={styles.resultPanel}>
               <AccountSession email={verifiedEmail} label={t`Signed in as`} onSignOut={signOutWaitlist} />
               <div className={styles.rankBlock} data-boosted={shareCompleted}>

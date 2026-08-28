@@ -21,7 +21,6 @@ export type ResultCardExportData = {
     conviction: string;
     instinct: string;
     resilience: string;
-    disclaimer: string;
   };
 };
 
