@@ -291,7 +291,21 @@ function Hero() {
             <span>stocks and prediction markets. Follow</span>
             <span>verified traders and trade in one tap.</span>
           </p>
-          <WaitlistButton placement="hero" />
+          <div className={styles.heroActionAnchor}>
+            <WaitlistButton placement="hero" />
+            <div className={styles.heroBacking}>
+              <div className={styles.heroBackingLockup}>
+                <span>Backed by</span>
+                <Image
+                  className={styles.yziLabsLogo}
+                  src={`${ASSET_ROOT}/yzi-labs-white.png`}
+                  alt="YZi Labs"
+                  width={1280}
+                  height={427}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

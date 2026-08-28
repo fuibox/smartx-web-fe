@@ -136,6 +136,58 @@ final result: passed
 
 ---
 
+### Hero YZi Labs backing signature · 2026-08-28
+
+- Source visual truth: the unchanged Consumer Network Hero captured before this pass at `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/01-current-hero.png`, plus the selected Direction A requirement to place a quiet backing signature below the existing Hero CTA.
+- Implementation screenshots: desktop `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/03-option-a-desktop.png`; mobile `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/04-option-a-mobile.png`.
+- Viewports: desktop override `1440 × 900` CSS px, browser capture `1390 × 891` px; mobile override `390 × 844` CSS px, browser capture `375 × 812` px. Both source and desktop implementation use the same in-app browser surface and capture density without resampling.
+- State: `/` at the Hero top with the live brand film running. Film-frame differences are intentionally excluded from the comparison because the video loop is unchanged.
+- Full-view comparison evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/05-before-after-desktop.png`.
+- Focused CTA/signature comparison: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/06-before-after-focus.png`.
+
+**Fidelity findings**
+
+- Typography and copy: the existing Playfair Hero title, IBM Plex Sans lede, and CTA are unchanged. `Backed by` renders at `12px`; `EASY Residency · Season 4` renders at the project minimum `11px` with restrained tracking.
+- Spacing and layout: the signature is absolutely anchored `22px` below the CTA on desktop and `18px` below on mobile, so it does not move the signed-off title, lede, or CTA. Desktop and mobile have no horizontal overflow.
+- Colors and tokens: the backing line stays monochrome white at secondary opacities; teal remains exclusive to the primary CTA and YZi yellow does not introduce a competing accent.
+- Image quality: the supplied official raster lockup is preserved and converted deterministically to a transparent white PNG. The final capture has no white matte, dark rectangle, stretching, or approximate redrawing. P3 follow-up: replace the raster with YZi Labs' official transparent SVG before production if available.
+- Content and accessibility: the logo has `alt="YZi Labs"`; the visible text communicates the backing relationship and exact program season. The existing waitlist interaction still changes to `Coming soon` and restores after 2.2 seconds.
+
+**Comparison history**
+
+| Round | Severity | Finding | Fix and post-fix evidence |
+| --- | --- | --- | --- |
+| 1 | P2 | The program caption was below the documented `11px` minimum. | Raised it to `11px`, increased the secondary contrast, and rechecked desktop/mobile in `03-option-a-desktop.png` and `04-option-a-mobile.png`. |
+| 1 | P2 | The initial CSS blend treatment could reveal the supplied image's opaque rectangle over some video frames. | Replaced it with a real transparent white raster derived from the supplied lockup; the final desktop capture and focused comparison show a clean logo edge over the moving film. |
+| 2 | — | Final desktop, mobile, CTA state, overflow, and console pass. | No actionable P0/P1/P2 finding remains; browser console reported no warnings or errors. |
+
+**Engineering validation**
+
+- `npm run typecheck` — passed.
+- Scoped ESLint for `consumer-home.tsx` — passed.
+- `git diff --check` — passed.
+- `npm run build` — passed.
+- Repository-wide `npm run lint` remains blocked by pre-existing generated `.vercel/output` files and the user's untracked `scripts/generate-opinion-rail-hq.cjs`; this pass introduces no lint error in its source file.
+
+final result: passed
+
+---
+
+### Hero YZi Labs backing signature — program caption removal · 2026-08-28
+
+- Scope: follow-up refinement to the approved Direction A Hero signature. This pass removes only `EASY Residency · Season 4`; the Hero title, lede, waitlist CTA, `Backed by` label, and YZi Labs logo remain unchanged.
+- Implementation screenshots: desktop `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/07-option-a-no-season-desktop.png`; mobile `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/08-option-a-no-season-mobile.png`.
+- Before/after evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/yzi-placement-audit/09-season-removal-comparison.png`. Film-frame differences are excluded because the unchanged Hero video continued running between captures.
+- Copy and hierarchy: the signature is now a single quiet line. The removed caption no longer competes with the primary CTA or adds program detail the user does not want exposed.
+- Layout: the backing lockup remains centered `22px` below the CTA on desktop and `18px` below on mobile. No horizontal overflow was detected at either checked viewport.
+- Content and accessibility: rendered body text contains no `EASY Residency`; `Backed by` remains visible and the logo retains `alt="YZi Labs"`.
+- Runtime: desktop and mobile checks reported no browser warnings or errors. TypeScript, scoped ESLint, and `git diff --check` passed after the removal.
+- Severity review: no actionable P0/P1/P2 finding remains.
+
+final result: passed
+
+---
+
 # Blog masthead and related-story simplification · 2026-08-25
 
 ## Scope and evidence

@@ -319,10 +319,45 @@
   display: none;
 }
 
-.heroSubcopy > .waitlistButton {
+.heroActionAnchor {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.heroActionAnchor > .waitlistButton {
   width: 184px;
   min-height: 50px;
   font-size: 18px;
+}
+
+.heroBacking {
+  position: absolute;
+  top: calc(100% + 22px);
+  left: 50%;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  color: rgb(255 255 255 / 68%);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.heroBackingLockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.yziLabsLogo {
+  width: 142px;
+  height: auto;
+  margin: -11px -17px;
 }
 
 .network {
@@ -3190,10 +3225,24 @@
     white-space: nowrap;
   }
 
-  .heroSubcopy > .waitlistButton {
+  .heroActionAnchor > .waitlistButton {
     width: min(190px, 70vw);
     min-height: 48px;
     font-size: 17px;
+  }
+
+  .heroBacking {
+    top: calc(100% + 18px);
+  }
+
+  .heroBackingLockup {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .yziLabsLogo {
+    width: 126px;
+    margin: -10px -15px;
   }
 
   .network > h2 {
