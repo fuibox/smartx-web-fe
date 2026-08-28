@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   type ButtonHTMLAttributes,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 
@@ -49,9 +50,12 @@ export function WaitlistButton({
   disabled,
   type = "button",
   className,
+  style,
   ...rest
 }: WaitlistButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [minWidth, setMinWidth] = useState<number>();
+  const [busyName, setBusyName] = useState("");
   const loadingRef = useRef(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const scope = useContext(ActionLockContext);
@@ -61,22 +65,23 @@ export function WaitlistButton({
     if (lock && scope?.locked) return;
     if (!onAction) return;
 
+    const node = buttonRef.current;
+    const width = node?.getBoundingClientRect().width;
+    const name = node?.innerText?.trim();
+    if (width) setMinWidth(width);
+    if (name) setBusyName(name);
     loadingRef.current = true;
-    const result = onAction();
-    if (!(result instanceof Promise)) {
-      loadingRef.current = false;
-      return;
-    }
-
     setLoading(true);
     if (lock) scope?.acquire();
     try {
-      await result;
+      await Promise.resolve(onAction());
     } catch {
       // Visible errors stay in the action; this catch only ends loading.
     } finally {
       loadingRef.current = false;
       setLoading(false);
+      setMinWidth(undefined);
+      setBusyName("");
       if (lock) scope?.release();
     }
   }, [disabled, lock, onAction, scope]);
@@ -97,7 +102,9 @@ export function WaitlistButton({
   }, [onAction, type]);
 
   const content = typeof children === "function" ? children({ loading }) : children;
-  const labeled = typeof content === "string" || typeof content === "number" ? <span>{content}</span> : content;
+  const mergedStyle: CSSProperties | undefined = minWidth
+    ? { ...style, minWidth }
+    : style;
 
   return (
     <button
@@ -105,8 +112,10 @@ export function WaitlistButton({
       ref={buttonRef}
       type={type}
       className={[styles.host, className].filter(Boolean).join(" ")}
+      style={mergedStyle}
       disabled={disabled || loading || Boolean(onAction && lock && scope?.locked)}
       aria-busy={loading || undefined}
+      aria-label={loading && busyName ? busyName : rest["aria-label"]}
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
@@ -118,12 +127,13 @@ export function WaitlistButton({
         if (onAction) void execute();
       }}
     >
-      {labeled}
       {loading ? (
         <output className={styles.icon} aria-hidden="true">
           <i className={styles.spinner} />
         </output>
-      ) : null}
+      ) : (
+        content
+      )}
     </button>
   );
 }

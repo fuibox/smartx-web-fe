@@ -1,14 +1,10 @@
 const USER_TOKEN_KEY = "smartx:waitlist:user-token";
-const QUIZ_SESSION_KEY = "smartx:waitlist:quiz-session";
+const LANDING_INVITE_KEY = "smartx:waitlist:landing-invite";
 const QUIZ_DRAFT_KEY = "smartx:waitlist:quiz-draft";
+const LEGACY_QUIZ_SESSION_KEY = "smartx:waitlist:quiz-session";
 const LEGACY_SESSION_TOKEN_KEY = "smartx:waitlist:session-token";
 const LEGACY_RESULT_KEY = "smartx:waitlist-last-result";
 const LEGACY_EMAIL_KEY = "smartx:waitlist-session-email";
-
-export type WaitlistQuizSession = {
-  sessionToken: string;
-  inviteCode: string;
-};
 
 export type WaitlistQuizDraft = {
   answers: Record<string, string>;
@@ -37,60 +33,58 @@ function readJson<T>(key: string): T | null {
   }
 }
 
+function isStoredInviteCode(value: string) {
+  return /^[a-z0-9]{8}$/.test(value.trim().toLowerCase());
+}
+
+function dropLegacySession() {
+  write(LEGACY_QUIZ_SESSION_KEY, "");
+  write(LEGACY_SESSION_TOKEN_KEY, "");
+}
+
 export function getUserToken() {
   return read(USER_TOKEN_KEY);
 }
 
 export function setUserToken(token: string) {
   write(USER_TOKEN_KEY, token);
-  if (token) clearQuizSession();
+  if (token) {
+    dropLegacySession();
+    clearLandingInvite();
+  }
 }
 
 export function clearUserToken() {
   write(USER_TOKEN_KEY, "");
 }
 
-export function getQuizSession(): WaitlistQuizSession | null {
-  const stored = readJson<WaitlistQuizSession>(QUIZ_SESSION_KEY);
-  if (!stored?.sessionToken) {
-    if (stored) write(QUIZ_SESSION_KEY, "");
-    return null;
+export function getLandingInvite() {
+  const stored = read(LANDING_INVITE_KEY).trim().toLowerCase();
+  if (isStoredInviteCode(stored)) {
+    dropLegacySession();
+    return stored;
   }
-  return {
-    sessionToken: stored.sessionToken,
-    inviteCode: stored.inviteCode || "",
-  };
+
+  const legacy = readJson<{ inviteCode?: string }>(LEGACY_QUIZ_SESSION_KEY);
+  const migrated = (legacy?.inviteCode ?? "").trim().toLowerCase();
+  dropLegacySession();
+  if (isStoredInviteCode(migrated)) {
+    write(LANDING_INVITE_KEY, migrated);
+    return migrated;
+  }
+  return "";
 }
 
-export function setQuizSession(session: WaitlistQuizSession) {
-  if (!session.sessionToken) return;
-  write(
-    QUIZ_SESSION_KEY,
-    JSON.stringify({
-      sessionToken: session.sessionToken,
-      inviteCode: session.inviteCode || "",
-    }),
-  );
-  write(LEGACY_SESSION_TOKEN_KEY, "");
-}
-
-export function clearQuizSession() {
-  write(QUIZ_SESSION_KEY, "");
-  write(LEGACY_SESSION_TOKEN_KEY, "");
-}
-
-export function getSessionTokenForInvite(inviteCode: string) {
-  const stored = getQuizSession();
+export function setLandingInvite(inviteCode: string) {
   const code = inviteCode.trim().toLowerCase();
-  if (!stored) return "";
-  if (stored.inviteCode && stored.inviteCode !== code) {
-    clearQuizSession();
-    return "";
-  }
-  if (!stored.inviteCode && code) {
-    setQuizSession({ sessionToken: stored.sessionToken, inviteCode: code });
-  }
-  return stored.sessionToken;
+  if (!isStoredInviteCode(code)) return;
+  write(LANDING_INVITE_KEY, code);
+  dropLegacySession();
+}
+
+export function clearLandingInvite() {
+  write(LANDING_INVITE_KEY, "");
+  dropLegacySession();
 }
 
 export function getQuizDraft(): WaitlistQuizDraft | null {
@@ -112,7 +106,7 @@ export function clearQuizDraft() {
 
 export function clearWaitlistSession() {
   write(USER_TOKEN_KEY, "");
-  clearQuizSession();
+  clearLandingInvite();
   clearQuizDraft();
   write(LEGACY_RESULT_KEY, "");
   write(LEGACY_EMAIL_KEY, "");

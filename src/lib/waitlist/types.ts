@@ -41,12 +41,10 @@ export type QuizQuestion = ApiQuizQuestion & {
   artAlt: string;
 };
 
-export type InviteStatus = 0 | 1 | 2 | 3;
+export type InviteStatus = 0 | 3;
 
 export type InviteView = {
   exists: boolean;
-  used: boolean;
-  locked: boolean;
   status: InviteStatus;
   message: string;
 };
@@ -111,7 +109,8 @@ export type UserInfo = {
   xCompleted: number;
   unlocked: boolean;
   shareCompleted: number;
-  inviteGenerated: number;
+  inviteCode: string;
+  inviteNum: number;
   marketingSubscribed: number;
 };
 
@@ -135,7 +134,7 @@ export type MyResultUnlocked = ResultCard & {
   rank: number;
   totalUsers: number;
   shareCompleted: number;
-  inviteGenerated: number;
+  inviteNum: number;
   joinedAt: number;
 };
 
@@ -154,12 +153,6 @@ export type CommunityCompleteResult = {
   telegramCompleted: number;
   xCompleted: number;
   unlocked: boolean;
-};
-
-export type InviteItem = {
-  code: string;
-  status: InviteStatus;
-  usedAt: number | null;
 };
 
 export type InviteFriend = {

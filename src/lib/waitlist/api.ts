@@ -1,10 +1,9 @@
-import { getQuizSession, getSessionTokenForInvite, getUserToken } from "./session";
+import { getUserToken } from "./session";
 import {
   type CommunityChannel,
   type CommunityCompleteResult,
   type CommunityInfo,
   type InviteFriendsView,
-  type InviteItem,
   type InviteView,
   type LoginResult,
   type MyResult,
@@ -43,7 +42,6 @@ async function waitlistRequest<T>(
     query?: Record<string, string | number | undefined>;
     body?: unknown;
     userToken?: string;
-    sessionToken?: string;
   } = {},
 ) {
   const url = new URL(path, `${apiBase()}/`);
@@ -54,10 +52,10 @@ async function waitlistRequest<T>(
   const headers: Record<string, string> = { Accept: "application/json" };
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
 
-  const userToken = options.userToken || getUserToken();
-  const sessionToken = options.sessionToken || getQuizSession()?.sessionToken || "";
-  if (userToken) headers.Authorization = authValue(userToken);
-  if (sessionToken) headers["x-session-token"] = authValue(sessionToken);
+  if (path.startsWith("/user/")) {
+    const userToken = options.userToken || getUserToken();
+    if (userToken) headers.Authorization = authValue(userToken);
+  }
   const scope = path.startsWith("/user/") ? "user" : "public";
 
   let payload: WaitlistEnvelope<T>;
@@ -123,32 +121,6 @@ export const waitlistApi = {
     });
   },
 
-  reserveInvite(inviteCode: string) {
-    const code = normalizeInviteCode(inviteCode);
-    getSessionTokenForInvite(code);
-    return waitlistRequest<{ sessionToken: string; inviteCode: string; reservedSeconds: number }>(
-      "/waitlist_public/reserve_invite",
-      {
-        method: "POST",
-        body: { inviteCode: code },
-      },
-    );
-  },
-
-  renewReserve(inviteCode: string) {
-    const code = normalizeInviteCode(inviteCode);
-    getSessionTokenForInvite(code);
-    return waitlistRequest<{
-      expireSeconds: number;
-      sessionToken?: string;
-      token?: string;
-      inviteCode?: string;
-    }>("/waitlist_public/renew_reserve", {
-      method: "POST",
-      body: { inviteCode: code },
-    });
-  },
-
   async getInviterCard(inviteCode: string) {
     const data = await waitlistRequest<ResultCard | Record<string, never>>("/waitlist_public/inviter_card", {
       query: { inviteCode: normalizeInviteCode(inviteCode) },
@@ -168,6 +140,12 @@ export const waitlistApi = {
     });
   },
 
+  checkEmailCode(email: string) {
+    return waitlistRequest<{ valid: boolean; expireSeconds: number | null }>("/waitlist_public/check_email_code", {
+      query: { email: normalizeEmail(email) },
+    });
+  },
+
   sendEmailCode(email: string) {
     return waitlistRequest<true>("/quiz/send_email_code", {
       method: "POST",
@@ -175,10 +153,16 @@ export const waitlistApi = {
     });
   },
 
-  login(email: string, code: string) {
+  login(email: string, code: string, inviteCode?: string) {
+    const body: { email: string; code: string; inviteCode?: string } = {
+      email: email.trim().toLowerCase(),
+      code,
+    };
+    const invite = inviteCode ? normalizeInviteCode(inviteCode) : "";
+    if (isValidInviteCode(invite)) body.inviteCode = invite;
     return waitlistRequest<LoginResult>("/quiz/login", {
       method: "POST",
-      body: { email: email.trim().toLowerCase(), code },
+      body,
     });
   },
 
@@ -188,6 +172,10 @@ export const waitlistApi = {
       body: { answers },
       userToken,
     });
+  },
+
+  getQuizStatus(userToken: string) {
+    return waitlistRequest<{ submitted: boolean; resultId: string }>("/user/quiz_status", { userToken });
   },
 
   getMyResult(userToken: string) {
@@ -215,10 +203,6 @@ export const waitlistApi = {
 
   getRank(userToken: string) {
     return waitlistRequest<RankView>("/user/rank", { userToken });
-  },
-
-  getMyInvites(userToken: string) {
-    return waitlistRequest<{ list: InviteItem[] }>("/user/my_invites", { userToken });
   },
 
   async getInviteFriends(userToken: string) {

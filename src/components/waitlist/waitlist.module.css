@@ -588,12 +588,28 @@
 
 .questionArtwork {
   position: relative;
+  z-index: 0;
+  isolation: isolate;
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
   background: transparent;
   -webkit-mask-image: radial-gradient(ellipse 74% 72% at 50% 48%, #000 55%, rgba(0, 0, 0, 0.7) 73%, transparent 100%);
   mask-image: radial-gradient(ellipse 74% 72% at 50% 48%, #000 55%, rgba(0, 0, 0, 0.7) 73%, transparent 100%);
+}
+
+.questionArtLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.questionArtLayer[data-active="true"] {
+  z-index: 1;
+  opacity: 1;
 }
 
 .questionArtwork img {
@@ -603,6 +619,7 @@
 
 .questionArtwork::after {
   position: absolute;
+  z-index: 2;
   inset: 0;
   background:
     linear-gradient(90deg, #010101 0%, transparent 18%, transparent 82%, #010101 100%),
@@ -611,7 +628,11 @@
   pointer-events: none;
 }
 
-.questionPanel { min-width: 0; }
+.questionPanel {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
 
 .questionPanel h1 {
   max-width: 540px;
@@ -654,9 +675,11 @@
 }
 
 .optionList > button span {
+  min-width: 0;
   font-size: clamp(16px, 1.45cqw, 18px);
   font-weight: 450;
   line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 .optionList > button[aria-busy="true"]:disabled {
@@ -1223,6 +1246,15 @@
 .invitationDeck > header span { color: var(--text); font-size: 14px; font-weight: 500; }
 .invitationDeck > header p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
 
+.inviteCount {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .primaryInviteCard {
   display: flex;
   min-height: 72px;
@@ -1757,6 +1789,7 @@
   .posterScores { grid-template-columns: 1fr; gap: 14px; }
   .cardDownloads > div { gap: 12px; }
   .invitationDeck > header { align-items: start; flex-direction: column; }
+  .inviteCount { text-align: left; }
   .inviteCardGrid { overflow-x: auto; grid-template-columns: repeat(5, 104px); padding-bottom: 8px; scroll-snap-type: x proximity; }
   .inviteCodeCard { scroll-snap-align: start; }
   .chemistryBlock { grid-template-columns: 1fr; }
@@ -1796,6 +1829,7 @@
   .accountStrip button { animation: none; transition: none; }
   .returningGate > button,
   .returningGate > button span { animation: none; transition: none; }
+  .questionArtLayer { transition: none; }
 }
 
 /* Figma waitlist screens. The shared ConsumerHeader is intentionally untouched. */
@@ -1965,7 +1999,7 @@
   .page[data-stage="gate"] .inviteCodeGroup input {
     grid-row: 1;
     height: 56px;
-    padding: 0 24px 0 150px;
+    padding: 0 24px 0 11em;
     border-color: rgb(255 255 255 / 24%);
     background: #121212;
     font: 400 16px var(--font-plex), var(--font-inter);
@@ -2343,7 +2377,7 @@
   .page[data-stage="email"] .formStage input {
     grid-row: 1;
     height: 56px;
-    padding: 0 24px 0 150px;
+    padding: 0 24px 0 11em;
     border-color: rgb(255 255 255 / 24%);
     background: #121212;
     font: 400 16px var(--font-plex), var(--font-inter);
@@ -2386,9 +2420,38 @@
     transform: translateY(-35px);
   }
 
-  .page[data-stage="unlock"] .accountStrip,
   .page[data-stage="quiz"] .accountStrip {
     display: none;
+  }
+
+  .page[data-stage="unlock"] .accountStrip {
+    display: flex;
+    width: 600px;
+    margin: 32px 0 0;
+    padding: 16px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 16%);
+    text-align: left;
+  }
+
+  .page[data-stage="unlock"] .accountStrip > div span {
+    color: #747474;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .page[data-stage="unlock"] .accountStrip strong {
+    max-width: 380px;
+    color: #f5f5f5;
+    font-size: 16px;
+  }
+
+  .page[data-stage="unlock"] .accountStrip button {
+    color: #747474;
+    font-size: 14px;
+  }
+
+  .page[data-stage="unlock"] .accountStrip + .unlockTasks {
+    margin-top: 24px;
   }
 
   .page[data-stage="unlock"] .unlockTasks {
@@ -2639,7 +2702,7 @@
   }
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 881px) {
+@media (hover: hover) and (pointer: fine) and (min-width: 751px) {
   .page[data-stage="unlock"] .unlockTasks > button:hover,
   .page[data-stage="quiz"] .optionList > button:hover {
     border-color: #fff;
@@ -2667,8 +2730,34 @@
     animation: none;
   }
 
-  .page:is([data-stage="result"], [data-referral="true"]) .accountStrip {
+  .page[data-referral="true"] .accountStrip {
     display: none;
+  }
+
+  .page[data-stage="result"] .accountStrip {
+    display: flex;
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 16%);
+    text-align: left;
+  }
+
+  .page[data-stage="result"] .accountStrip > div span {
+    color: #747474;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .page[data-stage="result"] .accountStrip strong {
+    max-width: 380px;
+    color: #f5f5f5;
+    font-size: 16px;
+  }
+
+  .page[data-stage="result"] .accountStrip button {
+    color: #747474;
+    font-size: 14px;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaPoster {
@@ -2997,6 +3086,12 @@
     color: #747474;
     font-size: 16px;
     line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header .inviteCount {
+    color: var(--teal);
+    font-size: 16px;
+    font-weight: 600;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard {
@@ -3334,10 +3429,11 @@
 
   .page[data-stage="gate"] .gateCopy h1 {
     margin: 0 0 16px;
-    font-size: clamp(40px, 11vw, 48px);
+    font-size: clamp(32px, 9.4vw, 44px);
     font-weight: 500;
     letter-spacing: 0;
-    line-height: 1.02;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
   }
 
   .page[data-stage="gate"] .gateCopy h1 br {
@@ -3377,29 +3473,29 @@
 
   .page[data-stage="gate"] .inviteCodeGroup label,
   .page[data-stage="email"] .formStage form > label {
-    position: absolute;
-    z-index: 2;
-    top: 17px;
-    left: 20px;
-    margin: 0;
+    position: static;
+    z-index: auto;
+    top: auto;
+    left: auto;
+    margin: 0 0 10px;
     color: #747474;
     font-size: 15px;
     font-weight: 400;
     letter-spacing: 0;
-    line-height: normal;
-    pointer-events: none;
+    line-height: 1.35;
+    pointer-events: auto;
     text-transform: none;
   }
 
   .page[data-stage="gate"] .inviteCodeGroup input,
   .page[data-stage="email"] .formStage input {
-    grid-row: 1;
+    grid-row: auto;
     height: 54px;
-    padding: 0 20px 0 132px;
+    padding: 0 20px;
     border-color: rgb(255 255 255 / 24%);
     background: #121212;
     font: 400 15px var(--font-plex), var(--font-inter);
-    text-align: right;
+    text-align: left;
   }
 
   .page[data-stage="gate"] .gateForm .naturalEntryHint {
@@ -3499,10 +3595,11 @@
   .page[data-stage="unlock"] .unlockStage h1 {
     margin: 14px 0 0;
     font-family: var(--font-display), Georgia, serif;
-    font-size: clamp(42px, 11.5vw, 52px);
+    font-size: clamp(32px, 9.4vw, 44px);
     font-weight: 500;
     letter-spacing: 0;
-    line-height: 1.06;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
   }
 
   .page:is([data-stage="email"], [data-stage="verify"]) .formStage > p,
@@ -3601,9 +3698,38 @@
     font-size: 13px;
   }
 
-  .page[data-stage="unlock"] .accountStrip,
   .page[data-stage="quiz"] .accountStrip {
     display: none;
+  }
+
+  .page[data-stage="unlock"] .accountStrip {
+    display: flex;
+    width: 100%;
+    margin: 24px 0 0;
+    padding: 14px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 16%);
+    text-align: left;
+  }
+
+  .page[data-stage="unlock"] .accountStrip > div span {
+    color: #747474;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .page[data-stage="unlock"] .accountStrip strong {
+    max-width: min(280px, 58vw);
+    color: #f5f5f5;
+    font-size: 14px;
+  }
+
+  .page[data-stage="unlock"] .accountStrip button {
+    color: #747474;
+    font-size: 13px;
+  }
+
+  .page[data-stage="unlock"] .accountStrip + .unlockTasks {
+    margin-top: 20px;
   }
 
   .page[data-stage="unlock"] .unlockTasks {
@@ -3635,12 +3761,18 @@
     color: #f5f5f5;
     font-size: 15px;
     font-weight: 600;
+    overflow-wrap: anywhere;
   }
 
   .page[data-stage="unlock"] .unlockTasks small {
     margin-top: 3px;
     color: #747474;
     font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button > span {
+    min-width: 0;
   }
 
   .page[data-stage="unlock"] .unlockTasks strong {
@@ -3727,6 +3859,7 @@
 
   .page[data-stage="quiz"] .questionPanel {
     width: 100%;
+    min-width: 0;
     padding: 18px 20px 0;
     transform: none;
   }
@@ -3783,6 +3916,7 @@
     font-weight: 600;
     letter-spacing: 0;
     line-height: 1.16;
+    overflow-wrap: break-word;
   }
 
   .page[data-stage="quiz"] .optionList {
@@ -3792,6 +3926,7 @@
 
   .page[data-stage="quiz"] .optionList > button {
     min-height: 62px;
+    align-items: center;
     grid-template-columns: 24px minmax(0, 1fr);
     gap: 12px;
     padding: 14px 16px;
@@ -3806,9 +3941,11 @@
   }
 
   .page[data-stage="quiz"] .optionList > button span {
+    min-width: 0;
     font-size: 16px;
     font-weight: 500;
     line-height: 1.35;
+    overflow-wrap: break-word;
   }
 
   .page[data-stage="quiz"] .optionList > button[data-selected="true"],
@@ -3862,10 +3999,11 @@
 
   .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
     margin: 8px 0 0;
-    font-size: clamp(44px, 13vw, 58px);
+    font-size: clamp(32px, 9.2vw, 48px);
     font-weight: 500;
     letter-spacing: 0;
-    line-height: 1.02;
+    line-height: 1.08;
+    overflow-wrap: anywhere;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
@@ -3882,8 +4020,18 @@
 
   .page:is([data-stage="result"], [data-referral="true"]) .posterScores {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
     margin-top: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child {
+    min-width: 0;
+    gap: 4px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child span,
@@ -3971,9 +4119,10 @@
 
   .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock strong {
     margin-top: 7px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    line-height: 1.15;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads {
@@ -4039,9 +4188,10 @@
 
   .page[data-referral="true"] .referralResultPanel h1 {
     margin: 16px 0 0;
-    font-size: clamp(42px, 11.6vw, 52px);
+    font-size: clamp(32px, 9.4vw, 48px);
     letter-spacing: 0;
-    line-height: 1.06;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
   }
 
   .page[data-referral="true"] .referralResultPanel > p {
@@ -4090,6 +4240,28 @@
     margin-bottom: 22px;
   }
 
+  .page[data-stage="result"] .accountStrip {
+    padding: 14px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 16%);
+  }
+
+  .page[data-stage="result"] .accountStrip > div span {
+    color: #747474;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .page[data-stage="result"] .accountStrip strong {
+    max-width: min(280px, 58vw);
+    color: #f5f5f5;
+    font-size: 14px;
+  }
+
+  .page[data-stage="result"] .accountStrip button {
+    color: #747474;
+    font-size: 13px;
+  }
+
   .page:is([data-stage="result"], [data-referral="true"]) .rankBlock {
     display: grid;
     padding: 0;
@@ -4119,8 +4291,14 @@
 
   .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div {
     min-height: 46px;
+    align-items: flex-start;
     color: #747474;
     font-size: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div + div {
@@ -4171,6 +4349,9 @@
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 12px;
   }
 
@@ -4185,8 +4366,17 @@
     font-size: 14px;
   }
 
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header .inviteCount {
+    color: var(--teal);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    white-space: normal;
+  }
+
   .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard {
     min-height: 72px;
+    flex-wrap: wrap;
     gap: 12px;
     padding: 12px 12px 12px 16px;
     border: 0;
@@ -4210,6 +4400,21 @@
   }
 }
 
+@media (max-width: 750px) and (max-height: 720px) {
+  .page[data-stage="quiz"] .questionPanel h1 {
+    font-size: clamp(22px, 6.4vw, 28px);
+  }
+
+  .page[data-stage="quiz"] .optionList {
+    margin-top: 16px;
+    gap: 8px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button span {
+    font-size: 15px;
+  }
+}
+
 @media (max-width: 420px) {
   .page[data-stage="verify"] .otpBoxes {
     gap: 6px;
@@ -4227,4 +4432,205 @@
   .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > button {
+    min-width: 0;
+    width: 100%;
+  }
 }
+
+/* Quiz desktop: keep the 700px answer column from 751px to 1920px; only type scales. */
+@media (min-width: 751px) {
+  .page[data-stage="quiz"] {
+    --quiz-scale: clamp(0, (100vw - 750px) / 1170px, 1);
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .page[data-stage="quiz"] .ambientBackdrop {
+    display: none;
+  }
+
+  .page[data-stage="quiz"] .stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    flex: 1 0 auto;
+    width: 100%;
+    min-height: max(720px, calc(100svh - 65px));
+    height: auto;
+    margin: 0;
+    padding: 0;
+    place-items: stretch;
+    align-items: stretch;
+  }
+
+  .page[data-stage="quiz"] .quizStage,
+  .page[data-stage="quiz"] .quizLayout {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+  }
+
+  .page[data-stage="quiz"] .quizStage {
+    animation: none;
+  }
+
+  .page[data-stage="quiz"] .quizLayout {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(max-content, 1fr);
+    gap: 0;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork {
+    width: 100%;
+    height: 100%;
+    min-height: 720px;
+    overflow: hidden;
+    aspect-ratio: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
+    background: #fff;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork img {
+    object-fit: cover;
+    object-position: center center;
+    filter: none;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork::after {
+    display: none;
+  }
+
+  .page[data-stage="quiz"] .questionPanel {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: auto;
+    min-height: 100%;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    justify-self: stretch;
+    box-sizing: border-box;
+    padding-inline: calc(28px + 20px * var(--quiz-scale));
+    padding-block: 48px;
+    transform: none;
+  }
+
+  .page[data-stage="quiz"] .quizTopline {
+    display: flex;
+    min-height: 24px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 12px;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    color: #747474;
+    font-size: calc(13px + 3px * var(--quiz-scale));
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button img {
+    width: 16px;
+    height: 16px;
+    transform: rotate(180deg);
+  }
+
+  .page[data-stage="quiz"] .quizTopline p {
+    margin: 0;
+    color: #747474;
+    font-size: calc(14px + 6px * var(--quiz-scale));
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .quizTopline strong {
+    color: #f5f5f5;
+    font-weight: 400;
+  }
+
+  .page[data-stage="quiz"] .progress {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #1c1c1c;
+  }
+
+  .page[data-stage="quiz"] .progress i {
+    display: block;
+    width: var(--quiz-progress);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--teal);
+  }
+
+  .page[data-stage="quiz"] .questionPanel h1 {
+    width: 100%;
+    max-width: none;
+    margin: 24px 0 0;
+    color: #f5f5f5;
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: calc(24px + 16px * var(--quiz-scale));
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+  }
+
+  .page[data-stage="quiz"] .optionList {
+    display: grid;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button {
+    display: grid;
+    width: 100%;
+    min-height: 64px;
+    align-items: center;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px 24px;
+    border: 1px solid rgb(255 255 255 / 16%);
+    border-radius: 16px;
+    background: #121212;
+    color: #f5f5f5;
+    text-align: left;
+  }
+
+  .page[data-stage="quiz"] .optionList > button[data-selected="true"],
+  .page[data-stage="quiz"] .optionList > button[aria-busy="true"] {
+    border-color: #fff;
+  }
+
+  .page[data-stage="quiz"] .optionList > button img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button span {
+    min-width: 0;
+    font-size: calc(14px + 6px * var(--quiz-scale));
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+  }
+}
+

@@ -16,12 +16,16 @@ import {
   hydrateQuestions,
   localizedPersonaName,
   localizedPersonaRoast,
+  localizedPole,
   mapCardToOutcome,
   PERSONAS_BY_CODE,
 } from "@/lib/waitlist/persona";
+import { localizedOptionLabel, localizedQuestionPrompt } from "@/lib/waitlist/quiz-i18n";
 import { i18n } from "@/lingui";
 import {
+  areCommunityTasksDone,
   decideWaitlistEntry,
+  isCommunityChannelDone,
   isOwnResultAvailable,
   rememberWaitlistNotice,
   shareQueryPresent,
@@ -29,21 +33,19 @@ import {
   waitlistPathWithoutShare,
 } from "@/lib/waitlist/routing";
 import {
+  clearLandingInvite,
   clearQuizDraft,
-  clearQuizSession,
-  clearWaitlistSession,
+  clearUserToken,
+  getLandingInvite,
   getQuizDraft,
-  getQuizSession,
-  getSessionTokenForInvite,
   getUserToken,
+  setLandingInvite,
   setQuizDraft,
-  setQuizSession,
   setUserToken,
 } from "@/lib/waitlist/session";
 import {
   type AuthIntent,
   type CommunityChannel,
-  type InviteItem,
   type Outcome,
   type QuizQuestion,
   type ResultCard,
@@ -51,8 +53,6 @@ import {
   type WaitlistStage,
   isMissingUserError,
   isUnlockedResult,
-  isUserApiError,
-  isUserInfoError,
   isWaitlistApiError,
 } from "@/lib/waitlist/types";
 
@@ -65,19 +65,16 @@ import styles from "./waitlist.module.css";
 const WAITLIST_URL = "https://smartx.io/waitlist/";
 const PRIORITY_PER_FRIEND = 500;
 const PRIORITY_FRIEND_CAP = 5000;
-const NO_SAVED_RESULT = "No saved result is linked to this email. Use an invite to take the test.";
+const NO_SAVED_RESULT = "No saved result is linked to this email. Take the test to create one.";
 const INVALID_EMAIL = "Please enter a valid email address.";
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try again.";
-const INVITE_CLAIMED = "This invite has already been claimed. Ask for another one.";
-const INVITE_BUSY = "This invite is being used in another session. Try again shortly.";
-const INVITE_EXPIRED = "This invite has expired. Ask for another one.";
-const RESERVE_EXPIRED_API = "Invite reservation expired. Reserve again.";
-const RESERVE_LIMIT_API = "Invite reservation time limit reached.";
-const RENEW_INTERVAL_MS = 90_000;
+const INVITE_JOIN_WITHOUT = "Invite code not recognized. You can still join without it.";
+const SESSION_EXPIRED = "Authorization error";
+const INVALID_ANSWERS = "invalid answers";
 const INVITES_POLL_MS = 10_000;
 const OTP_RESEND_SECONDS = 60;
-const OTP_EXPIRE_SECONDS = 600;
+const OTP_EXPIRE_SECONDS = 300;
 const DEFAULT_COMMUNITY = {
   telegram: "https://t.me/SmartX_Community",
   x: "https://x.com/SmartXTerminal",
@@ -95,14 +92,26 @@ const DEMO_OUTCOME: Outcome = {
 // 状态与分支逻辑始终使用英文规范文案（与 API 返回值精确比较）；
 // 只在渲染时经此映射表转成当前语言，未知文案原样透出。
 const WAITLIST_MESSAGE_L10N: Record<string, MessageDescriptor> = {
-  [NO_SAVED_RESULT]: msg`No saved result is linked to this email. Use an invite to take the test.`,
+  [NO_SAVED_RESULT]: msg`No saved result is linked to this email. Take the test to create one.`,
   [INVALID_EMAIL]: msg`Please enter a valid email address.`,
   [GENERIC_ERROR]: msg`Something went wrong. Please try again.`,
   [INVITE_UNRECOGNIZED]: msg`Invite code not recognized. Check the code and try again.`,
-  [INVITE_CLAIMED]: msg`This invite has already been claimed. Ask for another one.`,
-  [INVITE_BUSY]: msg`This invite is being used in another session. Try again shortly.`,
-  [INVITE_EXPIRED]: msg`This invite has expired. Ask for another one.`,
-  [RESERVE_LIMIT_API]: msg`Invite reservation time limit reached.`,
+  [INVITE_JOIN_WITHOUT]: msg`Invite code not recognized. You can still join without it.`,
+  [SESSION_EXPIRED]: msg`Your session expired. Sign in again to continue.`,
+  [INVALID_ANSWERS]: msg`Those answers didn’t go through. Check all six questions and try again.`,
+  "Verification code is incorrect or expired": msg`Verification code is incorrect or expired`,
+  "Please wait before requesting a new code.": msg`Please wait before requesting a new code.`,
+  "Email send limit exceeded. Try again later.": msg`Email send limit exceeded. Try again later.`,
+  "Failed to send verification code": msg`Failed to send verification code`,
+  "Too many requests. Try again later.": msg`Too many requests. Try again later.`,
+  "service is busy": msg`Service is busy. Try again in a moment.`,
+  "request too many times": msg`Too many requests. Try again later.`,
+  "result not found": msg`That result could not be found.`,
+  "user not found": msg`No account was found for this email.`,
+  "Quiz not submitted yet": msg`Finish the test before unlocking your result.`,
+  "parameters missing": msg`Required information is missing. Try again.`,
+  "invalid channel": msg`That community step could not be recorded. Try again.`,
+  "authorization required": msg`Your session expired. Sign in again to continue.`,
 };
 
 function localizeWaitlistMessage(message: string) {
@@ -118,7 +127,7 @@ type Workspace =
       rank: number;
       shareCompleted: boolean;
       verifiedFriends: number;
-      invitations: InviteItem[];
+      inviteCode: string;
       links: { telegram: string; x: string };
       telegramCompleted: boolean;
       xCompleted: boolean;
@@ -149,8 +158,7 @@ function formatClock(total: number) {
 }
 
 function formatWaitlistCopy(message: string) {
-  if (message === RESERVE_EXPIRED_API || message === INVITE_EXPIRED) return INVITE_EXPIRED;
-  if (message === INVITE_UNRECOGNIZED || message === INVITE_CLAIMED || message === INVITE_BUSY) return message;
+  if (message === "ERROR") return GENERIC_ERROR;
   return message;
 }
 
@@ -163,11 +171,15 @@ function isUnauthorized(error: unknown) {
   return isWaitlistApiError(error) && error.code === 401;
 }
 
-function shouldPurgeOnUserApiError(error: unknown) {
-  if (isUnauthorized(error)) return true;
-  if (isUserInfoError(error)) return true;
-  if (isUserApiError(error) && isMissingUserError(error)) return true;
-  return isUserApiError(error) && error.code === 500;
+function isExpiredSession(error: unknown) {
+  return isUnauthorized(error) || isMissingUserError(error);
+}
+
+function communityLinksFrom(info: { links?: { telegram?: string; x?: string } } | null | undefined) {
+  return {
+    telegram: info?.links?.telegram || DEFAULT_COMMUNITY.telegram,
+    x: info?.links?.x || DEFAULT_COMMUNITY.x,
+  };
 }
 
 function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = false) {
@@ -178,45 +190,39 @@ function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = 
   return url.toString();
 }
 
-function reservationToken(data: { sessionToken?: string; token?: string } | null | undefined) {
-  return (data?.sessionToken || data?.token || "").trim();
-}
-
 function publicShareCard(data: { hidden?: boolean; card?: ResultCard | null } | null) {
   if (!data || data.hidden || !data.card) return null;
   return data.card;
 }
 
 async function fetchWorkspace(token: string): Promise<Workspace> {
-  const [result, community] = await Promise.all([
+  const [result, community, info] = await Promise.all([
     waitlistApi.getMyResult(token),
     waitlistApi.getCommunityInfo(token),
+    waitlistApi.getUserInfo(token),
   ]);
-  const links = DEFAULT_COMMUNITY;
-  const telegramCompleted = community.telegramCompleted === 1;
-  const xCompleted = community.xCompleted === 1;
+  const links = communityLinksFrom(community);
+  const telegramCompleted = isCommunityChannelDone(info.telegramCompleted, community.telegramCompleted);
+  const xCompleted = isCommunityChannelDone(info.xCompleted, community.xCompleted);
+  const communityDone = telegramCompleted && xCompleted;
 
-  const toResultWorkspace = async (card: ResultCard & { rank: number; shareCompleted: number }) => {
-    const [invites, friends] = await Promise.all([
-      waitlistApi.getMyInvites(token),
-      waitlistApi.getInviteFriends(token),
-    ]);
+  const toResultWorkspace = async (card: ResultCard & { rank: number; shareCompleted: number; inviteNum?: number }) => {
     return {
       kind: "result" as const,
       outcome: mapCardToOutcome(card),
       rank: card.rank,
       shareCompleted: card.shareCompleted === 1,
-      verifiedFriends: friends.total,
-      invitations: invites.list,
+      verifiedFriends: Number.isFinite(info.inviteNum) ? info.inviteNum : Number(card.inviteNum) || 0,
+      inviteCode: info.inviteCode || "",
       links,
       telegramCompleted,
       xCompleted,
     };
   };
 
-  if (isUnlockedResult(result)) return toResultWorkspace(result);
+  if (communityDone && isUnlockedResult(result)) return toResultWorkspace(result);
 
-  if (telegramCompleted && xCompleted) {
+  if (communityDone) {
     const retry = await waitlistApi.getMyResult(token);
     if (isUnlockedResult(retry)) return toResultWorkspace(retry);
   }
@@ -224,10 +230,36 @@ async function fetchWorkspace(token: string): Promise<Workspace> {
   return { kind: "unlock", links, telegramCompleted, xCompleted };
 }
 
-function QuestionArtwork({ question }: { question: QuizQuestion }) {
+function QuestionArtwork({
+  question,
+  questions,
+}: {
+  question: QuizQuestion;
+  questions: QuizQuestion[];
+}) {
+  const layers = questions.length ? questions : [question];
+
   return (
     <div className={styles.questionArtwork}>
-      <Image src={question.artSrc} alt={question.artAlt} fill sizes="(max-width: 880px) 100vw, 50vw" priority />
+      {layers.map((item) => {
+        const active = item.questionId === question.questionId;
+        return (
+          <div
+            key={item.questionId}
+            className={styles.questionArtLayer}
+            data-active={active ? "true" : undefined}
+          >
+            <Image
+              src={item.artSrc}
+              alt={active ? item.artAlt : ""}
+              fill
+              sizes="(max-width: 750px) 100vw, 50vw"
+              {...(active ? { priority: true } : { loading: "eager" as const })}
+              aria-hidden={!active}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -286,7 +318,7 @@ function PersonaPoster({
     <article className={styles.personaPoster}>
       <div className={styles.posterIdentity}>
         <div className={styles.posterPoles}>
-          {outcome.poles.map((pole) => <span key={pole}>{pole}</span>)}
+          {outcome.poles.map((pole) => <span key={pole}>{localizedPole(pole)}</span>)}
         </div>
         <h2>{localizedPersonaName(outcome.persona)}</h2>
       </div>
@@ -314,7 +346,7 @@ function PersonaPoster({
           <span><Trans>Download result</Trans></span>
           <div>
             {preparedCards?.story ? <a href={preparedCards.story.href} download={preparedCards.story.filename}><Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" /><Trans>Story</Trans> <small>1080 × 1920</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
-            {preparedCards?.og ? <a href={preparedCards.og.href} download={preparedCards.og.filename}><Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" />X / TG <small>1200 × 630</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
+            {preparedCards?.og ? <a href={preparedCards.og.href} download={preparedCards.og.filename}><Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" /><Trans>X / TG</Trans> <small>1200 × 630</small></a> : <span>{exportError ? t`Unavailable` : t`Preparing…`}</span>}
           </div>
         </section>
       )}
@@ -337,7 +369,6 @@ export function WaitlistExperience() {
   const [referralOutcome, setReferralOutcome] = useState<Outcome | null>(null);
   const [ownOutcome, setOwnOutcome] = useState<Outcome | null>(null);
   const [userToken, setUserTokenState] = useState("");
-  const [sessionToken, setSessionTokenState] = useState("");
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [authIntent, setAuthIntent] = useState<AuthIntent>("create");
   const [email, setEmail] = useState("");
@@ -358,12 +389,11 @@ export function WaitlistExperience() {
   answersRef.current = answers;
   const inviteCodeRef = useRef(inviteCode);
   inviteCodeRef.current = inviteCode;
-  const renewalCappedRef = useRef(false);
-  const [reserveWarning, setReserveWarning] = useState("");
+  const [quizWarning, setQuizWarning] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [shareCompleted, setShareCompleted] = useState(false);
   const [verifiedFriends, setVerifiedFriends] = useState(0);
-  const [invitations, setInvitations] = useState<InviteItem[]>([]);
+  const [ownInviteCode, setOwnInviteCode] = useState("");
   const [rank, setRank] = useState<number | null>(null);
   const [preparedCards, setPreparedCards] = useState<Partial<Record<ResultCardFormat, RenderedResultCard>>>({});
   const [exportError, setExportError] = useState(false);
@@ -377,7 +407,6 @@ export function WaitlistExperience() {
   const savedPersona = ownOutcome?.persona ?? PERSONAS_BY_CODE[userInfo?.personaId ?? ""];
   const savedPersonaName = savedPersona ? localizedPersonaName(savedPersona) : t`your trader type`;
   const currentQuestion = questions[questionIndex];
-  const primaryInvitation = invitations[0] ?? null;
   const verifiedEmail = userInfo?.email || sessionEmail || email;
   const friendRewardApplied = verifiedFriends > 0;
   const friendPriority = Math.min(
@@ -414,36 +443,33 @@ export function WaitlistExperience() {
       setRank(workspace.rank);
       setShareCompleted(workspace.shareCompleted);
       setVerifiedFriends(workspace.verifiedFriends);
-      setInvitations(workspace.invitations);
+      setOwnInviteCode(workspace.inviteCode);
       setStage("result");
       return;
     }
     setVerifiedFriends(0);
+    setOwnInviteCode("");
     setStage("unlock");
   };
 
-  const persistReservation = (reserved: { sessionToken?: string; token?: string; inviteCode?: string }) => {
-    const token = reservationToken(reserved);
-    const code = normalizeInviteCode(reserved.inviteCode || inviteCodeRef.current);
-    if (!token || !isValidInviteCode(code)) return false;
-    setQuizSession({ sessionToken: token, inviteCode: code });
-    setSessionTokenState(token);
-    setInviteCode(code);
+  const persistLandingInvite = (code: string) => {
+    const next = normalizeInviteCode(code);
+    if (!isValidInviteCode(next)) return false;
+    setLandingInvite(next);
+    setInviteCode(next);
     return true;
   };
 
-  const dropReservation = () => {
-    clearQuizSession();
-    setSessionTokenState("");
+  const dropLandingInvite = () => {
+    clearLandingInvite();
   };
 
-  const resetAuth = () => {
-    clearWaitlistSession();
+  const resetAuth = (options?: { keepDraft?: boolean }) => {
+    clearUserToken();
     setUserTokenState("");
-    setSessionTokenState("");
     setUserInfo(null);
     setOwnOutcome(null);
-    setInvitations([]);
+    setOwnInviteCode("");
     setRank(null);
     setShareCompleted(false);
     setVerifiedFriends(0);
@@ -452,28 +478,40 @@ export function WaitlistExperience() {
     setOtp("");
     setTelegramOpened(false);
     setXOpened(false);
-    setAnswers({});
-    setQuestionIndex(0);
+    if (!options?.keepDraft) {
+      clearQuizDraft();
+      setAnswers({});
+      setQuestionIndex(0);
+    }
   };
 
-  const purgeWaitlistClient = (notice = "") => {
-    resetAuth();
-    setReferralOutcome(null);
-    setInviteCode("");
-    setGateError(notice);
-    setReserveWarning("");
-    setPreparedCards({});
-    setExportError(false);
-    setAuthIntent("create");
+  const handleExpiredUserSession = (error: unknown) => {
+    const hadResult = Boolean(userInfo?.submitted && userInfo.resultId);
+    const draft = getQuizDraft();
+    const hasDraft = Boolean(draft && Object.keys(draft.answers).length);
+    resetAuth({ keepDraft: true });
+    setOtp("");
     setOtpError("");
-    setRecoveryError("");
-    clearShareUrl({ hard: shareQueryPresent(), notice });
+    const message = errorMessage(error);
+    if (hadResult) {
+      setAuthIntent("recover");
+      setRecoveryError(message === SESSION_EXPIRED ? message : SESSION_EXPIRED);
+      setStage("email");
+      return;
+    }
+    if (hasDraft) {
+      setAuthIntent("create");
+      setRecoveryError(message === SESSION_EXPIRED ? message : SESSION_EXPIRED);
+      setStage("email");
+      return;
+    }
+    setGateError(message === "user not found" ? message : SESSION_EXPIRED);
     setStage("gate");
   };
 
   const handleUserApiError = (error: unknown) => {
-    if (!shouldPurgeOnUserApiError(error)) return false;
-    purgeWaitlistClient(errorMessage(error));
+    if (!isExpiredSession(error)) return false;
+    handleExpiredUserSession(error);
     return true;
   };
   const handleUserApiErrorRef = useRef(handleUserApiError);
@@ -492,33 +530,29 @@ export function WaitlistExperience() {
       const urlInvite = normalizeInviteCode(urlInviteRaw);
       const shareEntry = Boolean(resultId || urlInviteRaw);
       const storedUserToken = getUserToken();
-      const storedSession = getQuizSession();
       const quizDraft = getQuizDraft();
+      const storedInvite = getLandingInvite();
 
-      let invite = urlInvite;
-      if (urlInvite && storedSession?.inviteCode && storedSession.inviteCode !== urlInvite) {
-        clearQuizSession();
-      } else if (urlInvite && storedSession?.sessionToken && !storedSession.inviteCode) {
-        setQuizSession({ sessionToken: storedSession.sessionToken, inviteCode: urlInvite });
-      } else if (!urlInvite && storedSession?.inviteCode) {
-        invite = storedSession.inviteCode;
+      let invite = urlInvite || storedInvite;
+      if (urlInvite) {
+        persistLandingInvite(urlInvite);
+        invite = urlInvite;
+      } else if (storedInvite) {
+        invite = storedInvite;
       }
 
       if (invite) setInviteCode(invite);
-      const matchingSession = getSessionTokenForInvite(invite);
-      if (matchingSession) setSessionTokenState(matchingSession);
       if (quizDraft) {
         setAnswers(quizDraft.answers);
         setQuestionIndex(quizDraft.questionIndex);
       }
 
-      const resumeInProgress = Boolean(matchingSession) && !storedUserToken;
       const [questionsResult, infoResult, publicResult, inviteCardResult, inviteStatusResult] = await Promise.allSettled([
         waitlistApi.getQuestions().then((data) => hydrateQuestions(data.questions)),
         storedUserToken ? waitlistApi.getUserInfo(storedUserToken) : Promise.resolve(null),
-        resultId && !resumeInProgress ? waitlistApi.getPublicResult(resultId) : Promise.resolve(null),
-        shareEntry && isValidInviteCode(urlInvite) && !resumeInProgress ? waitlistApi.getInviterCard(urlInvite) : Promise.resolve(null),
-        shareEntry && isValidInviteCode(urlInvite) && !resumeInProgress ? waitlistApi.checkInvite(urlInvite) : Promise.resolve(null),
+        resultId ? waitlistApi.getPublicResult(resultId) : Promise.resolve(null),
+        shareEntry && isValidInviteCode(urlInvite) ? waitlistApi.getInviterCard(urlInvite) : Promise.resolve(null),
+        isValidInviteCode(invite) ? waitlistApi.checkInvite(invite) : Promise.resolve(null),
       ]);
 
       if (cancelled) return;
@@ -529,16 +563,20 @@ export function WaitlistExperience() {
       if (infoResult.status === "fulfilled") {
         info = infoResult.value;
       } else if (storedUserToken) {
-        purgeWaitlistClient(errorMessage(infoResult.reason));
-        return;
+        if (isExpiredSession(infoResult.reason)) {
+          clearUserToken();
+        } else {
+          setGateError(errorMessage(infoResult.reason));
+          setStage("gate");
+          return;
+        }
       }
 
       if (info && storedUserToken) {
         setUserTokenState(storedUserToken);
         setUserInfo(info);
         setSessionEmail(info.email);
-        clearQuizSession();
-        setSessionTokenState("");
+        if (info.inviteCode) setOwnInviteCode(info.inviteCode);
       }
 
       if (publicResult.status === "rejected") {
@@ -556,22 +594,27 @@ export function WaitlistExperience() {
       if (friendCard) setReferralOutcome(mapCardToOutcome(friendCard));
 
       const inviteView = inviteStatusResult.status === "fulfilled" ? inviteStatusResult.value : null;
-      const ownReservation = Boolean(matchingSession) && inviteView?.status === 1;
-      const resumeSession = Boolean(matchingSession) && !(info?.submitted && info.resultId) && (inviteView?.status === 0 || inviteView?.status === 1 || !inviteView);
-
       if (inviteStatusResult.status === "rejected") {
-        setGateError(errorMessage(inviteStatusResult.reason));
-      } else if (inviteView && inviteView.status !== 0 && !ownReservation) {
-        setGateError(formatWaitlistCopy(inviteView.message));
-        if (matchingSession && (inviteView.status === 2 || inviteView.status === 3)) dropReservation();
+        const reason = errorMessage(inviteStatusResult.reason);
+        if (reason === INVITE_UNRECOGNIZED) {
+          setGateError(INVITE_JOIN_WITHOUT);
+          dropLandingInvite();
+        } else {
+          setGateError(reason);
+        }
+      } else if (inviteView && inviteView.status !== 0) {
+        setGateError(inviteView.message || INVITE_JOIN_WITHOUT);
+        dropLandingInvite();
+      } else if (inviteView && inviteView.status === 0 && invite) {
+        persistLandingInvite(invite);
       }
 
       const route = decideWaitlistEntry({
         hasFriendCard: Boolean(friendCard),
         loggedIn: Boolean(info && storedUserToken),
         submitted: Boolean(info?.submitted && info.resultId),
-        unlocked: Boolean(info?.unlocked),
-        hasQuizSession: resumeSession,
+        unlocked: Boolean(info?.unlocked) && areCommunityTasksDone(info),
+        hasQuizProgress: Boolean(quizDraft && Object.keys(quizDraft.answers).length),
       });
 
       if ((route.stage === "result" || route.stage === "unlock") && storedUserToken) {
@@ -628,13 +671,13 @@ export function WaitlistExperience() {
       if (inFlight || document.hidden) return;
       inFlight = true;
       try {
-        const [invites, friends, result] = await Promise.all([
-          waitlistApi.getMyInvites(userToken),
-          waitlistApi.getInviteFriends(userToken),
+        const [info, result] = await Promise.all([
+          waitlistApi.getUserInfo(userToken),
           waitlistApi.getMyResult(userToken),
         ]);
-        setInvitations(invites.list);
-        setVerifiedFriends(friends.total);
+        setUserInfo(info);
+        setVerifiedFriends(Number.isFinite(info.inviteNum) ? info.inviteNum : 0);
+        if (info.inviteCode) setOwnInviteCode(info.inviteCode);
         if (isUnlockedResult(result)) {
           setRank(result.rank);
           setShareCompleted(result.shareCompleted === 1);
@@ -651,43 +694,6 @@ export function WaitlistExperience() {
     return () => window.clearInterval(timer);
   }, [demoActive, stage, userToken]);
 
-  const syncReservation = async () => {
-    const code = inviteCodeRef.current;
-    if (!isValidInviteCode(code) || renewalCappedRef.current) return;
-    try {
-      const renewed = await waitlistApi.renewReserve(code);
-      if (reservationToken(renewed)) persistReservation({ ...renewed, inviteCode: code });
-      setReserveWarning("");
-    } catch (error) {
-      if (isWaitlistApiError(error) && error.message === RESERVE_LIMIT_API) {
-        renewalCappedRef.current = true;
-        setReserveWarning(errorMessage(error));
-        return;
-      }
-      if (isWaitlistApiError(error) && error.message === RESERVE_EXPIRED_API) {
-        try {
-          persistReservation({ ...(await waitlistApi.reserveInvite(code)), inviteCode: code });
-          setReserveWarning("");
-        } catch (reserveError) {
-          dropReservation();
-          setReserveWarning(errorMessage(reserveError));
-        }
-        return;
-      }
-      setReserveWarning(errorMessage(error));
-    }
-  };
-  const syncReservationRef = useRef(syncReservation);
-  syncReservationRef.current = syncReservation;
-
-  useEffect(() => {
-    if (stage !== "quiz") return;
-    const timer = window.setInterval(() => {
-      void syncReservationRef.current();
-    }, RENEW_INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, [stage]);
-
   useEffect(() => {
     if (stage !== "result" || !ownOutcome) return;
     let disposed = false;
@@ -699,7 +705,7 @@ export function WaitlistExperience() {
       code: ownOutcome.persona.mark,
       roast: localizedPersonaRoast(ownOutcome.persona),
       artSrc: ownOutcome.persona.artSrc,
-      poles: ownOutcome.poles,
+      poles: ownOutcome.poles.map(localizedPole),
       scores: ownOutcome.stats,
       bestMatch: { name: localizedPersonaName(ownOutcome.bestMatch) },
       rival: { name: localizedPersonaName(ownOutcome.rival) },
@@ -743,7 +749,7 @@ export function WaitlistExperience() {
     setDemoActive(true);
     setDemoTarget(target);
     setGateError("");
-    setReserveWarning("");
+    setQuizWarning("");
     setRecoveryError("");
     setOtpError("");
     setPreparedCards({});
@@ -802,8 +808,8 @@ export function WaitlistExperience() {
     setOwnOutcome(DEMO_OUTCOME);
     setRank(8017);
     setShareCompleted(false);
-    setVerifiedFriends(0);
-    setInvitations([{ code: "smartx01", status: 0, usedAt: null }]);
+    setVerifiedFriends(2);
+    setOwnInviteCode("smartx01");
     setStage("result");
   };
 
@@ -813,30 +819,28 @@ export function WaitlistExperience() {
     window.location.assign(url.toString());
   };
 
-  const startQuiz = async (options: { reserve: boolean }) => {
-    const reserve = options.reserve && !demoActive;
-    if (reserve && !isValidInviteCode(inviteCode)) return;
+  const startQuiz = async () => {
     setGateError("");
-    setReserveWarning("");
-    renewalCappedRef.current = false;
+    setQuizWarning("");
     try {
       await ensureQuestions();
-      if (reserve) {
-        const existingSession = getSessionTokenForInvite(inviteCode);
-        if (existingSession) {
-          persistReservation({ sessionToken: existingSession, inviteCode });
-        } else {
-          try {
-            const reserved = await waitlistApi.reserveInvite(inviteCode);
-            if (!persistReservation({ ...reserved, inviteCode })) {
-              dropReservation();
-              throw new Error(GENERIC_ERROR);
-            }
-          } catch (error) {
-            dropReservation();
-            throw error;
+      const code = inviteCodeRef.current;
+      if (!demoActive && isValidInviteCode(code)) {
+        try {
+          const view = await waitlistApi.checkInvite(code);
+          if (view.status === 0) {
+            persistLandingInvite(code);
+          } else {
+            dropLandingInvite();
+            setGateError(view.message || INVITE_JOIN_WITHOUT);
           }
+        } catch (error) {
+          dropLandingInvite();
+          const reason = errorMessage(error);
+          setGateError(reason === INVITE_UNRECOGNIZED ? INVITE_JOIN_WITHOUT : reason);
         }
+      } else if (!demoActive && !isValidInviteCode(code)) {
+        dropLandingInvite();
       }
       setAuthIntent("create");
       const draft = getQuizDraft();
@@ -854,16 +858,9 @@ export function WaitlistExperience() {
     }
   };
 
-  const beginFromReferral = () => {
-    if (demoActive || (loggedIn && !hasOwnResult)) return startQuiz({ reserve: false });
-    return startQuiz({ reserve: true });
-  };
+  const beginFromReferral = () => startQuiz();
 
-  const beginWithoutInvite = () => {
-    setInviteCode("");
-    dropReservation();
-    return startQuiz({ reserve: false });
-  };
+  const beginWithoutInvite = () => startQuiz();
 
   const beginResultRecovery = () => {
     setAuthIntent("recover");
@@ -885,6 +882,9 @@ export function WaitlistExperience() {
 
   const signOutWaitlist = () => {
     resetAuth();
+    setInviteCode("");
+    setReferralOutcome(null);
+    setGateError("");
     setStage("gate");
   };
 
@@ -901,24 +901,14 @@ export function WaitlistExperience() {
       if (authIntent === "create") {
         const check = await waitlistApi.checkEmailRegistered(nextEmail);
         if (check?.registered === true) {
-          clearWaitlistSession();
-          setUserTokenState("");
-          setSessionTokenState("");
-          setUserInfo(null);
-          setOwnOutcome(null);
-          setInvitations([]);
-          setRank(null);
-          setShareCompleted(false);
-          setVerifiedFriends(0);
+          clearQuizDraft();
+          answersRef.current = {};
           setAnswers({});
           setQuestionIndex(0);
-          setInviteCode("");
-          setTelegramOpened(false);
-          setXOpened(false);
           setOtp("");
           setOtpError("");
-          setAuthIntent("recover");
           setRecoveryError("");
+          setAuthIntent("recover");
           setStage("email");
           return;
         }
@@ -949,54 +939,75 @@ export function WaitlistExperience() {
     }
   };
 
-  const enterAfterLogin = async (token: string, intent: AuthIntent, isNewUser: boolean, resultId: string) => {
+  const enterAfterLogin = async (token: string, isNewUser: boolean, resultId: string) => {
     setUserToken(token);
     setUserTokenState(token);
-    setSessionTokenState("");
-    if (intent === "recover") {
-      if (isNewUser || !resultId) {
-        resetAuth();
-        setRecoveryError(NO_SAVED_RESULT);
-        setStage("email");
+
+    if (isNewUser) {
+      try {
+        await waitlistApi.submitQuiz(buildQuizAnswers(questions, answersRef.current), token);
+      } catch (error) {
+        if (handleUserApiError(error)) return;
+        setQuizWarning(errorMessage(error));
+        await ensureQuestions();
+        setStage("quiz");
         return;
       }
+      clearQuizDraft();
       const info = await waitlistApi.getUserInfo(token);
       setUserInfo(info);
       setSessionEmail(info.email);
-      clearQuizDraft();
       applyWorkspace(await fetchWorkspace(token));
       return;
     }
 
-    if (!isNewUser) {
-      const info = await waitlistApi.getUserInfo(token);
-      setUserInfo(info);
-      setSessionEmail(info.email);
-      clearQuizDraft();
-      applyWorkspace(await fetchWorkspace(token));
-      return;
-    }
-
-    await waitlistApi.submitQuiz(buildQuizAnswers(questions, answersRef.current), token);
-    clearQuizDraft();
     const info = await waitlistApi.getUserInfo(token);
     setUserInfo(info);
     setSessionEmail(info.email);
-    applyWorkspace(await fetchWorkspace(token));
+    if (resultId || info.submitted) {
+      clearQuizDraft();
+      applyWorkspace(await fetchWorkspace(token));
+      return;
+    }
+
+    const localAnswers = buildQuizAnswers(questions, answersRef.current);
+    if (questions.length && Object.keys(localAnswers).length === questions.length) {
+      try {
+        await waitlistApi.submitQuiz(localAnswers, token);
+        clearQuizDraft();
+        applyWorkspace(await fetchWorkspace(token));
+        return;
+      } catch (error) {
+        if (handleUserApiError(error)) return;
+        setQuizWarning(errorMessage(error));
+      }
+    }
+
+    await ensureQuestions();
+    setStage("quiz");
+  };
+
+  const resolveLoginInvite = () => {
+    const typed = normalizeInviteCode(inviteCodeRef.current);
+    if (isValidInviteCode(typed)) return typed;
+    const stored = getLandingInvite();
+    return isValidInviteCode(stored) ? stored : "";
   };
 
   const submitOtp = async () => {
     setOtpError("");
+    const loginInvite = resolveLoginInvite();
     try {
-      const login = await waitlistApi.login(email, otp);
-      await enterAfterLogin(login.token, authIntent, login.isNewUser, login.resultId);
+      const login = await waitlistApi.login(email, otp, loginInvite || undefined);
+      await enterAfterLogin(login.token, login.isNewUser, login.resultId);
     } catch (error) {
       if (handleUserApiError(error)) return;
-      if (authIntent === "create" && isWaitlistApiError(error) && error.message === INVITE_UNRECOGNIZED && isValidInviteCode(inviteCode)) {
+      if (isWaitlistApiError(error) && error.message === INVITE_UNRECOGNIZED && loginInvite) {
         try {
-          persistReservation({ ...(await waitlistApi.reserveInvite(inviteCode)), inviteCode });
+          dropLandingInvite();
+          setInviteCode("");
           const login = await waitlistApi.login(email, otp);
-          await enterAfterLogin(login.token, authIntent, login.isNewUser, login.resultId);
+          await enterAfterLogin(login.token, login.isNewUser, login.resultId);
           return;
         } catch (retryError) {
           if (handleUserApiError(retryError)) return;
@@ -1004,18 +1015,7 @@ export function WaitlistExperience() {
           return;
         }
       }
-      if (authIntent === "create" && isWaitlistApiError(error) && error.message === INVITE_CLAIMED) {
-        dropReservation();
-        setGateError(errorMessage(error));
-        setStage("gate");
-        return;
-      }
-      if (authIntent === "recover" && isWaitlistApiError(error) && /invite code not recognized|user not found/i.test(error.message)) {
-        setRecoveryError(NO_SAVED_RESULT);
-        setStage("email");
-      } else {
-        setOtpError(errorMessage(error));
-      }
+      setOtpError(errorMessage(error));
     }
   };
 
@@ -1028,7 +1028,7 @@ export function WaitlistExperience() {
         setUserInfo(info);
         applyWorkspace(await fetchWorkspace(userToken));
       } catch (error) {
-        if (!handleUserApiError(error)) setReserveWarning(errorMessage(error));
+        if (!handleUserApiError(error)) setQuizWarning(errorMessage(error));
       }
       return;
     }
@@ -1041,9 +1041,6 @@ export function WaitlistExperience() {
     const nextAnswers = { ...answers, [currentQuestion.questionId]: optionId };
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);
-    if (inviteCode && (sessionToken || getQuizSession()?.sessionToken)) {
-      await syncReservation();
-    }
     if (questionIndex === questions.length - 1) {
       await finishQuiz();
       return;
@@ -1059,17 +1056,6 @@ export function WaitlistExperience() {
     setQuestionIndex((current) => current - 1);
   };
 
-  const reReserveInvite = async () => {
-    try {
-      persistReservation({ ...(await waitlistApi.reserveInvite(inviteCode)), inviteCode });
-      renewalCappedRef.current = false;
-      setReserveWarning("");
-    } catch (error) {
-      dropReservation();
-      setReserveWarning(errorMessage(error));
-    }
-  };
-
   const openCommunity = async (channel: CommunityChannel) => {
     const href = channel === "telegram" ? communityLinks.telegram : communityLinks.x;
     window.open(href, "_blank", "noopener,noreferrer");
@@ -1083,6 +1069,9 @@ export function WaitlistExperience() {
       const result = await waitlistApi.completeCommunity(channel, userToken);
       setTelegramOpened(result.telegramCompleted === 1);
       setXOpened(result.xCompleted === 1);
+      if (!areCommunityTasksDone(result) && !result.unlocked) return;
+      const workspace = await fetchWorkspace(userToken);
+      if (workspace.kind === "result") applyWorkspace(workspace);
     } catch (error) {
       if (!handleUserApiError(error)) notifyError(localizeWaitlistMessage(errorMessage(error)));
     }
@@ -1102,12 +1091,12 @@ export function WaitlistExperience() {
   };
 
   const shareResult = async () => {
-    if (!ownOutcome || !primaryInvitation?.code) return;
+    if (!ownOutcome || !ownInviteCode) return;
     const shareUrl = new URL("https://twitter.com/intent/tweet");
     const shareName = localizedPersonaName(ownOutcome.persona);
     const shareRoast = localizedPersonaRoast(ownOutcome.persona);
     shareUrl.searchParams.set("text", `${t`My SmartX trader type is ${shareName}.`}${shareRoast ? `\n\n“${shareRoast}”` : ""}\n\n${t`Find yours in six questions.`}`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(primaryInvitation.code, ownOutcome.resultId, true));
+    shareUrl.searchParams.set("url", makeInvitationUrl(ownInviteCode, ownOutcome.resultId, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     if (!userToken || shareCompleted || demoActive) return;
     try {
@@ -1157,20 +1146,21 @@ export function WaitlistExperience() {
             const next = sanitizeInviteCodeInput(event.target.value);
             setInviteCode(next);
             setGateError("");
-            const storedInvite = getQuizSession()?.inviteCode;
-            if (isValidInviteCode(next) && storedInvite && storedInvite !== next) {
-              dropReservation();
+            const storedInvite = getLandingInvite();
+            if (isValidInviteCode(next)) {
+              persistLandingInvite(next);
+            } else if (storedInvite && storedInvite !== next) {
+              dropLandingInvite();
             }
           }}
           aria-invalid={Boolean(gateError)}
           aria-describedby={gateError ? "invite-error" : undefined}
-          required
         />
         <WaitlistButton
           className={`${styles.primaryButton} ${styles.inviteEntryButton}`}
           type="submit"
           disabled={!inviteReady}
-          onAction={() => startQuiz({ reserve: true })}
+          onAction={() => startQuiz()}
         >
           <Trans>Start with invite</Trans>
         </WaitlistButton>
@@ -1265,7 +1255,7 @@ export function WaitlistExperience() {
                 </WaitlistButton>
               ) : (
                 <>
-                  <WaitlistButton className={styles.primaryButton} disabled={!inviteReady} onAction={beginFromReferral}>
+                  <WaitlistButton className={styles.primaryButton} onAction={beginFromReferral}>
                     <Trans>Find my trader type</Trans>
                   </WaitlistButton>
                   <WaitlistButton className={styles.textButton} onClick={beginResultRecovery}>
@@ -1331,7 +1321,7 @@ export function WaitlistExperience() {
             </p>
             <form onSubmit={(event) => event.preventDefault()}>
               <WaitlistButton className={styles.primaryButton} onClick={() => setStage("gate")}>
-                <Trans>Back to invite</Trans>
+                <Trans>Back to start</Trans>
               </WaitlistButton>
             </form>
           </div>
@@ -1347,8 +1337,8 @@ export function WaitlistExperience() {
                 onSignOut={signOutWaitlist}
               />
             )}
-            <div className={styles.quizLayout} key={currentQuestion.questionId}>
-              <QuestionArtwork question={currentQuestion} />
+            <div className={styles.quizLayout}>
+              <QuestionArtwork question={currentQuestion} questions={questions} />
               <div className={styles.questionPanel}>
                 <div className={styles.quizTopline}>
                   <WaitlistButton type="button" onClick={goBack}>
@@ -1368,7 +1358,7 @@ export function WaitlistExperience() {
                 >
                   <i aria-hidden="true" />
                 </div>
-                <h1>{currentQuestion.prompt}</h1>
+                <h1>{localizedQuestionPrompt(currentQuestion)}</h1>
                 <div className={styles.optionList}>
                   {currentQuestion.options.map((option) => {
                     const selected = answers[currentQuestion.questionId] === option.optionId;
@@ -1388,19 +1378,14 @@ export function WaitlistExperience() {
                           height={26}
                           aria-hidden="true"
                         />
-                        <span>{option.label}</span>
+                        <span>{localizedOptionLabel(option)}</span>
                       </WaitlistButton>
                     );
                   })}
                 </div>
-                {reserveWarning ? (
+                {quizWarning ? (
                   <div className={styles.quizWarning} role="alert">
-                    <small>{localizeWaitlistMessage(reserveWarning)}</small>
-                    {reserveWarning === INVITE_EXPIRED && (
-                      <WaitlistButton className={styles.textButton} onAction={reReserveInvite}>
-                        <Trans>Reserve again</Trans>
-                      </WaitlistButton>
-                    )}
+                    <small>{localizeWaitlistMessage(quizWarning)}</small>
                   </div>
                 ) : null}
               </div>
@@ -1426,7 +1411,7 @@ export function WaitlistExperience() {
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
-                  placeholder="you@domain.com"
+                  placeholder={t`you@domain.com`}
                   value={email}
                   onChange={(event) => {
                     setEmail(event.target.value);
@@ -1478,6 +1463,7 @@ export function WaitlistExperience() {
                     pattern="[0-9]{6}"
                     maxLength={6}
                     value={otp}
+                    placeholder={t`Six-digit code`}
                     onChange={(event) => { setOtp(event.target.value.replace(/\D/g, "").slice(0, 6)); setOtpError(""); }}
                     aria-invalid={Boolean(otpError)}
                     aria-describedby="otp-note"
@@ -1529,8 +1515,7 @@ export function WaitlistExperience() {
             </p>
             <AccountSession
               email={verifiedEmail}
-              label={t`Verified as`}
-              compact
+              label={t`Signed in as`}
               onSignOut={signOutWaitlist}
             />
             <div className={styles.unlockTasks}>
@@ -1603,7 +1588,7 @@ export function WaitlistExperience() {
                             <small>1080 × 1920</small>
                           </a>
                           <a href={preparedCards.og.href} download={preparedCards.og.filename}>
-                            <span>X / TG</span>
+                            <span><Trans>X / TG</Trans></span>
                             <small>1200 × 630</small>
                           </a>
                         </>
@@ -1612,7 +1597,7 @@ export function WaitlistExperience() {
                       )}
                     </div>
                   </details>
-                  <WaitlistButton className={styles.shareButton} disabled={!primaryInvitation?.code} onAction={shareResult}>
+                  <WaitlistButton className={styles.shareButton} disabled={!ownInviteCode} onAction={shareResult}>
                     {shareCompleted ? t`Share again` : t`Share result`}
                   </WaitlistButton>
                 </div>
@@ -1627,20 +1612,25 @@ export function WaitlistExperience() {
                       <Trans>Share one link with every friend you invite.</Trans>
                     </p>
                   </div>
+                  {verifiedFriends > 0 ? (
+                    <p className={styles.inviteCount}>
+                      {t`${verifiedFriends} friends joined via your invite.`}
+                    </p>
+                  ) : null}
                 </header>
-                <div className={styles.primaryInviteCard} data-empty={primaryInvitation ? undefined : "true"}>
+                <div className={styles.primaryInviteCard} data-empty={ownInviteCode ? undefined : "true"}>
                   <div>
                     <span><Trans>Invite code</Trans></span>
-                    <strong>{primaryInvitation?.code || t`Invite link is being prepared`}</strong>
+                    <strong>{ownInviteCode || t`Invite link is being prepared`}</strong>
                   </div>
                   <WaitlistButton
                     type="button"
                     lock={false}
-                    disabled={!primaryInvitation?.code}
-                    onClick={() => { void copyInvitation(primaryInvitation?.code); }}
+                    disabled={!ownInviteCode}
+                    onClick={() => { void copyInvitation(ownInviteCode); }}
                   >
                     <Image src="/assets/waitlist/copy.svg" alt="" width={20} height={20} aria-hidden="true" />
-                    {copiedCode === primaryInvitation?.code ? t`Copied` : t`Copy link`}
+                    {copiedCode === ownInviteCode ? t`Copied` : t`Copy link`}
                   </WaitlistButton>
                 </div>
               </section>

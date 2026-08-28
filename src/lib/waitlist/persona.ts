@@ -138,6 +138,19 @@ export function localizedPersonaRoast(persona: Persona): string {
   return entry ? i18n._(entry.roast) : persona.roast;
 }
 
+const POLE_L10N: Record<Pole, MessageDescriptor> = {
+  DEGEN: msg`DEGEN`,
+  SNIPER: msg`SNIPER`,
+  GUT: msg`GUT`,
+  DATA: msg`DATA`,
+  PACK: msg`PACK`,
+  LONE: msg`LONE`,
+};
+
+export function localizedPole(pole: Pole): string {
+  return i18n._(POLE_L10N[pole]);
+}
+
 const CHEMISTRY: Record<string, { best: string; rival: string }> = {
   LQD: { best: "DIP", rival: "LMT" }, AIM: { best: "DOC", rival: "CHN" },
   SIG: { best: "CHN", rival: "DOC" }, CND: { best: "LMT", rival: "DIP" },
