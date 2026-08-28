@@ -118,6 +118,112 @@ Scope: only `03 / Learn`. The supplied 1280×720 concept image is the visual sou
 
 final result: passed
 
+---
+
+# Waitlist follow-up — mobile hierarchy and result actions · 2026-08-28
+
+## Scope
+
+- Waitlist screens only; the shared SmartX navigation was not changed.
+- Direct entry H5, quiz question H5, and the signed-in result action area.
+- Backend question fetching, invite handling, authentication, and result recovery logic remain unchanged.
+
+## Comparison evidence
+
+- Direct-entry source: `/var/folders/jx/8lhk_zbj02d4hb48l_8_10940000gn/T/codex-clipboard-805abfb5-cd0b-4c60-8a4d-16aec39c2d20.png`.
+- Direct-entry implementation: `output/browser/waitlist-ui-followup/entry-mobile.png`.
+- Side-by-side direct-entry comparison: `output/browser/waitlist-ui-followup/compare-entry.png`.
+- Quiz source: `/var/folders/jx/8lhk_zbj02d4hb48l_8_10940000gn/T/codex-clipboard-0e56b9ea-e1a1-45fd-a796-3760e861f5cc.png`.
+- Quiz implementation: `output/browser/waitlist-ui-followup/quiz-2-mobile.png`.
+- Side-by-side quiz comparison: `output/browser/waitlist-ui-followup/compare-quiz.png`.
+- Result closed state: `output/browser/waitlist-ui-followup/result-desktop-closed.png` and `result-mobile-closed.png`.
+- Result download disclosure: `output/browser/waitlist-ui-followup/result-desktop-open.png` and `result-mobile-open.png`.
+- Responsive browser checks used a 390 × 844 viewport override; the in-app browser content capture is 375 × 812 after browser chrome.
+
+## Findings and resolutions
+
+| Severity | Finding | Resolution |
+| --- | --- | --- |
+| P1 | The quiz artwork occupied nearly half of the H5 viewport, pushing most of the question and options below the fold. | Reduced the artwork to a responsive `200–260px` context strip and tightened the question-panel top spacing. The prompt and three answer choices are now visible in the verification capture. |
+| P1 | The direct-entry headline inherited a desktop hard break, producing an awkward four-line mobile title. | Mobile now ignores the desktop break, uses a slightly tighter responsive display size, and preserves a real word space; the headline settles into three readable lines. |
+| P2 | The direct-entry eyebrow repeated information already expressed by the headline and primary CTA. | Removed `The SmartX trader type test`; retained only conversion-relevant reassurance and alternate paths. |
+| P2 | Result-card format choices were always visible under the persona poster, increasing page noise and separating download from sharing. | Moved Download next to Share result in the right action area. Story and X / TG sizes render only after the semantic disclosure is opened. |
+| P2 | A long download label would crowd the two-column H5 action row. | Added the localized short label `Download` for English, Simplified Chinese, Japanese, and Korean. |
+
+## Interaction and accessibility
+
+- Download is a native `details` / `summary` disclosure, so keyboard activation and open/closed semantics are retained without a custom menu state machine.
+- The closed state exposes no format choices; the open state exposes two labelled download links with exact pixel dimensions.
+- Focus-visible styling covers the disclosure trigger and both download links.
+- The direct entry, quiz options, result share, copy-link, sign-out, and demo-review controls remain operable in the verified states.
+
+## Engineering validation
+
+- `npm run compile` — passed; all four locale catalogs compiled.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed with the existing `src/lingui/LinguiProvider.tsx:55` exhaustive-deps warning and no errors.
+- `npm run build` — passed; 17 static pages generated and `/waitlist` exported successfully.
+- `git diff --check` — passed.
+
+final result: passed
+
+---
+
+# Waitlist direct entry — conversion hierarchy and layout QA · 2026-08-28
+
+## Scope and evidence
+
+- Source visual truth: `/var/folders/jx/8lhk_zbj02d4hb48l_8_10940000gn/T/codex-clipboard-d7ba7154-d841-41e5-a172-4e59b96d0e04.png`.
+- Source pixels: `3816 × 1894`, representing a `1908 × 947` @2x desktop capture.
+- Implementation route/state: `/waitlist/`, direct entry, English, no demo overlay.
+- Implementation screenshot: `output/playwright/waitlist-entry-first-principles/desktop-live-1404x697.jpg`.
+- Comparison viewport and implementation pixels: `1404 × 697`, device scale factor 1.
+- Density normalization: the source was downsampled to `1404 × 697` as `output/playwright/waitlist-entry-first-principles/source-normalized-1404x697.jpg`; no browser chrome or device frame is included.
+- Full-view combined comparison: `output/playwright/waitlist-entry-first-principles/comparison-full.jpg`.
+- Focused copy/form comparison: `output/playwright/waitlist-entry-first-principles/comparison-focused.jpg`.
+- Responsive evidence: `output/playwright/waitlist-entry-first-principles/desktop-1024x768.jpg`, `mobile-live-390x844.jpg`, and `mobile-zh-390x844.jpg`.
+
+## Intended product changes
+
+- The supplied screenshot is the visual-language source, while the user-requested structural target intentionally reverses the desktop composition from copy-left/art-right to art-left/copy-right.
+- Natural users now receive one unambiguous primary action, `Start the test`, with `No invite needed` directly below it. The invite-code path is a clearly labelled secondary branch, and result recovery remains tertiary.
+- Navigation, backend-provided questions, login/recovery behavior, and the friend-invite entry are outside this layout change and remain intact.
+
+## Findings and comparison history
+
+| Round | Severity | Finding | Fix | Post-fix evidence |
+| --- | --- | --- | --- | --- |
+| 1 | P1 | The no-invite path was a small underlined link beneath a dominant invite-code `Begin` button, so natural visitors could reasonably infer that an invite was required. | Promoted the natural path to the only teal primary CTA and added explicit no-invite reassurance; moved invite entry below a labelled divider with a neutral secondary button. | Full and focused comparisons show the CTA as the strongest element while the invite path remains visible without competing with it. |
+| 1 | P1 | Direct entry placed copy on the left and art on the right, contradicting the established friend-entry reading direction. | Reversed the desktop composition to art-left/copy-right and retained the mobile top-art/bottom-copy adaptation. | `desktop-live-1404x697.jpg`, `desktop-1024x768.jpg`, and `mobile-live-390x844.jpg`. |
+| 2 | P2 | Entering `?demo=1` did not set review-only state until the reviewer changed the screen selector, so the first click could still reach a mutating invite reservation call. | Initialize demo mode from the query string and reset the invite field whenever the direct-entry target is selected. | In review mode, both the no-invite CTA and a valid invite code enter the quiz without reservation; result recovery enters the email stage. |
+| 3 | — | Rechecked the final desktop, mid-width, mobile, and Chinese states after the hierarchy and demo-safety fixes. | No actionable P0/P1/P2 issue remains. | Combined comparisons, responsive captures, clean console tab, and interaction checks listed below. |
+
+## Required fidelity surfaces
+
+- **Fonts and typography:** the Playfair display title, IBM Plex/Inter body and control text, weights, line-height, and two-line desktop title preserve the source hierarchy. Mobile wraps naturally without truncation; Chinese switches fully to localized copy.
+- **Spacing and layout rhythm:** the desktop uses equal visual halves with the supplied artwork enlarged on the left and a bounded 620px action column on the right. The 1024px desktop capture has no collision or overflow. H5 keeps the existing top-art flow and a readable action sequence.
+- **Colors and tokens:** black canvas, white title/body, muted secondary text, `#08DFB5` primary CTA, pill radii, and low-contrast neutral invite state remain aligned with the Waitlist design system.
+- **Image quality and asset fidelity:** the existing `waitlist-intro.png` source asset is reused without replacement, stretching, CSS recreation, or generated substitute. Scaling preserves its monochrome linework and human figures at desktop and mobile sizes.
+- **Copy and content:** the main CTA communicates the default action; `No invite needed` removes qualification anxiety; `Have an invite code?` and `Start with invite` define the secondary path; result recovery remains visible. New copy is translated in English, Simplified Chinese, Japanese, and Korean catalogs.
+
+## Interaction, responsiveness, and console verification
+
+- `Start the test` is enabled on first view and reaches the quiz.
+- A valid eight-character invite enables `Start with invite`; review mode reaches the quiz without mutating backend reservation data.
+- `Already tested? View my result` reaches the recovery email stage.
+- English and Simplified Chinese were switched in the real browser; all four new strings changed language with no English fallback.
+- Desktop `1404 × 697`, desktop `1024 × 768`, and mobile `390 × 844` checks reported no horizontal document overflow.
+- A fresh browser tab after the final dev-server restart reported zero console warnings and zero console errors.
+
+## Engineering validation
+
+- `npm run typecheck` — passed.
+- `npm run lint` — passed with one pre-existing warning in `src/lingui/LinguiProvider.tsx:55`; zero errors.
+- `npm run build` — passed; 17 static pages generated.
+- Production build temporarily invalidated the running Next.js development manifest; the preview server was restarted and the final browser pass was clean.
+
+final result: passed
+
 ### Consumer homepage · Screen 5 SmartX Hub and demo identity pass · 2026-08-25
 
 - Source asset: `public/assets/consumer-network/account-hub-network-brand-teal.webp` (`1920 × 800`). The SmartX-owned glow and circuit traces use the website brand teal `#08DFB5`; Apple, Google, bank, Coinbase, Binance, Solana, Robinhood, Base, and BNB Chain retain their distinct colors.

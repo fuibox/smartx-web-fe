@@ -7,14 +7,22 @@ export type RenderedResultCard = {
 
 export type ResultCardExportData = {
   name: string;
-  cn: string;
   code: string;
   roast: string;
   artSrc: string;
   poles: readonly string[];
   scores: { conviction: number; instinct: number; resilience: number };
-  bestMatch: { name: string; cn: string };
-  rival: { name: string; cn: string };
+  bestMatch: { name: string };
+  rival: { name: string };
+  labels: {
+    traderType: string;
+    bestMatch: string;
+    naturalRival: string;
+    conviction: string;
+    instinct: string;
+    resilience: string;
+    disclaimer: string;
+  };
 };
 
 const COLORS = {
@@ -69,14 +77,14 @@ function drawBase(context: CanvasRenderingContext2D, width: number, height: numb
   context.stroke();
 }
 
-function drawHeader(context: CanvasRenderingContext2D, width: number, x: number, y: number) {
+function drawHeader(context: CanvasRenderingContext2D, width: number, x: number, y: number, traderType: string) {
   context.fillStyle = COLORS.text;
   context.font = "700 26px Lexend, sans-serif";
   context.fillText("SmartX", x, y);
   context.fillStyle = COLORS.dim;
   context.font = "700 13px Inter, sans-serif";
   context.textAlign = "right";
-  context.fillText("TRADER TYPE", width - x, y - 4);
+  context.fillText(traderType.toUpperCase(), width - x, y - 4);
   context.textAlign = "left";
 }
 
@@ -106,8 +114,8 @@ function drawRelations(context: CanvasRenderingContext2D, data: ResultCardExport
   const columnWidth = width / 2;
   context.fillStyle = COLORS.dim;
   context.font = "600 11px Inter, sans-serif";
-  context.fillText("BEST MATCH", x, y);
-  context.fillText("NATURAL RIVAL", x + columnWidth, y);
+  context.fillText(data.labels.bestMatch.toUpperCase(), x, y);
+  context.fillText(data.labels.naturalRival.toUpperCase(), x + columnWidth, y);
   context.fillStyle = COLORS.text;
   context.font = "500 18px IBM Plex Sans, sans-serif";
   context.fillText(data.bestMatch.name, x, y + 28);
@@ -143,7 +151,7 @@ function drawAxis(
 function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData, artwork: HTMLImageElement) {
   const width = 1080;
   drawBase(context, width, 1920, 42);
-  drawHeader(context, width, 84, 98);
+  drawHeader(context, width, 84, 98, data.labels.traderType);
   context.fillStyle = COLORS.mintStrong;
   context.font = "700 17px JetBrainsMono, monospace";
   context.fillText(data.poles.join(" · "), 84, 178);
@@ -151,9 +159,9 @@ function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData
   context.font = "600 84px \"Playfair Display\", Georgia, serif";
   wrapText(context, data.name, 84, 282, 912, 88, 2);
   drawArtwork(context, artwork, 84, 440, 912, 600);
-  drawAxis(context, "Conviction", data.scores.conviction, 84, 1105, 278);
-  drawAxis(context, "Instinct", data.scores.instinct, 400, 1105, 278);
-  drawAxis(context, "Resilience", data.scores.resilience, 718, 1105, 278);
+  drawAxis(context, data.labels.conviction, data.scores.conviction, 84, 1105, 278);
+  drawAxis(context, data.labels.instinct, data.scores.instinct, 400, 1105, 278);
+  drawAxis(context, data.labels.resilience, data.scores.resilience, 718, 1105, 278);
   context.fillStyle = COLORS.mint;
   context.font = "500 34px \"Playfair Display\", Georgia, serif";
   wrapText(context, `“${data.roast}”`, 84, 1260, 860, 45, 3);
@@ -169,14 +177,14 @@ function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData
   context.fillStyle = COLORS.dim;
   context.font = "600 12px Inter, sans-serif";
   context.textAlign = "right";
-  context.fillText("FOR ENTERTAINMENT ONLY", 996, 1844);
+  context.fillText(data.labels.disclaimer.toUpperCase(), 996, 1844);
   context.textAlign = "left";
 }
 
 function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, artwork: HTMLImageElement) {
   const width = 1200;
   drawBase(context, width, 630, 24);
-  drawHeader(context, width, 54, 70);
+  drawHeader(context, width, 54, 70, data.labels.traderType);
   context.fillStyle = COLORS.mintStrong;
   context.font = "700 13px JetBrainsMono, monospace";
   context.fillText(data.poles.join(" · "), 54, 120);
@@ -187,9 +195,9 @@ function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, a
   context.font = "500 24px \"Playfair Display\", Georgia, serif";
   wrapText(context, `“${data.roast}”`, 54, 350, 560, 31, 3);
   drawArtwork(context, artwork, 680, 104, 466, 382);
-  drawAxis(context, "CONVICTION", data.scores.conviction, 680, 528, 140);
-  drawAxis(context, "INSTINCT", data.scores.instinct, 842, 528, 140);
-  drawAxis(context, "RESILIENCE", data.scores.resilience, 1004, 528, 140);
+  drawAxis(context, data.labels.conviction.toUpperCase(), data.scores.conviction, 680, 528, 140);
+  drawAxis(context, data.labels.instinct.toUpperCase(), data.scores.instinct, 842, 528, 140);
+  drawAxis(context, data.labels.resilience.toUpperCase(), data.scores.resilience, 1004, 528, 140);
   drawRelations(context, data, 54, 566, 560);
 }
 

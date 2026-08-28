@@ -106,6 +106,69 @@
   height: 20px;
 }
 
+.posterPoles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.posterPoles span {
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.demoControl {
+  position: fixed;
+  z-index: 100;
+  right: 20px;
+  bottom: 20px;
+  width: min(300px, calc(100vw - 40px));
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 16px;
+  background: rgb(18 18 18 / 94%);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 40%);
+  color: #fff;
+  font-family: var(--font-plex), var(--font-inter);
+  backdrop-filter: blur(16px);
+}
+
+.demoControl summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.demoControl > div {
+  display: grid;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.demoControl label,
+.demoControl small {
+  color: #929292;
+  font-size: 12px;
+}
+
+.demoControl select,
+.demoControl button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 10px;
+  background: #202020;
+  color: #fff;
+  font: inherit;
+}
+
+.demoControl button {
+  cursor: pointer;
+}
+
 .stage {
   display: grid;
   box-sizing: border-box;
@@ -122,7 +185,7 @@
   max-width: 100%;
 }
 
-.page[data-stage="result"] .stage {
+.page:is([data-stage="result"], [data-referral="true"]) .stage {
   align-items: start;
   padding-top: 58px;
 }
@@ -962,6 +1025,30 @@
   padding-top: 4px;
 }
 
+.referralResultPanel {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 18px;
+}
+
+.referralResultPanel h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(44px, 4vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.06;
+}
+
+.referralResultPanel > p {
+  max-width: 640px;
+  margin: 0;
+  color: var(--body);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
 .rankBlock {
   display: grid;
   padding-bottom: 26px;
@@ -1013,9 +1100,95 @@
   width: fit-content;
   min-width: 144px;
   min-height: 44px;
-  margin-top: 18px;
   padding: 0 22px;
   font-size: 13px;
+}
+
+.resultActions {
+  display: grid;
+  width: min(100%, 430px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.downloadMenu {
+  position: relative;
+  min-width: 0;
+}
+
+.downloadMenu > summary {
+  display: flex;
+  min-height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  background: #202020;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.downloadMenu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.downloadMenu > summary img {
+  width: 18px;
+  height: 18px;
+}
+
+.downloadMenu[open] > summary {
+  border-color: rgb(255 255 255 / 42%);
+  background: #292929;
+}
+
+.downloadOptions {
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 10px);
+  left: 0;
+  display: grid;
+  width: max(100%, 250px);
+  gap: 4px;
+  padding: 7px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 16px;
+  background: #121212;
+  box-shadow: 0 16px 42px rgb(0 0 0 / 46%);
+}
+
+.downloadOptions a,
+.downloadPending {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 14px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.downloadOptions a small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.downloadPending {
+  justify-content: center;
+  color: var(--muted);
 }
 
 .chemistryBlock {
@@ -1049,6 +1222,58 @@
 .invitationDeck > header > div:first-child { display: grid; gap: 5px; }
 .invitationDeck > header span { color: var(--text); font-size: 14px; font-weight: 500; }
 .invitationDeck > header p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+
+.primaryInviteCard {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 16px 14px 20px;
+  border: 1px solid #202627;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.primaryInviteCard > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.primaryInviteCard > div span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.primaryInviteCard > div strong {
+  overflow: hidden;
+  color: var(--text);
+  font: 600 16px var(--font-jb), monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.primaryInviteCard > button {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: #202020;
+  color: #fff;
+  font: inherit;
+}
+
+.primaryInviteCard > button:disabled {
+  cursor: not-allowed;
+  color: #555;
+}
 
 .inviteCardGrid {
   display: grid;
@@ -1320,6 +1545,8 @@
 .posterLogo:focus-visible,
 .primaryButton:focus-visible,
 .shareButton:focus-visible,
+.downloadMenu > summary:focus-visible,
+.downloadOptions a:focus-visible,
 .shareInviteOption:focus-visible,
 .shareDialogShare:focus-visible,
 .textButton:focus-visible,
@@ -1329,6 +1556,7 @@
 .optionList > button:focus-visible,
 .cardDownloads a:focus-visible,
 .unlockTasks > button:focus-visible,
+.primaryInviteCard > button:focus-visible,
 .inviteCodeCard:focus-visible,
 .inviteNavigation button:focus-visible {
   outline: 2px solid var(--teal);
@@ -1367,6 +1595,7 @@
   .quizTopline button,
   .optionList > button,
   .unlockTasks > button,
+  .primaryInviteCard > button,
   .inviteCodeCard,
   .inviteNavigation button,
   .cardDownloads a,
@@ -1412,6 +1641,7 @@
   }
 
   .unlockTasks > button:hover { background: rgba(8, 223, 181, 0.035); }
+  .primaryInviteCard > button:not(:disabled):hover { background: #2a2a2a; }
   .inviteCodeCard:not(:disabled):hover {
     border-color: rgba(8, 223, 181, 0.58);
     background: #080c0c;
@@ -1558,6 +1788,7 @@
   .gateForm input,
   .formStage input,
   .cardDownloads a,
+  .primaryInviteCard > button,
   .shareDialog[open],
   .shareDialog[open]::backdrop,
   .shareInviteOption { animation: none; transition: none; }
@@ -1565,5 +1796,2435 @@
   .accountStrip button { animation: none; transition: none; }
   .returningGate > button,
   .returningGate > button span { animation: none; transition: none; }
-  .optionList > button:hover { transform: none; }
+}
+
+/* Figma waitlist screens. The shared ConsumerHeader is intentionally untouched. */
+.gateBackdrop,
+.flowBackdrop {
+  position: absolute;
+  pointer-events: none;
+}
+
+.otpField {
+  position: relative;
+  width: 100%;
+}
+
+.otpBoxes {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.otpBoxes span {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: #121212;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  place-items: center;
+}
+
+.otpBoxes span[data-active="true"] {
+  border-color: #fff;
+  background: rgb(255 255 255 / 12%);
+}
+
+.otpStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 881px) {
+  .page:is([data-stage="gate"], [data-stage="verify"]) .ambientBackdrop {
+    z-index: 0;
+    inset: 65px 0 0;
+    height: calc(100svh - 65px);
+    min-height: 620px;
+    opacity: 1;
+    transition: none;
+  }
+
+  .page:is([data-stage="gate"], [data-stage="verify"]) .ambientBackdrop::after {
+    display: none;
+  }
+
+  .page:is([data-stage="gate"], [data-stage="verify"]) .ambientBackdrop img {
+    filter: none;
+  }
+
+  .page:is([data-stage="gate"], [data-stage="verify"]) .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: calc(100svh - 65px);
+    margin: 0;
+    padding: 0;
+  }
+
+  .gateBackdrop {
+    inset: 5% 50% 5% 0;
+  }
+
+  .gateBackdrop img {
+    object-fit: contain;
+    object-position: center;
+    transform: scale(1.34);
+    transform-origin: center;
+  }
+
+  .page[data-stage="gate"] .gateStage {
+    width: 50%;
+    min-height: calc(100svh - 65px);
+    align-content: center;
+    justify-items: start;
+    margin-left: 50%;
+    padding: 40px clamp(40px, 4.2vw, 80px);
+    text-align: left;
+    animation: none;
+    transform: translateY(-8px);
+  }
+
+  .page[data-stage="gate"] .gateCopy {
+    width: min(100%, 660px);
+    justify-items: start;
+  }
+
+  .page[data-stage="gate"] .gateCopy > .eyebrow {
+    box-sizing: border-box;
+    width: 236px;
+    padding: 4px 16px;
+    font-size: 16px;
+  }
+
+  .page[data-stage="gate"] .gateCopy h1 {
+    width: 100%;
+    margin: 0 0 24px;
+    font-size: clamp(54px, 3.65vw, 72px);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.1;
+    text-align: left;
+  }
+
+  .page[data-stage="gate"] .gateCopy h1 em {
+    color: inherit;
+    font-style: normal;
+    font-weight: inherit;
+  }
+
+  .page[data-stage="gate"] .gateCopy > p {
+    max-width: 100%;
+    color: #fff;
+    font-size: 20px;
+    line-height: 1.35;
+  }
+
+  .page[data-stage="gate"] .gateForm {
+    position: relative;
+    display: grid;
+    width: min(100%, 620px);
+    margin-top: 36px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup {
+    position: relative;
+    display: grid;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup .inlineField {
+    display: contents;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup label {
+    position: absolute;
+    z-index: 2;
+    top: 17px;
+    left: 24px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.35;
+    pointer-events: none;
+    text-transform: none;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup input {
+    grid-row: 1;
+    height: 56px;
+    padding: 0 24px 0 150px;
+    border-color: rgb(255 255 255 / 24%);
+    background: #121212;
+    font: 400 16px var(--font-plex), var(--font-inter);
+    text-align: right;
+  }
+
+  .page[data-stage="gate"] .gateForm .primaryButton {
+    grid-row: auto;
+    width: 100%;
+    min-height: 56px;
+    margin-top: 0;
+    background: var(--teal);
+    color: var(--consumer-black);
+    font-size: 20px;
+  }
+
+  .page[data-stage="gate"] .gateForm .naturalEntryHint {
+    min-height: 0;
+    margin: 9px 0 0;
+    color: #a0a0a0;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .page[data-stage="gate"] .inviteChoice {
+    display: grid;
+    align-items: center;
+    grid-template-columns: minmax(24px, 1fr) auto minmax(24px, 1fr);
+    gap: 14px;
+    margin: 24px 0 12px;
+    color: #747474;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .page[data-stage="gate"] .inviteChoice::before,
+  .page[data-stage="gate"] .inviteChoice::after {
+    height: 1px;
+    background: rgb(255 255 255 / 14%);
+    content: "";
+  }
+
+  .page[data-stage="gate"] .gateForm .inviteEntryButton {
+    margin-top: 12px;
+    border: 1px solid rgb(255 255 255 / 18%);
+    background: #202020;
+    color: #f5f5f5;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup > .formError {
+    min-height: 18px;
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .page[data-stage="gate"] .gateForm .inviteEntryButton:disabled {
+    cursor: not-allowed;
+    border-color: rgb(255 255 255 / 8%);
+    background: #171717;
+    color: #595959;
+  }
+
+  .page[data-stage="gate"] .gateFormMeta {
+    grid-row: auto;
+    grid-column: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .page[data-stage="gate"] .gateFormMeta .textButton {
+    border-bottom: 0;
+    color: var(--muted);
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .page[data-stage="gate"] .gateForm .inviteEntryButton:not(:disabled):hover {
+      background: #2b2b2b;
+      color: #fff;
+    }
+  }
+
+  @media (max-width: 1180px) {
+    .page[data-stage="gate"] .gateStage {
+      padding-right: 36px;
+      padding-left: 36px;
+    }
+
+    .page[data-stage="gate"] .gateCopy h1 {
+      font-size: clamp(48px, 5vw, 58px);
+    }
+  }
+
+  .flowBackdrop {
+    inset: 0 50% 0 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .flowBackdrop img {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .page[data-stage="verify"] .stage {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: stretch;
+  }
+
+  .page[data-stage="verify"] .formStage {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    align-items: center;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    grid-column: 2;
+    text-align: center;
+    animation: none;
+    transform: translateY(-35px);
+  }
+
+  .page[data-stage="verify"] .formStage > .eyebrow {
+    box-sizing: border-box;
+    padding: 4px 16px;
+    font-size: 16px;
+  }
+
+  .page[data-stage="verify"] .formStage h1 {
+    margin: 0;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 80px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .page[data-stage="verify"] .formStage > p {
+    width: 100%;
+    max-width: none;
+    margin: 24px 0 0;
+    color: #fff;
+    font-size: 20px;
+    line-height: normal;
+  }
+
+  .page[data-stage="verify"] .formStage > p b {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-stage="verify"] .formStage form {
+    position: relative;
+    display: grid;
+    width: 600px;
+    margin: 48px auto 0;
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .page[data-stage="verify"] .formStage form > label {
+    grid-row: 1;
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+    text-transform: none;
+  }
+
+  .page[data-stage="verify"] .formStage .inlineField {
+    display: contents;
+  }
+
+  .page[data-stage="verify"] .otpField {
+    grid-row: 2;
+    height: 72px;
+  }
+
+  .page[data-stage="verify"] .formStage .otpInput {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    width: 100%;
+    height: 72px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    cursor: text;
+    letter-spacing: 0;
+  }
+
+  .page[data-stage="verify"] .formMeta {
+    display: flex;
+    grid-row: 3;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px 0 0;
+  }
+
+  .page[data-stage="verify"] .formMeta button {
+    border-bottom: 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: normal;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-stage="verify"] .formMeta button:disabled {
+    opacity: 1;
+  }
+
+  .page[data-stage="verify"] .formStage .primaryButton {
+    grid-row: 4;
+    width: 100%;
+    min-height: 56px;
+    margin-top: 24px;
+    padding: 0 24px;
+    font-size: 20px;
+  }
+
+  .page[data-stage="verify"] .formStage form > .formError {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 880px) {
+  .gateBackdrop,
+  .flowBackdrop {
+    inset: 0;
+  }
+
+  .gateBackdrop img,
+  .flowBackdrop img {
+    object-fit: cover;
+  }
+
+  .otpBoxes span {
+    width: clamp(42px, 12vw, 64px);
+    height: clamp(42px, 12vw, 64px);
+    border-radius: 12px;
+    font-size: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gateBackdrop,
+  .flowBackdrop,
+  .otpBoxes span {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (min-width: 881px) {
+  .page:is([data-stage="email"], [data-stage="unlock"]) .ambientBackdrop {
+    z-index: 0;
+    inset: 65px 0 0;
+    height: calc(100svh - 65px);
+    min-height: 620px;
+    opacity: 1;
+    transition: none;
+  }
+
+  .page:is([data-stage="email"], [data-stage="unlock"]) .ambientBackdrop::after {
+    display: none;
+  }
+
+  .page:is([data-stage="email"], [data-stage="unlock"]) .ambientBackdrop img {
+    filter: none;
+  }
+
+  .page:is([data-stage="email"], [data-stage="unlock"], [data-stage="quiz"]) .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: calc(100svh - 65px);
+    margin: 0;
+    padding: 0;
+  }
+
+  .page:is([data-stage="email"], [data-stage="unlock"]) .stage {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: stretch;
+  }
+
+  .page[data-stage="email"] .formStage,
+  .page[data-stage="unlock"] .unlockStage {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    align-items: center;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    grid-column: 2;
+    text-align: center;
+    animation: none;
+  }
+
+  .page[data-stage="email"] .formStage {
+    transform: translateY(-60px);
+  }
+
+  .page[data-stage="email"] .formStage > .eyebrow,
+  .page[data-stage="unlock"] .unlockStage > .eyebrow {
+    box-sizing: border-box;
+    padding: 4px 16px;
+    font-size: 16px;
+  }
+
+  .page[data-stage="email"] .formStage h1,
+  .page[data-stage="unlock"] .unlockStage h1 {
+    margin: 0;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 80px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .page[data-stage="email"] .formStage > p,
+  .page[data-stage="unlock"] .unlockStage > p {
+    width: 600px;
+    max-width: 600px;
+    margin: 24px 0 0;
+    color: #fff;
+    font-size: 20px;
+    line-height: normal;
+  }
+
+  .page[data-stage="email"] .formStage form {
+    position: relative;
+    display: grid;
+    width: 600px;
+    margin: 48px auto 0;
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .page[data-stage="email"] .formStage .inlineField {
+    display: contents;
+  }
+
+  .page[data-stage="email"] .formStage form > label {
+    position: absolute;
+    z-index: 2;
+    top: 17px;
+    left: 24px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+    pointer-events: none;
+    text-transform: none;
+  }
+
+  .page[data-stage="email"] .formStage input {
+    grid-row: 1;
+    height: 56px;
+    padding: 0 24px 0 150px;
+    border-color: rgb(255 255 255 / 24%);
+    background: #121212;
+    font: 400 16px var(--font-plex), var(--font-inter);
+    text-align: right;
+  }
+
+  .page[data-stage="email"] .formStage input:focus {
+    border-color: var(--teal);
+  }
+
+  .page[data-stage="email"] .formStage .primaryButton {
+    grid-row: 2;
+    width: 100%;
+    min-height: 56px;
+    margin-top: 24px;
+    padding: 0 24px;
+    font-size: 20px;
+  }
+
+  .page[data-stage="email"] .formStage .formHint {
+    display: none;
+  }
+
+  .page[data-stage="email"] .formStage .formError {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .page[data-stage="email"] .recoveryBack {
+    position: absolute;
+    top: calc(100% + 38px);
+    left: 0;
+    margin: 0;
+  }
+
+  .page[data-stage="unlock"] .unlockStage {
+    transform: translateY(-35px);
+  }
+
+  .page[data-stage="unlock"] .accountStrip,
+  .page[data-stage="quiz"] .accountStrip {
+    display: none;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks {
+    display: grid;
+    width: 600px;
+    gap: 8px;
+    margin-top: 48px;
+    border: 0;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button {
+    position: relative;
+    display: grid;
+    width: 100%;
+    min-height: 80px;
+    align-items: center;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: #121212;
+    color: inherit;
+    text-align: left;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button > img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button > span {
+    display: grid;
+    gap: 4px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks b {
+    color: #f5f5f5;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks small {
+    color: #747474;
+    font-size: 14px;
+    line-height: normal;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks strong {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #747474;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks strong img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button[data-complete="true"] {
+    border-color: var(--teal);
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button[data-complete="true"] strong {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 16px;
+    border-radius: 0 16px 0 8px;
+    background: var(--teal);
+    color: #010101;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .page[data-stage="unlock"] .unlockStage > .primaryButton {
+    width: 600px;
+    min-height: 56px;
+    margin-top: 24px;
+    padding: 0 24px;
+    font-size: 20px;
+  }
+
+  .page[data-stage="unlock"] .unlockStage > .primaryButton:disabled {
+    background: #202020;
+    color: #555;
+  }
+
+  .page[data-stage="unlock"] .unlockStage > small {
+    margin-top: 8px;
+    color: #555;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .quizStage,
+  .page[data-stage="quiz"] .quizLayout {
+    width: 100%;
+    min-height: calc(100svh - 65px);
+  }
+
+  .page[data-stage="quiz"] .quizStage {
+    animation: none;
+  }
+
+  .page[data-stage="quiz"] .quizLayout {
+    display: grid;
+    align-items: stretch;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork {
+    width: 100%;
+    height: calc(100svh - 65px);
+    min-height: 620px;
+    aspect-ratio: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
+    background: #fff;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork img {
+    object-fit: cover;
+    object-position: center;
+    filter: none;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork::after {
+    display: none;
+  }
+
+  .page[data-stage="quiz"] .questionPanel {
+    display: flex;
+    width: 700px;
+    align-self: center;
+    flex-direction: column;
+    justify-self: center;
+    transform: translateY(-106.5px);
+  }
+
+  .page[data-stage="quiz"] .quizTopline {
+    display: flex;
+    min-height: 24px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 12px;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    color: #747474;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button img {
+    width: 16px;
+    height: 16px;
+    transform: rotate(180deg);
+  }
+
+  .page[data-stage="quiz"] .quizTopline p {
+    margin: 0;
+    color: #747474;
+    font-size: 20px;
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .quizTopline strong {
+    color: #f5f5f5;
+    font-weight: 400;
+  }
+
+  .page[data-stage="quiz"] .progress {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #1c1c1c;
+  }
+
+  .page[data-stage="quiz"] .progress i {
+    display: block;
+    width: var(--quiz-progress);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--teal);
+  }
+
+  .page[data-stage="quiz"] .questionPanel h1 {
+    width: 100%;
+    max-width: none;
+    margin: 24px 0 0;
+    color: #f5f5f5;
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: normal;
+  }
+
+  .page[data-stage="quiz"] .optionList {
+    display: grid;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button {
+    display: grid;
+    width: 100%;
+    min-height: 64px;
+    align-items: center;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px 24px;
+    border: 1px solid rgb(255 255 255 / 16%);
+    border-radius: 16px;
+    background: #121212;
+    color: #f5f5f5;
+    text-align: left;
+  }
+
+  .page[data-stage="quiz"] .optionList > button[data-selected="true"],
+  .page[data-stage="quiz"] .optionList > button[aria-busy="true"] {
+    border-color: #fff;
+  }
+
+  .page[data-stage="quiz"] .optionList > button img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button span {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: normal;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 881px) {
+  .page[data-stage="unlock"] .unlockTasks > button:hover,
+  .page[data-stage="quiz"] .optionList > button:hover {
+    border-color: #fff;
+    background: #202020;
+  }
+}
+
+@media (min-width: 881px) {
+  .page:is([data-stage="result"], [data-referral="true"]) .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: calc(100svh - 65px);
+    margin: 0;
+    padding: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultStage {
+    display: grid;
+    width: 100%;
+    min-height: calc(100svh - 65px);
+    align-items: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .accountStrip {
+    display: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster {
+    display: block;
+    width: 700px;
+    justify-self: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity {
+    margin: 0 0 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterPoles {
+    display: flex;
+    gap: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterPoles span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 16px;
+    border-radius: 999px;
+    background: var(--teal-soft);
+    color: var(--teal);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
+    margin: 8px 0 2px;
+    font-size: 80px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 80px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity p {
+    color: #747474;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
+    height: 330px;
+    background: #737373;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt img {
+    mix-blend-mode: normal;
+    object-fit: cover;
+    object-position: 43% 53.4%;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterScores {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child span,
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child strong {
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child span {
+    color: #747474;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreTrack {
+    height: 8px;
+    margin-top: 4px;
+    background: rgb(8 223 181 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(2) .scoreTrack {
+    background: rgb(169 87 214 / 20%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(2) .scoreTrack i {
+    background: #a957d6;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(3) .scoreTrack {
+    background: rgb(246 144 2 / 14%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(3) .scoreTrack i {
+    background: #f69002;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote {
+    position: relative;
+    max-width: none;
+    margin: 32px 0 0;
+    padding: 24px;
+    border-radius: 16px;
+    background: #121212;
+    color: #fff;
+    font: 500 24px/normal var(--font-plex), var(--font-inter);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote::after {
+    position: absolute;
+    top: -9px;
+    right: 11px;
+    width: 46px;
+    height: 38px;
+    background: url("/assets/waitlist/quote.svg") center / contain no-repeat;
+    content: "";
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 16px 0 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div {
+    min-height: 128px;
+    align-content: start;
+    gap: 0;
+    padding: 24px;
+    overflow: hidden;
+    border: 1px solid #60b1ef;
+    border-radius: 16px;
+    background: rgb(96 177 239 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div:nth-child(2) {
+    border-color: var(--coral);
+    background: rgb(255 93 96 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock span {
+    color: #60b1ef;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+    text-transform: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div:nth-child(2) span {
+    color: var(--coral);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock strong {
+    margin-top: 8px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock small {
+    margin-top: 4px;
+    color: #747474;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads {
+    margin-top: 32px;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > span {
+    margin-bottom: 8px;
+    color: #747474;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: normal;
+    text-transform: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads a,
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div > span {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 999px;
+    background: #202020;
+    color: #f5f5f5;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads a small {
+    margin-left: 0;
+    color: #747474;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel {
+    width: 700px;
+    align-self: center;
+    justify-self: center;
+    padding: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock {
+    display: grid;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > span {
+    color: #747474;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > strong {
+    margin: 8px 0 16px;
+    font: 600 48px/normal var(--font-plex), var(--font-inter);
+    letter-spacing: 0;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 8px 24px;
+    border-radius: 16px;
+    background: #121212;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div {
+    min-height: 48px;
+    color: #747474;
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div + div {
+    border-top: 1px solid #202020;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards b {
+    color: var(--teal);
+    font: 600 16px/normal var(--font-plex), var(--font-inter);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > small {
+    max-width: none;
+    margin-top: 8px;
+    color: #555;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultActions {
+    width: 100%;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadMenu > summary {
+    min-height: 56px;
+    font-size: 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadOptions {
+    width: 100%;
+    min-width: 280px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadOptions a,
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadPending {
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock .shareButton {
+    width: 100%;
+    min-height: 56px;
+    margin-top: 0;
+    padding: 0 24px;
+    font-size: 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck {
+    width: 100%;
+    padding-top: 40px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header {
+    margin-bottom: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header > div:first-child {
+    gap: 4px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header span {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header p {
+    color: #747474;
+    font-size: 16px;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard {
+    min-height: 76px;
+    padding: 12px 16px 12px 24px;
+    border: 0;
+    background: #121212;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > div span {
+    color: #747474;
+    font-size: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > div strong {
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > button {
+    min-width: 136px;
+    min-height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCardGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard {
+    position: relative;
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border: 0;
+    border-radius: 16px;
+    background: #121212;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="0"] {
+    order: 1;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard > header i,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard > div {
+    display: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard > header span,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard footer span,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard footer b {
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: normal;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard > header span {
+    color: #747474;
+    font-weight: 400;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard footer {
+    gap: 8px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard footer span {
+    color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="1"],
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="2"],
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="3"] {
+    width: 342px;
+    margin-top: 40px;
+    grid-column: 1;
+    order: 2;
+    opacity: 1;
+    background: #121212;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="1"]::before,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="2"]::before,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="3"]::before {
+    position: absolute;
+    bottom: calc(100% + 16px);
+    left: 0;
+    color: #747474;
+    content: "Used";
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="1"] *,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="2"] *,
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard[data-status="3"] * {
+    color: #555;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .inviteCodeCard footer b {
+    padding: 4px 16px;
+    border-radius: 999px;
+    background: #1c1c1c;
+    color: #555;
+    font-weight: 500;
+  }
+
+  .page[data-referral="true"] .referralResultPanel {
+    display: flex;
+    width: 700px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .eyebrow {
+    padding: 4px 16px;
+    font-size: 16px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel h1 {
+    margin-top: 24px;
+    font-size: 64px;
+    letter-spacing: 0;
+    line-height: 1.08;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > p {
+    margin-top: 24px;
+    color: #fff;
+    font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .primaryButton,
+  .page[data-referral="true"] .referralResultPanel .referralReturn {
+    width: min(100%, 600px);
+    margin-top: 40px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .primaryButton,
+  .page[data-referral="true"] .referralResultPanel .referralReturn .primaryButton {
+    width: 100%;
+    min-height: 56px;
+    font-size: 20px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .textButton,
+  .page[data-referral="true"] .referralResultPanel .referralError .textButton {
+    margin-top: 16px;
+    border-bottom: 0;
+    color: var(--muted);
+    font-size: 16px;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-referral="true"] .referralResultPanel .gateForm {
+    width: min(100%, 600px);
+    margin-top: 32px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel .accountStrip {
+    display: flex;
+    width: min(100%, 600px);
+    margin-top: 28px;
+  }
+}
+
+@media (min-width: 881px) and (max-width: 1600px) {
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster,
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel {
+    width: min(calc(100% - 40px), 640px);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity {
+    margin-bottom: 12px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
+    margin-top: 6px;
+    font-size: 64px;
+    line-height: 64px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
+    height: 270px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote {
+    margin-top: 20px;
+    padding: 18px 20px;
+    font-size: 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock {
+    margin-top: 12px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div {
+    min-height: 104px;
+    padding: 18px 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock strong {
+    font-size: 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads {
+    margin-top: 20px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads a,
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div > span {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultActions {
+    margin-top: 28px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock .shareButton {
+    margin-top: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck {
+    padding-top: 28px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel {
+    width: min(calc(100% - 40px), 640px);
+  }
+
+  .page[data-referral="true"] .referralResultPanel h1 {
+    font-size: 52px;
+  }
+}
+
+/* H5 follows the same visual system as the calibrated desktop screens. */
+@media (max-width: 880px) {
+  .page .stage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: calc(100svh - 62px);
+    margin: 0;
+    padding: 32px 20px 56px;
+    align-items: start;
+    place-items: start stretch;
+  }
+
+  .page .ambientBackdrop {
+    z-index: 0;
+    inset: 62px 0 auto;
+    height: 310px;
+    min-height: 0;
+    opacity: 0;
+    transition: none;
+  }
+
+  .page .ambientBackdrop::after {
+    display: block;
+    background: linear-gradient(180deg, rgb(1 1 1 / 0%) 42%, #010101 100%);
+  }
+
+  .page .ambientBackdrop img {
+    filter: none;
+  }
+
+  .page[data-stage="gate"]:not([data-referral="true"]) .ambientBackdrop,
+  .page:is([data-stage="email"], [data-stage="verify"], [data-stage="unlock"]) .ambientBackdrop {
+    opacity: 1;
+  }
+
+  .page[data-referral="true"] .ambientBackdrop,
+  .page:is([data-stage="quiz"], [data-stage="result"]) .ambientBackdrop {
+    display: none;
+  }
+
+  .page .gateBackdrop,
+  .page .flowBackdrop {
+    inset: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .page .gateBackdrop img {
+    object-fit: cover;
+    object-position: 68% center;
+  }
+
+  .page .flowBackdrop img {
+    object-fit: cover;
+    object-position: center 42%;
+  }
+
+  .page[data-stage="gate"]:not([data-referral="true"]) .stage {
+    padding-top: 270px;
+  }
+
+  .page:is([data-stage="email"], [data-stage="verify"], [data-stage="unlock"]) .stage {
+    padding-top: 292px;
+  }
+
+  .page[data-stage="gate"] .gateStage {
+    display: grid;
+    width: 100%;
+    justify-items: stretch;
+    gap: 0;
+    text-align: left;
+    animation: none;
+  }
+
+  .page[data-stage="gate"] .gateCopy {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .page[data-stage="gate"] .gateCopy > .eyebrow,
+  .page:is([data-stage="email"], [data-stage="verify"], [data-stage="unlock"]) .eyebrow {
+    box-sizing: border-box;
+    padding: 4px 14px;
+    font-size: 14px;
+  }
+
+  .page[data-stage="gate"] .gateCopy h1 {
+    margin: 0 0 16px;
+    font-size: clamp(40px, 11vw, 48px);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.02;
+  }
+
+  .page[data-stage="gate"] .gateCopy h1 br {
+    display: none;
+  }
+
+  .page[data-stage="gate"] .gateCopy h1 em {
+    color: inherit;
+    font-style: normal;
+    font-weight: inherit;
+  }
+
+  .page[data-stage="gate"] .gateCopy > p {
+    max-width: 34rem;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .page[data-stage="gate"] .gateForm {
+    position: relative;
+    display: grid;
+    width: 100%;
+    margin-top: 32px;
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup {
+    position: relative;
+    display: grid;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup .inlineField {
+    display: contents;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup label,
+  .page[data-stage="email"] .formStage form > label {
+    position: absolute;
+    z-index: 2;
+    top: 17px;
+    left: 20px;
+    margin: 0;
+    color: #747474;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+    pointer-events: none;
+    text-transform: none;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup input,
+  .page[data-stage="email"] .formStage input {
+    grid-row: 1;
+    height: 54px;
+    padding: 0 20px 0 132px;
+    border-color: rgb(255 255 255 / 24%);
+    background: #121212;
+    font: 400 15px var(--font-plex), var(--font-inter);
+    text-align: right;
+  }
+
+  .page[data-stage="gate"] .gateForm .naturalEntryHint {
+    min-height: 0;
+    margin: 8px 0 0;
+    color: #a0a0a0;
+    font-size: 13px;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .page[data-stage="gate"] .gateForm .primaryButton,
+  .page[data-stage="email"] .formStage .primaryButton,
+  .page[data-stage="verify"] .formStage .primaryButton {
+    grid-row: auto;
+    width: 100%;
+    min-height: 54px;
+    margin-top: 20px;
+    padding: 0 20px;
+    font-size: 18px;
+  }
+
+  .page[data-stage="gate"] .inviteChoice {
+    display: grid;
+    align-items: center;
+    grid-template-columns: minmax(20px, 1fr) auto minmax(20px, 1fr);
+    gap: 12px;
+    margin: 22px 0 12px;
+    color: #747474;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .page[data-stage="gate"] .inviteChoice::before,
+  .page[data-stage="gate"] .inviteChoice::after {
+    height: 1px;
+    background: rgb(255 255 255 / 14%);
+    content: "";
+  }
+
+  .page[data-stage="gate"] .gateForm .inviteEntryButton {
+    margin-top: 12px;
+    border: 1px solid rgb(255 255 255 / 18%);
+    background: #202020;
+    color: #f5f5f5;
+  }
+
+  .page[data-stage="gate"] .gateForm .inviteEntryButton:disabled {
+    border-color: rgb(255 255 255 / 8%);
+    background: #171717;
+    color: #595959;
+  }
+
+  .page[data-stage="gate"] .inviteCodeGroup > .formError {
+    min-height: 0;
+    margin: 8px 0 0;
+    font-size: 13px;
+  }
+
+  .page[data-stage="gate"] .gateFormMeta {
+    display: flex;
+    grid-row: auto;
+    grid-column: 1;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 14px;
+    margin: 16px 0 0;
+  }
+
+  .page[data-stage="gate"] .gateFormMeta .textButton,
+  .page[data-stage="gate"] .gateFormMeta .testCodeButton {
+    border: 0;
+    color: #747474;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-stage="gate"] .returningGate {
+    width: 100%;
+    margin-top: 28px;
+    padding: 18px 0;
+  }
+
+  .page:is([data-stage="email"], [data-stage="verify"]) .formStage,
+  .page[data-stage="unlock"] .unlockStage {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    align-items: stretch;
+    flex-direction: column;
+    text-align: left;
+    animation: none;
+  }
+
+  .page:is([data-stage="email"], [data-stage="verify"]) .formStage h1,
+  .page[data-stage="unlock"] .unlockStage h1 {
+    margin: 14px 0 0;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: clamp(42px, 11.5vw, 52px);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.06;
+  }
+
+  .page:is([data-stage="email"], [data-stage="verify"]) .formStage > p,
+  .page[data-stage="unlock"] .unlockStage > p {
+    width: 100%;
+    max-width: 34rem;
+    margin: 16px 0 0;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .page:is([data-stage="email"], [data-stage="verify"]) .formStage form {
+    position: relative;
+    display: grid;
+    width: 100%;
+    margin: 32px 0 0;
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .page[data-stage="email"] .formStage .inlineField,
+  .page[data-stage="verify"] .formStage .inlineField {
+    display: contents;
+  }
+
+  .page[data-stage="email"] .formStage .formHint {
+    display: none;
+  }
+
+  .page[data-stage="email"] .formStage .formError {
+    margin: 10px 0 0;
+    font-size: 13px;
+  }
+
+  .page[data-stage="email"] .recoveryBack {
+    margin: 18px 0 0;
+    font-size: 13px;
+  }
+
+  .page[data-stage="verify"] .formStage form > label {
+    margin: 0 0 10px;
+    color: #747474;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .page[data-stage="verify"] .otpField {
+    width: 100%;
+    height: 52px;
+  }
+
+  .page[data-stage="verify"] .otpInput {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    width: 100%;
+    height: 52px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    cursor: text;
+    letter-spacing: 0;
+  }
+
+  .page[data-stage="verify"] .otpBoxes {
+    gap: 8px;
+  }
+
+  .page[data-stage="verify"] .otpBoxes span {
+    width: calc((100% - 40px) / 6);
+    height: 52px;
+    border-radius: 12px;
+    font-size: 22px;
+  }
+
+  .page[data-stage="verify"] .formMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 14px 0 0;
+  }
+
+  .page[data-stage="verify"] .formMeta button {
+    border: 0;
+    color: #747474;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-stage="verify"] .formStage form > .formError {
+    margin: 10px 0 0;
+    font-size: 13px;
+  }
+
+  .page[data-stage="unlock"] .accountStrip,
+  .page[data-stage="quiz"] .accountStrip {
+    display: none;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks {
+    display: grid;
+    width: 100%;
+    gap: 8px;
+    margin-top: 32px;
+    border: 0;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button {
+    position: relative;
+    width: 100%;
+    min-height: 76px;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: #121212;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button > img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks b {
+    color: #f5f5f5;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks small {
+    margin-top: 3px;
+    color: #747474;
+    font-size: 12px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks strong {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #747474;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks strong img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button[data-complete="true"] {
+    border-color: var(--teal);
+  }
+
+  .page[data-stage="unlock"] .unlockTasks > button[data-complete="true"] strong {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 12px;
+    border-radius: 0 16px 0 8px;
+    background: var(--teal);
+    color: #010101;
+    font-size: 12px;
+  }
+
+  .page[data-stage="unlock"] .unlockStage > .primaryButton {
+    width: 100%;
+    min-height: 54px;
+    margin-top: 20px;
+    padding: 0 20px;
+    font-size: 18px;
+  }
+
+  .page[data-stage="unlock"] .unlockStage > small {
+    margin-top: 8px;
+    color: #555;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .page[data-stage="quiz"] .stage {
+    padding: 0 0 56px;
+  }
+
+  .page[data-stage="quiz"] .quizStage,
+  .page[data-stage="quiz"] .quizLayout {
+    width: 100%;
+  }
+
+  .page[data-stage="quiz"] .quizStage {
+    animation: none;
+  }
+
+  .page[data-stage="quiz"] .quizLayout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork {
+    width: 100%;
+    height: clamp(200px, 29svh, 260px);
+    aspect-ratio: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
+    background: #fff;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork img {
+    object-fit: cover;
+    object-position: center;
+    filter: none;
+  }
+
+  .page[data-stage="quiz"] .questionArtwork::after {
+    display: none;
+  }
+
+  .page[data-stage="quiz"] .questionPanel {
+    width: 100%;
+    padding: 18px 20px 0;
+    transform: none;
+  }
+
+  .page[data-stage="quiz"] .quizTopline {
+    margin: 0 0 10px;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    color: #747474;
+    font-size: 14px;
+  }
+
+  .page[data-stage="quiz"] .quizTopline button img {
+    width: 14px;
+    height: 14px;
+    transform: rotate(180deg);
+  }
+
+  .page[data-stage="quiz"] .quizTopline p {
+    margin: 0;
+    color: #747474;
+    font-size: 15px;
+  }
+
+  .page[data-stage="quiz"] .quizTopline strong {
+    color: #f5f5f5;
+    font-weight: 400;
+  }
+
+  .page[data-stage="quiz"] .progress {
+    display: block;
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: #1c1c1c;
+  }
+
+  .page[data-stage="quiz"] .progress i {
+    width: var(--quiz-progress);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--teal);
+  }
+
+  .page[data-stage="quiz"] .questionPanel h1 {
+    width: 100%;
+    margin: 16px 0 0;
+    font-size: clamp(28px, 8.2vw, 36px);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.16;
+  }
+
+  .page[data-stage="quiz"] .optionList {
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button {
+    min-height: 62px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 16px;
+    border-color: rgb(255 255 255 / 16%);
+    border-radius: 14px;
+    background: #121212;
+  }
+
+  .page[data-stage="quiz"] .optionList > button img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .page[data-stage="quiz"] .optionList > button span {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .page[data-stage="quiz"] .optionList > button[data-selected="true"],
+  .page[data-stage="quiz"] .optionList > button[aria-busy="true"] {
+    border-color: #fff;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .stage {
+    padding: 32px 20px 64px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultStage {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster,
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity {
+    margin: 0 0 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterPoles {
+    gap: 8px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterPoles span {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--teal-soft);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
+    margin: 8px 0 0;
+    font-size: clamp(44px, 13vw, 58px);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.02;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
+    width: 100%;
+    height: clamp(210px, 61vw, 270px);
+    background: #737373;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt img {
+    mix-blend-mode: normal;
+    object-fit: cover;
+    object-position: 43% 53.4%;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterScores {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child span,
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis > div:first-child strong {
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 12px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreTrack {
+    height: 6px;
+    margin-top: 4px;
+    background: rgb(8 223 181 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(2) .scoreTrack {
+    background: rgb(169 87 214 / 20%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(2) .scoreTrack i {
+    background: #a957d6;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(3) .scoreTrack {
+    background: rgb(246 144 2 / 14%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .scoreAxis:nth-child(3) .scoreTrack i {
+    background: #f69002;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote {
+    position: relative;
+    max-width: none;
+    margin: 24px 0 0;
+    padding: 18px;
+    border-radius: 14px;
+    background: #121212;
+    color: #fff;
+    font: 500 18px/1.35 var(--font-plex), var(--font-inter);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote::after {
+    position: absolute;
+    top: -7px;
+    right: 9px;
+    width: 36px;
+    height: 30px;
+    background: url("/assets/waitlist/quote.svg") center / contain no-repeat;
+    content: "";
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div {
+    min-height: 104px;
+    align-content: start;
+    padding: 16px;
+    border: 1px solid #60b1ef;
+    border-radius: 14px;
+    background: rgb(96 177 239 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div:nth-child(2) {
+    border-color: var(--coral);
+    background: rgb(255 93 96 / 12%);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock span {
+    color: #60b1ef;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock > div:nth-child(2) span {
+    color: var(--coral);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock strong {
+    margin-top: 7px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads {
+    margin-top: 24px;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > span {
+    margin-bottom: 8px;
+    color: #747474;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads a,
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div > span {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-radius: 999px;
+    background: #202020;
+    color: #f5f5f5;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads a small {
+    margin-left: 0;
+    color: #747474;
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel {
+    padding: 0;
+  }
+
+  .page[data-referral="true"] .referralResultPanel {
+    display: flex;
+    order: -1;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .eyebrow {
+    align-self: flex-start;
+    padding: 4px 14px;
+    font-size: 14px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel h1 {
+    margin: 16px 0 0;
+    font-size: clamp(42px, 11.6vw, 52px);
+    letter-spacing: 0;
+    line-height: 1.06;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > p {
+    margin: 16px 0 0;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .primaryButton,
+  .page[data-referral="true"] .referralResultPanel .referralReturn {
+    width: 100%;
+    margin-top: 28px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .primaryButton,
+  .page[data-referral="true"] .referralResultPanel .referralReturn .primaryButton {
+    width: 100%;
+    min-height: 54px;
+    font-size: 18px;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .textButton {
+    align-self: center;
+    margin-top: 14px;
+    border: 0;
+    color: #747474;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-position: from-font;
+  }
+
+  .page[data-referral="true"] .referralResultPanel .accountStrip {
+    width: 100%;
+    margin: 22px 0 0;
+  }
+
+  .page[data-referral="true"] .referralError {
+    width: 100%;
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .accountStrip {
+    display: flex;
+    margin-bottom: 22px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock {
+    display: grid;
+    padding: 0;
+    border: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > span {
+    color: #747474;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > strong {
+    margin: 6px 0 14px;
+    font: 600 44px/normal var(--font-plex), var(--font-inter);
+    letter-spacing: 0;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards {
+    gap: 0;
+    margin: 0;
+    padding: 6px 18px;
+    border-radius: 14px;
+    background: #121212;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div {
+    min-height: 46px;
+    color: #747474;
+    font-size: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards > div + div {
+    border-top: 1px solid #202020;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankRewards b {
+    color: var(--teal);
+    font: 600 14px/normal var(--font-plex), var(--font-inter);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > small {
+    max-width: none;
+    margin-top: 8px;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultActions {
+    width: 100%;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadMenu > summary {
+    min-height: 54px;
+    padding: 0 14px;
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadOptions {
+    width: max(100%, 238px);
+    min-width: 0;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock .shareButton {
+    width: 100%;
+    min-height: 54px;
+    margin-top: 0;
+    padding: 0 20px;
+    font-size: 18px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck {
+    width: 100%;
+    padding-top: 32px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header {
+    margin-bottom: 12px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header span {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header p {
+    color: #747474;
+    font-size: 14px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard {
+    min-height: 72px;
+    gap: 12px;
+    padding: 12px 12px 12px 16px;
+    border: 0;
+    background: #121212;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > div span {
+    font-size: 12px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > div strong {
+    font-family: var(--font-plex), var(--font-inter);
+    font-size: 16px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .primaryInviteCard > button {
+    min-width: 112px;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page[data-stage="verify"] .otpBoxes {
+    gap: 6px;
+  }
+
+  .page[data-stage="verify"] .otpBoxes span {
+    width: calc((100% - 30px) / 6);
+    height: 48px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .cardDownloads > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
