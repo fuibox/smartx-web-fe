@@ -346,7 +346,7 @@ function PersonaPoster({
           src={outcome.persona.artSrc}
           alt={outcome.persona.artAlt}
           fill
-          sizes="(max-width: 750px) 90vw, 50vw"
+          sizes="(max-width: 880px) 320px, 400px"
           priority
         />
       </div>

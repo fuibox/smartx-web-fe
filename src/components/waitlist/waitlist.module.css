@@ -4073,15 +4073,18 @@
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
-    width: 100%;
-    height: clamp(210px, 61vw, 270px);
+    width: min(100%, 320px);
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1;
+    margin-inline: auto;
     background: #737373;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaArt img {
     mix-blend-mode: normal;
     object-fit: cover;
-    object-position: 43% 53.4%;
+    object-position: center;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .posterScores {
@@ -4774,16 +4777,16 @@
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaPoster {
     display: flex;
-    width: 100%;
-    max-width: none;
+    width: min(calc(100% - 48px), 640px);
+    max-width: 640px;
     min-width: 0;
     height: auto;
-    min-height: 100%;
-    align-self: stretch;
+    min-height: 0;
+    align-self: center;
     flex-direction: column;
-    justify-self: stretch;
+    justify-self: center;
     box-sizing: border-box;
-    padding: calc(24px + 16px * var(--result-scale)) calc(20px + 44px * var(--result-scale));
+    padding: calc(24px + 16px * var(--result-scale)) 0;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
@@ -4792,10 +4795,18 @@
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: calc(180px + 150px * var(--result-scale));
+    flex: none;
+    align-self: center;
+    width: min(100%, 400px);
+    max-width: 400px;
     height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt img {
+    object-fit: cover;
+    object-position: center;
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote {
