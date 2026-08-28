@@ -10,8 +10,8 @@ import { Trans } from "@lingui/react/macro";
 import type { MessageDescriptor } from "@lingui/core";
 
 import { ConsumerHeader } from "@/components/consumer-network/consumer-header";
-import { notifyError } from "@/components/site/app-notice";
-import { isValidEmail, isValidInviteCode, normalizeEmail, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
+import { notifyError, notifyNotice } from "@/components/site/app-notice";
+import { isInviteAccepted, inviteCheckMessage, isValidEmail, isValidInviteCode, normalizeEmail, normalizeInviteCode, sanitizeInviteCodeInput, waitlistApi } from "@/lib/waitlist/api";
 import {
   hydrateQuestions,
   localizedPersonaName,
@@ -19,8 +19,22 @@ import {
   localizedPole,
   mapCardToOutcome,
   PERSONAS_BY_CODE,
+  prefetchQuizArtwork,
+  QUIZ_ART_SRCS,
 } from "@/lib/waitlist/persona";
 import { localizedOptionLabel, localizedQuestionPrompt } from "@/lib/waitlist/quiz-i18n";
+import {
+  copyShareImage,
+  createImagePreviewUrl,
+  downloadShareImage,
+  isAndroid,
+  isIOS,
+  isMobileSharePlatform,
+  SHARE_IMAGE_EXT,
+  shareFileName,
+  type ShareImageAction,
+  type ShareImageActionResult,
+} from "@/lib/waitlist/share-image";
 import { i18n } from "@/lingui";
 import {
   areCommunityTasksDone,
@@ -69,7 +83,6 @@ const NO_SAVED_RESULT = "No saved result is linked to this email. Take the test 
 const INVALID_EMAIL = "Please enter a valid email address.";
 const GENERIC_ERROR = "Something went wrong. Please try again.";
 const INVITE_UNRECOGNIZED = "Invite code not recognized. Check the code and try again.";
-const INVITE_JOIN_WITHOUT = "Invite code not recognized. You can still join without it.";
 const SESSION_EXPIRED = "Authorization error";
 const INVALID_ANSWERS = "invalid answers";
 const INVITES_POLL_MS = 10_000;
@@ -79,6 +92,25 @@ const DEFAULT_COMMUNITY = {
   telegram: "https://t.me/SmartX_Community",
   x: "https://x.com/SmartXTerminal",
 };
+
+function resolveCommunityHref(value: string | undefined, fallback: string) {
+  const href = value?.trim() ?? "";
+  if (!href) return fallback;
+  try {
+    const url = new URL(href);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return fallback;
+    return href;
+  } catch {
+    return fallback;
+  }
+}
+
+function communityLinksFrom(info: { links?: { telegram?: string; x?: string } } | null | undefined) {
+  return {
+    telegram: resolveCommunityHref(info?.links?.telegram, DEFAULT_COMMUNITY.telegram),
+    x: resolveCommunityHref(info?.links?.x, DEFAULT_COMMUNITY.x),
+  };
+}
 
 const DEMO_OUTCOME: Outcome = {
   resultId: "demo-result",
@@ -96,7 +128,6 @@ const WAITLIST_MESSAGE_L10N: Record<string, MessageDescriptor> = {
   [INVALID_EMAIL]: msg`Please enter a valid email address.`,
   [GENERIC_ERROR]: msg`Something went wrong. Please try again.`,
   [INVITE_UNRECOGNIZED]: msg`Invite code not recognized. Check the code and try again.`,
-  [INVITE_JOIN_WITHOUT]: msg`Invite code not recognized. You can still join without it.`,
   [SESSION_EXPIRED]: msg`Your session expired. Sign in again to continue.`,
   [INVALID_ANSWERS]: msg`Those answers didn’t go through. Check all six questions and try again.`,
   "Verification code is incorrect or expired": msg`Verification code is incorrect or expired`,
@@ -175,13 +206,6 @@ function isExpiredSession(error: unknown) {
   return isUnauthorized(error) || isMissingUserError(error);
 }
 
-function communityLinksFrom(info: { links?: { telegram?: string; x?: string } } | null | undefined) {
-  return {
-    telegram: info?.links?.telegram || DEFAULT_COMMUNITY.telegram,
-    x: info?.links?.x || DEFAULT_COMMUNITY.x,
-  };
-}
-
 function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = false) {
   const base = useCurrentOrigin && typeof window !== "undefined" ? new URL("/waitlist/", window.location.origin).toString() : WAITLIST_URL;
   const url = new URL(base);
@@ -207,7 +231,7 @@ async function fetchWorkspace(token: string): Promise<Workspace> {
   const communityDone = telegramCompleted && xCompleted;
 
   const toResultWorkspace = async (card: ResultCard & { rank: number; shareCompleted: number; inviteNum?: number }) => {
-    return {
+  return {
       kind: "result" as const,
       outcome: mapCardToOutcome(card),
       rank: card.rank,
@@ -254,7 +278,8 @@ function QuestionArtwork({
               alt={active ? item.artAlt : ""}
               fill
               sizes="(max-width: 750px) 100vw, 50vw"
-              {...(active ? { priority: true } : { loading: "eager" as const })}
+              priority
+              loading="eager"
               aria-hidden={!active}
             />
           </div>
@@ -327,7 +352,7 @@ function PersonaPoster({
           src={outcome.persona.artSrc}
           alt={outcome.persona.artAlt}
           fill
-          sizes="(max-width: 880px) 90vw, 610px"
+          sizes="(max-width: 750px) 90vw, 50vw"
           priority
         />
       </div>
@@ -397,8 +422,16 @@ export function WaitlistExperience() {
   const [rank, setRank] = useState<number | null>(null);
   const [preparedCards, setPreparedCards] = useState<Partial<Record<ResultCardFormat, RenderedResultCard>>>({});
   const [exportError, setExportError] = useState(false);
+  const [sharePreview, setSharePreview] = useState<{ url: string; tip: string } | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const preparedCardsRef = useRef(preparedCards);
+  preparedCardsRef.current = preparedCards;
   const [demoActive, setDemoActive] = useState(() => shareParams.get("demo") === "1");
   const [demoTarget, setDemoTarget] = useState<WaitlistDemoTarget>("gate");
+
+  useEffect(() => {
+    prefetchQuizArtwork();
+  }, []);
 
   const loggedIn = Boolean(userToken && userInfo);
   const demoVisible = shareParams.get("demo") === "1";
@@ -524,7 +557,7 @@ export function WaitlistExperience() {
       const pendingNotice = takeWaitlistNotice();
       if (pendingNotice) setGateError(pendingNotice);
 
-      const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
       const resultId = params.get("result")?.trim() ?? "";
       const urlInviteRaw = (params.get("invite") ?? "").trim();
       const urlInvite = normalizeInviteCode(urlInviteRaw);
@@ -557,7 +590,10 @@ export function WaitlistExperience() {
 
       if (cancelled) return;
 
-      if (questionsResult.status === "fulfilled") setQuestions(questionsResult.value);
+      if (questionsResult.status === "fulfilled") {
+        setQuestions(questionsResult.value);
+        prefetchQuizArtwork(questionsResult.value.map((item) => item.artSrc));
+      }
 
       let info: UserInfo | null = null;
       if (infoResult.status === "fulfilled") {
@@ -565,7 +601,7 @@ export function WaitlistExperience() {
       } else if (storedUserToken) {
         if (isExpiredSession(infoResult.reason)) {
           clearUserToken();
-        } else {
+      } else {
           setGateError(errorMessage(infoResult.reason));
           setStage("gate");
           return;
@@ -594,18 +630,15 @@ export function WaitlistExperience() {
       if (friendCard) setReferralOutcome(mapCardToOutcome(friendCard));
 
       const inviteView = inviteStatusResult.status === "fulfilled" ? inviteStatusResult.value : null;
-      if (inviteStatusResult.status === "rejected") {
-        const reason = errorMessage(inviteStatusResult.reason);
-        if (reason === INVITE_UNRECOGNIZED) {
-          setGateError(INVITE_JOIN_WITHOUT);
-          dropLandingInvite();
-        } else {
-          setGateError(reason);
-        }
-      } else if (inviteView && inviteView.status !== 0) {
-        setGateError(inviteView.message || INVITE_JOIN_WITHOUT);
+      const inviteRejected = inviteStatusResult.status === "rejected";
+      const inviteBlocked = Boolean(invite) && (inviteRejected || !isInviteAccepted(inviteView));
+      if (inviteRejected) {
         dropLandingInvite();
-      } else if (inviteView && inviteView.status === 0 && invite) {
+        setGateError(errorMessage(inviteStatusResult.reason));
+      } else if (inviteBlocked) {
+        dropLandingInvite();
+        setGateError(inviteCheckMessage(inviteView, INVITE_UNRECOGNIZED));
+      } else if (isInviteAccepted(inviteView) && invite) {
         persistLandingInvite(invite);
       }
 
@@ -631,6 +664,11 @@ export function WaitlistExperience() {
 
       if (route.stage === "quiz" && questionsResult.status !== "fulfilled") {
         setGateError(errorMessage(questionsResult.reason));
+        setStage("gate");
+        return;
+      }
+
+      if (inviteBlocked && route.stage === "quiz") {
         setStage("gate");
         return;
       }
@@ -694,31 +732,33 @@ export function WaitlistExperience() {
     return () => window.clearInterval(timer);
   }, [demoActive, stage, userToken]);
 
+  const resultCardData = (outcome: Outcome) => ({
+    name: localizedPersonaName(outcome.persona),
+    code: outcome.persona.mark,
+    roast: localizedPersonaRoast(outcome.persona),
+    artSrc: outcome.persona.artSrc,
+    localArtSrc: PERSONAS_BY_CODE[outcome.persona.mark]?.artSrc
+      || PERSONAS_BY_CODE[outcome.persona.code]?.artSrc,
+    poles: outcome.poles.map(localizedPole),
+    scores: outcome.stats,
+    rank: rank ?? 0,
+    labels: {
+      traderType: t`Trader type`,
+      waitlistRank: t`Waitlist rank`,
+      conviction: t`Conviction`,
+      instinct: t`Instinct`,
+      resilience: t`Resilience`,
+      disclaimer: t`For entertainment only`,
+    },
+  });
+
   useEffect(() => {
     if (stage !== "result" || !ownOutcome) return;
     let disposed = false;
     let rendered: RenderedResultCard[] = [];
     setPreparedCards({});
     setExportError(false);
-    const data = {
-      name: localizedPersonaName(ownOutcome.persona),
-      code: ownOutcome.persona.mark,
-      roast: localizedPersonaRoast(ownOutcome.persona),
-      artSrc: ownOutcome.persona.artSrc,
-      poles: ownOutcome.poles.map(localizedPole),
-      scores: ownOutcome.stats,
-      bestMatch: { name: localizedPersonaName(ownOutcome.bestMatch) },
-      rival: { name: localizedPersonaName(ownOutcome.rival) },
-      labels: {
-        traderType: t`Trader type`,
-        bestMatch: t`Best match`,
-        naturalRival: t`Natural rival`,
-        conviction: t`Conviction`,
-        instinct: t`Instinct`,
-        resilience: t`Resilience`,
-        disclaimer: t`For entertainment only`,
-      },
-    };
+    const data = resultCardData(ownOutcome);
     Promise.all([renderResultCard(data, "story"), renderResultCard(data, "og")])
       .then((cards) => {
         rendered = cards;
@@ -735,12 +775,14 @@ export function WaitlistExperience() {
       disposed = true;
       rendered.forEach((card) => URL.revokeObjectURL(card.href));
     };
-  }, [stage, ownOutcome, activeI18n.locale]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- render from outcome, locale, and rank
+  }, [stage, ownOutcome, activeI18n.locale, rank]);
 
   const ensureQuestions = async () => {
     if (questions.length) return questions;
     const data = await waitlistApi.getQuestions();
     const next = hydrateQuestions(data.questions);
+    prefetchQuizArtwork(next.map((item) => item.artSrc));
     setQuestions(next);
     return next;
   };
@@ -819,40 +861,54 @@ export function WaitlistExperience() {
     window.location.assign(url.toString());
   };
 
-  const startQuiz = async () => {
-    setGateError("");
-    setQuizWarning("");
+  const verifyLandingInvite = async (code: string) => {
+    const next = normalizeInviteCode(code);
+    if (!isValidInviteCode(next)) {
+      dropLandingInvite();
+      setGateError(INVITE_UNRECOGNIZED);
+      return false;
+    }
     try {
-      await ensureQuestions();
-      const code = inviteCodeRef.current;
-      if (!demoActive && isValidInviteCode(code)) {
-        try {
-          const view = await waitlistApi.checkInvite(code);
-          if (view.status === 0) {
-            persistLandingInvite(code);
-          } else {
-            dropLandingInvite();
-            setGateError(view.message || INVITE_JOIN_WITHOUT);
-          }
-        } catch (error) {
-          dropLandingInvite();
-          const reason = errorMessage(error);
-          setGateError(reason === INVITE_UNRECOGNIZED ? INVITE_JOIN_WITHOUT : reason);
-        }
-      } else if (!demoActive && !isValidInviteCode(code)) {
-        dropLandingInvite();
+      const view = await waitlistApi.checkInvite(next);
+      if (isInviteAccepted(view)) {
+        persistLandingInvite(next);
+        setGateError("");
+        return true;
       }
-      setAuthIntent("create");
-      const draft = getQuizDraft();
-      if (!draft || !Object.keys(draft.answers).length) {
-        setQuestionIndex(0);
-        setAnswers({});
-      } else {
-        setAnswers(draft.answers);
-        setQuestionIndex(draft.questionIndex);
+      dropLandingInvite();
+      setGateError(inviteCheckMessage(view, INVITE_UNRECOGNIZED));
+      return false;
+    } catch (error) {
+      dropLandingInvite();
+      setGateError(errorMessage(error));
+      return false;
+    }
+  };
+
+  const enterQuiz = async () => {
+    setQuizWarning("");
+    await ensureQuestions();
+    setAuthIntent("create");
+    const draft = getQuizDraft();
+    if (!draft || !Object.keys(draft.answers).length) {
+      setQuestionIndex(0);
+      setAnswers({});
+    } else {
+      setAnswers(draft.answers);
+      setQuestionIndex(draft.questionIndex);
+    }
+    clearShareUrl();
+    setStage("quiz");
+  };
+
+  const startQuiz = async () => {
+    try {
+      if (!demoActive) {
+        const allowed = await verifyLandingInvite(inviteCodeRef.current);
+        if (!allowed) return;
       }
-      clearShareUrl();
-      setStage("quiz");
+      setGateError("");
+      await enterQuiz();
     } catch (error) {
       setGateError(errorMessage(error));
     }
@@ -860,7 +916,20 @@ export function WaitlistExperience() {
 
   const beginFromReferral = () => startQuiz();
 
-  const beginWithoutInvite = () => startQuiz();
+  const beginWithoutInvite = async () => {
+    if (normalizeInviteCode(inviteCodeRef.current)) {
+      await startQuiz();
+      return;
+    }
+    setGateError("");
+    dropLandingInvite();
+    setInviteCode("");
+    try {
+      await enterQuiz();
+    } catch (error) {
+      setGateError(errorMessage(error));
+    }
+  };
 
   const beginResultRecovery = () => {
     setAuthIntent("recover");
@@ -1057,7 +1126,11 @@ export function WaitlistExperience() {
   };
 
   const openCommunity = async (channel: CommunityChannel) => {
-    const href = channel === "telegram" ? communityLinks.telegram : communityLinks.x;
+    const fallback = channel === "telegram" ? DEFAULT_COMMUNITY.telegram : DEFAULT_COMMUNITY.x;
+    const href = resolveCommunityHref(
+      channel === "telegram" ? communityLinks.telegram : communityLinks.x,
+      fallback,
+    );
     window.open(href, "_blank", "noopener,noreferrer");
     if (demoActive) {
       if (channel === "telegram") setTelegramOpened(true);
@@ -1113,8 +1186,8 @@ export function WaitlistExperience() {
     if (!code || !ownOutcome) return;
     try {
       await navigator.clipboard.writeText(makeInvitationUrl(code, ownOutcome.resultId, true));
-      setCopiedCode(code);
-      window.setTimeout(() => setCopiedCode(null), 1400);
+    setCopiedCode(code);
+    window.setTimeout(() => setCopiedCode(null), 1400);
     } catch (error) {
       notifyError(
         errorMessage(error) === GENERIC_ERROR
@@ -1122,6 +1195,92 @@ export function WaitlistExperience() {
           : localizeWaitlistMessage(errorMessage(error)),
       );
     }
+  };
+
+  const shareImageFeedback = (action: ShareImageAction, result: Exclude<ShareImageActionResult, "cancelled">) => {
+    if (result === "clipboard") return t`Copied Success!`;
+    if (result === "share") return t`Selection successful`;
+    if (result === "download") return t`Image saved.`;
+    if (result === "tab") return t`Image opened in a new tab. Long press to save.`;
+    if (isIOS()) {
+      return action === "copy" ? t`Long press the image and tap Copy.` : t`Long press the image and tap Save Image.`;
+    }
+    if (isAndroid()) {
+      return action === "copy" ? t`Long press the image and tap Copy image.` : t`Long press the image and tap Download image.`;
+    }
+    return action === "copy" ? t`Long press the image to save or copy.` : t`Long press the image to save to your album.`;
+  };
+
+  const closeSharePreview = () => {
+    setSharePreview((current) => {
+      if (current?.url.startsWith("blob:")) URL.revokeObjectURL(current.url);
+      return null;
+    });
+  };
+
+  const applyShareResult = (action: ShareImageAction, result: ShareImageActionResult, blob: Blob) => {
+    if (result === "cancelled") return;
+    const tip = shareImageFeedback(action, result);
+    if (result === "preview") {
+      setSharePreview((current) => {
+        if (current?.url.startsWith("blob:")) URL.revokeObjectURL(current.url);
+        return { url: createImagePreviewUrl(blob), tip };
+      });
+    }
+    notifyNotice(tip);
+  };
+
+  const runDownloadButtonAction = (card: RenderedResultCard) => {
+    const fileName = shareFileName(card.filename);
+    const pending = isMobileSharePlatform()
+      ? copyShareImage(card.blob, fileName)
+      : downloadShareImage(card.blob, fileName, card.href);
+    return pending
+      .then((result) => applyShareResult(isMobileSharePlatform() ? "copy" : "download", result, card.blob))
+      .catch(() => notifyError(t`Couldn’t export the image. Try again.`));
+  };
+
+  const downloadResultCard = () => {
+    const card = preparedCardsRef.current.story;
+    if (card) {
+      void runDownloadButtonAction(card);
+      return;
+    }
+
+    if (!ownOutcome || exporting) {
+      notifyNotice(t`Preparing…`);
+      return;
+    }
+
+    setExporting(true);
+    void renderResultCard(resultCardData(ownOutcome), "story")
+      .then((rendered) => {
+        setPreparedCards((current) => ({ ...current, story: rendered }));
+        setExportError(false);
+        return runDownloadButtonAction(rendered);
+      })
+      .catch(() => {
+        setExportError(true);
+        notifyError(t`Couldn’t export the image. Try again.`);
+      })
+      .finally(() => setExporting(false));
+  };
+
+  const onPreparedDownloadClick = (event: { preventDefault: () => void }) => {
+    const card = preparedCardsRef.current.story;
+    if (!card) {
+      event.preventDefault();
+      downloadResultCard();
+      return;
+    }
+
+    if (isMobileSharePlatform()) {
+      event.preventDefault();
+      void runDownloadButtonAction(card);
+      return;
+    }
+
+    notifyNotice(t`Image saved.`);
   };
 
   const inviteForm = (
@@ -1188,7 +1347,7 @@ export function WaitlistExperience() {
         {stage === "gate" && !referralOutcome ? (
           <div className={styles.gateBackdrop}>
             <Image src="/assets/waitlist/waitlist-intro.png" alt="" fill sizes="70vw" priority />
-          </div>
+      </div>
         ) : stage === "email" || stage === "verify" || stage === "unlock" ? (
           <div className={styles.flowBackdrop}>
             <Image src="/assets/waitlist/waitlist-verification.png" alt="" fill sizes="50vw" priority />
@@ -1248,7 +1407,7 @@ export function WaitlistExperience() {
                   <small>
                     <Trans>Your result is saved as {savedPersonaName}.</Trans>
                   </small>
-                </div>
+            </div>
               ) : loggedIn ? (
                 <WaitlistButton className={styles.primaryButton} onAction={beginFromReferral}>
                   <Trans>Find my trader type</Trans>
@@ -1324,7 +1483,7 @@ export function WaitlistExperience() {
                 <Trans>Back to start</Trans>
               </WaitlistButton>
             </form>
-          </div>
+              </div>
         )}
 
         {stage === "quiz" && currentQuestion && (
@@ -1480,7 +1639,7 @@ export function WaitlistExperience() {
                         {otp[index] || ""}
                       </span>
                     ))}
-                  </div>
+              </div>
                 </div>
                 <WaitlistButton className={styles.primaryButton} type="submit" onAction={submitOtp}>
                   <Trans>Continue</Trans>
@@ -1575,28 +1734,28 @@ export function WaitlistExperience() {
                   <Trans>Priority improves your score; rank updates against the live waitlist.</Trans>
                 </small>
                 <div className={styles.resultActions}>
-                  <details className={styles.downloadMenu}>
-                    <summary>
+                  {preparedCards.story ? (
+                    <a
+                      className={styles.downloadButton}
+                      href={preparedCards.story.href}
+                      download={`${shareFileName(preparedCards.story.filename)}.${SHARE_IMAGE_EXT}`}
+                      onClick={onPreparedDownloadClick}
+                    >
                       <Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" />
                       <Trans>Download</Trans>
-                    </summary>
-                    <div className={styles.downloadOptions} role="group" aria-label={t`Download result card`}>
-                      {preparedCards.story && preparedCards.og ? (
-                        <>
-                          <a href={preparedCards.story.href} download={preparedCards.story.filename}>
-                            <span><Trans>Story</Trans></span>
-                            <small>1080 × 1920</small>
-                          </a>
-                          <a href={preparedCards.og.href} download={preparedCards.og.filename}>
-                            <span><Trans>X / TG</Trans></span>
-                            <small>1200 × 630</small>
-                          </a>
-                        </>
-                      ) : (
-                        <span className={styles.downloadPending}>{exportError ? t`Unavailable` : t`Preparing…`}</span>
-                      )}
-                    </div>
-                  </details>
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.downloadButton}
+                      disabled={exporting || !exportError}
+                      title={exportError ? t`Couldn’t export the image. Try again.` : undefined}
+                      onClick={downloadResultCard}
+                    >
+                      <Image src="/assets/waitlist/download.svg" alt="" width={20} height={20} aria-hidden="true" />
+                      {exportError ? t`Download` : t`Preparing…`}
+                    </button>
+                  )}
                   <WaitlistButton className={styles.shareButton} disabled={!ownInviteCode} onAction={shareResult}>
                     {shareCompleted ? t`Share again` : t`Share result`}
                   </WaitlistButton>
@@ -1624,7 +1783,7 @@ export function WaitlistExperience() {
                     <strong>{ownInviteCode || t`Invite link is being prepared`}</strong>
                   </div>
                   <WaitlistButton
-                    type="button"
+                        type="button"
                     lock={false}
                     disabled={!ownInviteCode}
                     onClick={() => { void copyInvitation(ownInviteCode); }}
@@ -1639,6 +1798,24 @@ export function WaitlistExperience() {
         )}
       </section>
     </main>
+    {sharePreview ? (
+      <div className={styles.sharePreview} onClick={closeSharePreview}>
+        <p>{sharePreview.tip}</p>
+        {/* Native img so mobile long-press copy/save works. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={sharePreview.url} alt={t`Share image`} onClick={(event) => event.stopPropagation()} />
+        <WaitlistButton type="button" lock={false} onAction={closeSharePreview}>
+          <Trans>Close</Trans>
+        </WaitlistButton>
+      </div>
+    ) : null}
+    <div className={styles.artPrefetch} aria-hidden="true">
+      {QUIZ_ART_SRCS.map((src) => (
+        // Prefetch into the HTTP cache before the quiz mounts.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={src} src={src} alt="" />
+      ))}
+    </div>
     </WaitlistActionScope>
   );
 }

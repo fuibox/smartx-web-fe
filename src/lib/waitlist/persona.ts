@@ -31,10 +31,10 @@ export const PERSONAS: Record<string, Persona> = {
     artAlt: "The All-In Mystic meditating beside an all-in stack of chips",
   },
   "DEGEN|DATA|PACK": {
-    name: "The Signal General", cn: "喊单军师", code: "PARROT", mark: "SIG",
+    name: "The Send-It Strategist", cn: "喊单军师", code: "PARROT", mark: "SIG",
     roast: "Three hours of research. Two-word thesis: send it.",
     artSrc: "/assets/waitlist/personas/ops-meme-v1/sig-signal-general.png",
-    artAlt: "The Signal General directing followers from a chart-covered strategy table",
+    artAlt: "The Send-It Strategist directing followers from a chart-covered strategy table",
   },
   "DEGEN|DATA|LONE": {
     name: "The Candle Prophet", cn: "K线教主", code: "FOX", mark: "CND",
@@ -49,16 +49,16 @@ export const PERSONAS: Record<string, Persona> = {
     artAlt: "The Dip Ringleader leading followers down a falling candlestick chart",
   },
   "SNIPER|GUT|LONE": {
-    name: "The Market Doctor", cn: "行情老中医", code: "BEAR", mark: "DOC",
+    name: "The Vibes Doctor", cn: "行情老中医", code: "BEAR", mark: "DOC",
     roast: "Every symptom diagnosed. Every loss professionally explained.",
     artSrc: "/assets/waitlist/personas/ops-meme-v1/doc-market-doctor.png",
-    artAlt: "The Market Doctor listening to a candlestick chart with a stethoscope",
+    artAlt: "The Vibes Doctor listening to a candlestick chart with a stethoscope",
   },
   "SNIPER|DATA|PACK": {
-    name: "The Onchain Detective", cn: "链上侦探", code: "WHALE", mark: "CHN",
+    name: "The Onchain Paparazzi", cn: "链上侦探", code: "WHALE", mark: "CHN",
     roast: "You know everyone’s position except, occasionally, your own.",
     artSrc: "/assets/waitlist/personas/ops-meme-v1/chn-onchain-detective.png",
-    artAlt: "The Onchain Detective tracing wallets while ignoring its own losing trade",
+    artAlt: "The Onchain Paparazzi tracing wallets while ignoring its own losing trade",
   },
   "SNIPER|DATA|LONE": {
     name: "The Limit Sniper", cn: "潜伏狙击手", code: "CAT", mark: "LMT",
@@ -92,7 +92,7 @@ const PERSONA_L10N: Record<string, { name: MessageDescriptor; roast: MessageDesc
     roast: msg`Every all-in starts with enlightenment and ends with reincarnation.`,
   },
   SIG: {
-    name: msg`The Signal General`,
+    name: msg`The Send-It Strategist`,
     roast: msg`Three hours of research. Two-word thesis: send it.`,
   },
   CND: {
@@ -104,11 +104,11 @@ const PERSONA_L10N: Record<string, { name: MessageDescriptor; roast: MessageDesc
     roast: msg`You’re not buying the dip. You’re giving the downtrend a demo.`,
   },
   DOC: {
-    name: msg`The Market Doctor`,
+    name: msg`The Vibes Doctor`,
     roast: msg`Every symptom diagnosed. Every loss professionally explained.`,
   },
   CHN: {
-    name: msg`The Onchain Detective`,
+    name: msg`The Onchain Paparazzi`,
     roast: msg`You know everyone’s position except, occasionally, your own.`,
   },
   LMT: {
@@ -178,6 +178,24 @@ const QUESTION_ART: Record<string, { src: string; alt: string }> = {
 };
 
 const QUESTION_ART_BY_INDEX = Object.values(QUESTION_ART);
+
+export const QUIZ_ART_SRCS = QUESTION_ART_BY_INDEX.map((item) => item.src);
+
+const prefetchedQuizArt = new Set<string>();
+
+export function prefetchQuizArtwork(extraSrcs: readonly string[] = []) {
+  if (typeof window === "undefined") return;
+  for (const src of [...QUIZ_ART_SRCS, ...extraSrcs]) {
+    if (!src || prefetchedQuizArt.has(src)) continue;
+    prefetchedQuizArt.add(src);
+    const image = new window.Image();
+    image.decoding = "async";
+    image.src = src;
+    void image.decode?.().catch(() => undefined);
+  }
+}
+
+if (typeof window !== "undefined") prefetchQuizArtwork();
 
 export function hydrateQuestions(questions: ApiQuizQuestion[]): QuizQuestion[] {
   return questions.map((question, index) => {

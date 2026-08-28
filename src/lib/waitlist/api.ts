@@ -102,6 +102,35 @@ export function isValidInviteCode(value: string) {
   return /^[a-z0-9]{8}$/.test(normalizeInviteCode(value));
 }
 
+function readInviteView(raw: unknown): InviteView | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  const nested = obj.data;
+  if (nested && typeof nested === "object" && ("status" in nested || "exists" in nested)) {
+    return readInviteView(nested);
+  }
+  if (!("status" in obj) && !("exists" in obj)) return null;
+  const status = Number(obj.status);
+  return {
+    exists: obj.exists === true,
+    status: status === 0 ? 0 : 3,
+    message: typeof obj.message === "string" ? obj.message : "",
+  };
+}
+
+/** `check_invite` 以 data.status 为准：0 可用，3 无效。外层 code 200 / message SUCCESS 只表示请求成功。 */
+export function isInviteAccepted(view: InviteView | null | undefined): boolean {
+  const parsed = readInviteView(view);
+  return Boolean(parsed && parsed.status === 0 && parsed.exists);
+}
+
+export function inviteCheckMessage(view: InviteView | null | undefined, fallback: string) {
+  const parsed = readInviteView(view);
+  const text = parsed?.message.trim() ?? "";
+  if (!text || text.toUpperCase() === "SUCCESS") return fallback;
+  return text;
+}
+
 export function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
 }
@@ -115,10 +144,17 @@ export const waitlistApi = {
     return waitlistRequest<{ questions: ApiQuizQuestion[] }>("/quiz/questions");
   },
 
-  checkInvite(inviteCode: string) {
-    return waitlistRequest<InviteView>("/waitlist_public/check_invite", {
+  async checkInvite(inviteCode: string) {
+    const data = await waitlistRequest<InviteView>("/waitlist_public/check_invite", {
       query: { inviteCode: normalizeInviteCode(inviteCode) },
     });
+    return (
+      readInviteView(data) ?? {
+        exists: false,
+        status: 3 as const,
+        message: "",
+      }
+    );
   },
 
   async getInviterCard(inviteCode: string) {

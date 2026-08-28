@@ -3,6 +3,7 @@ export type ResultCardFormat = "story" | "og";
 export type RenderedResultCard = {
   href: string;
   filename: string;
+  blob: Blob;
 };
 
 export type ResultCardExportData = {
@@ -10,14 +11,13 @@ export type ResultCardExportData = {
   code: string;
   roast: string;
   artSrc: string;
+  localArtSrc?: string;
   poles: readonly string[];
   scores: { conviction: number; instinct: number; resilience: number };
-  bestMatch: { name: string };
-  rival: { name: string };
+  rank: number;
   labels: {
     traderType: string;
-    bestMatch: string;
-    naturalRival: string;
+    waitlistRank: string;
     conviction: string;
     instinct: string;
     resilience: string;
@@ -31,19 +31,22 @@ const COLORS = {
   line: "#202627",
   text: "#f5f5f5",
   body: "#d4d7d6",
-  muted: "#8a8f98",
+  muted: "#747474",
   dim: "#62676e",
   mint: "#08dfb5",
   mintStrong: "#08dfb5",
 };
 
-function wrapText(
+const AXIS_THEME = [
+  { fill: "#08dfb5", track: "rgba(8, 223, 181, 0.12)" },
+  { fill: "#a957d6", track: "rgba(169, 87, 214, 0.2)" },
+  { fill: "#f69002", track: "rgba(246, 144, 2, 0.14)" },
+] as const;
+
+function wrapLines(
   context: CanvasRenderingContext2D,
   value: string,
-  x: number,
-  y: number,
   maxWidth: number,
-  lineHeight: number,
   maxLines: number,
 ) {
   const words = value.split(" ");
@@ -55,10 +58,39 @@ function wrapText(
     else { lines.push(line); line = word; }
   }
   if (line) lines.push(line);
-  lines.slice(0, maxLines).forEach((text, index) => {
-    const finalLine = index === maxLines - 1 && lines.length > maxLines ? `${text.replace(/[.,—]$/, "")}…` : text;
-    context.fillText(finalLine, x, y + index * lineHeight);
+  return lines.slice(0, maxLines);
+}
+
+function wrapText(
+  context: CanvasRenderingContext2D,
+  value: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines: number,
+) {
+  const lines = wrapLines(context, value, maxWidth, maxLines);
+  lines.forEach((text, index) => {
+    context.fillText(text, x, y + index * lineHeight);
   });
+  return lines.length;
+}
+
+const STORY_WIDTH = 1080;
+const STORY_INSET = 42;
+const STORY_BOTTOM_PAD = 28;
+
+function measureStoryHeight(context: CanvasRenderingContext2D, data: ResultCardExportData) {
+  context.font = "600 84px \"Playfair Display\", Georgia, serif";
+  const nameLines = wrapLines(context, data.name, 912, 2).length;
+  const rankY = 268 + (nameLines - 1) * 84 + 68;
+  const artY = rankY + 36;
+  const axisY = artY + 668;
+  const quoteY = axisY + 156;
+  context.font = "500 34px \"Playfair Display\", Georgia, serif";
+  const quoteLines = wrapLines(context, `“${data.roast}”`, 912, 3).length;
+  return quoteY + quoteLines * 45 + STORY_BOTTOM_PAD + STORY_INSET;
 }
 
 function roundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
@@ -88,13 +120,43 @@ function drawHeader(context: CanvasRenderingContext2D, width: number, x: number,
   context.textAlign = "left";
 }
 
-function loadImage(src: string) {
+function isCrossOriginSrc(src: string) {
+  if (typeof window === "undefined") return false;
+  if (!/^(https?:)?\/\//i.test(src)) return false;
+  try {
+    return new URL(src, window.location.href).origin !== window.location.origin;
+  } catch {
+    return true;
+  }
+}
+
+function loadImageElement(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
+    if (isCrossOriginSrc(src)) image.crossOrigin = "anonymous";
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error(`Could not load artwork: ${src}`));
     image.src = src;
   });
+}
+
+async function loadArtwork(src: string, fallbackSrc?: string) {
+  try {
+    return await loadImageElement(src);
+  } catch {
+    if (fallbackSrc && fallbackSrc !== src) return loadImageElement(fallbackSrc);
+    throw new Error(`Could not load artwork: ${src}`);
+  }
+}
+
+function waitForFonts() {
+  if (typeof document === "undefined" || !document.fonts?.ready) return Promise.resolve();
+  return Promise.race([
+    document.fonts.ready.then(() => undefined),
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 1200);
+    }),
+  ]);
 }
 
 function drawArtwork(context: CanvasRenderingContext2D, artwork: HTMLImageElement, x: number, y: number, width: number, height: number) {
@@ -110,16 +172,16 @@ function drawArtwork(context: CanvasRenderingContext2D, artwork: HTMLImageElemen
   context.restore();
 }
 
-function drawRelations(context: CanvasRenderingContext2D, data: ResultCardExportData, x: number, y: number, width: number) {
-  const columnWidth = width / 2;
-  context.fillStyle = COLORS.dim;
-  context.font = "600 11px Inter, sans-serif";
-  context.fillText(data.labels.bestMatch.toUpperCase(), x, y);
-  context.fillText(data.labels.naturalRival.toUpperCase(), x + columnWidth, y);
-  context.fillStyle = COLORS.text;
-  context.font = "500 18px IBM Plex Sans, sans-serif";
-  context.fillText(data.bestMatch.name, x, y + 28);
-  context.fillText(data.rival.name, x + columnWidth, y + 28);
+function drawRank(context: CanvasRenderingContext2D, data: ResultCardExportData, x: number, y: number) {
+  const rankText = `#${data.rank.toLocaleString("en-US")}`;
+  context.textAlign = "left";
+  context.fillStyle = COLORS.mintStrong;
+  context.font = "600 52px \"IBM Plex Sans\", Inter, sans-serif";
+  context.fillText(rankText, x, y);
+  const rankWidth = context.measureText(rankText).width;
+  context.fillStyle = COLORS.muted;
+  context.font = "500 18px Inter, sans-serif";
+  context.fillText(data.labels.waitlistRank, x + rankWidth + 16, y - 8);
 }
 
 function drawAxis(
@@ -129,56 +191,48 @@ function drawAxis(
   x: number,
   y: number,
   width: number,
+  theme: (typeof AXIS_THEME)[number],
 ) {
   context.fillStyle = COLORS.muted;
-  context.font = "600 13px Inter, sans-serif";
+  context.font = "500 22px Inter, sans-serif";
   context.fillText(label, x, y);
   context.fillStyle = COLORS.text;
-  context.font = "700 14px JetBrainsMono, monospace";
+  context.font = "600 22px \"IBM Plex Sans\", Inter, sans-serif";
   context.textAlign = "right";
   context.fillText(String(score), x + width, y);
   context.textAlign = "left";
-  roundedRect(context, x, y + 14, width, 5, 3);
-  context.fillStyle = "rgba(208,224,232,0.12)";
+  roundedRect(context, x, y + 12, width, 8, 4);
+  context.fillStyle = theme.track;
   context.fill();
   if (score > 0) {
-    roundedRect(context, x, y + 14, width * (score / 100), 5, 3);
-    context.fillStyle = COLORS.mintStrong;
+    roundedRect(context, x, y + 12, Math.max(8, width * (score / 100)), 8, 4);
+    context.fillStyle = theme.fill;
     context.fill();
   }
 }
 
-function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData, artwork: HTMLImageElement) {
-  const width = 1080;
-  drawBase(context, width, 1920, 42);
+function drawStory(context: CanvasRenderingContext2D, data: ResultCardExportData, artwork: HTMLImageElement, height: number) {
+  const width = STORY_WIDTH;
+  drawBase(context, width, height, STORY_INSET);
   drawHeader(context, width, 84, 98, data.labels.traderType);
   context.fillStyle = COLORS.mintStrong;
   context.font = "700 17px JetBrainsMono, monospace";
   context.fillText(data.poles.join(" · "), 84, 178);
   context.fillStyle = COLORS.text;
   context.font = "600 84px \"Playfair Display\", Georgia, serif";
-  wrapText(context, data.name, 84, 282, 912, 88, 2);
-  drawArtwork(context, artwork, 84, 440, 912, 600);
-  drawAxis(context, data.labels.conviction, data.scores.conviction, 84, 1105, 278);
-  drawAxis(context, data.labels.instinct, data.scores.instinct, 400, 1105, 278);
-  drawAxis(context, data.labels.resilience, data.scores.resilience, 718, 1105, 278);
+  const nameLines = wrapText(context, data.name, 84, 268, 912, 84, 2);
+  const rankY = 268 + (nameLines - 1) * 84 + 68;
+  drawRank(context, data, 84, rankY);
+  const artY = rankY + 36;
+  drawArtwork(context, artwork, 84, artY, 912, 620);
+  const axisY = artY + 668;
+  drawAxis(context, data.labels.conviction, data.scores.conviction, 84, axisY, 278, AXIS_THEME[0]);
+  drawAxis(context, data.labels.instinct, data.scores.instinct, 400, axisY, 278, AXIS_THEME[1]);
+  drawAxis(context, data.labels.resilience, data.scores.resilience, 718, axisY, 278, AXIS_THEME[2]);
+  const quoteY = axisY + 156;
   context.fillStyle = COLORS.mint;
   context.font = "500 34px \"Playfair Display\", Georgia, serif";
-  wrapText(context, `“${data.roast}”`, 84, 1260, 860, 45, 3);
-  drawRelations(context, data, 84, 1510, 912);
-  context.strokeStyle = COLORS.line;
-  context.beginPath();
-  context.moveTo(84, 1790);
-  context.lineTo(996, 1790);
-  context.stroke();
-  context.fillStyle = COLORS.mintStrong;
-  context.font = "700 16px Inter, sans-serif";
-  context.fillText("smartx.io/waitlist", 84, 1844);
-  context.fillStyle = COLORS.dim;
-  context.font = "600 12px Inter, sans-serif";
-  context.textAlign = "right";
-  context.fillText(data.labels.disclaimer.toUpperCase(), 996, 1844);
-  context.textAlign = "left";
+  wrapText(context, `“${data.roast}”`, 84, quoteY, 912, 45, 3);
 }
 
 function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, artwork: HTMLImageElement) {
@@ -190,30 +244,49 @@ function drawOg(context: CanvasRenderingContext2D, data: ResultCardExportData, a
   context.fillText(data.poles.join(" · "), 54, 120);
   context.fillStyle = COLORS.text;
   context.font = "600 58px \"Playfair Display\", Georgia, serif";
-  wrapText(context, data.name, 54, 190, 590, 60, 2);
+  const nameLines = wrapText(context, data.name, 54, 186, 590, 58, 2);
+  context.fillStyle = COLORS.mintStrong;
+  context.font = "600 32px \"IBM Plex Sans\", Inter, sans-serif";
+  const rankText = `#${data.rank.toLocaleString("en-US")}`;
+  const rankY = 186 + (nameLines - 1) * 58 + 52;
+  context.fillText(rankText, 54, rankY);
+  const rankWidth = context.measureText(rankText).width;
+  context.fillStyle = COLORS.muted;
+  context.font = "500 14px Inter, sans-serif";
+  context.fillText(data.labels.waitlistRank, 54 + rankWidth + 12, rankY - 4);
   context.fillStyle = COLORS.mint;
   context.font = "500 24px \"Playfair Display\", Georgia, serif";
-  wrapText(context, `“${data.roast}”`, 54, 350, 560, 31, 3);
+  wrapText(context, `“${data.roast}”`, 54, rankY + 56, 560, 31, 3);
   drawArtwork(context, artwork, 680, 104, 466, 382);
-  drawAxis(context, data.labels.conviction.toUpperCase(), data.scores.conviction, 680, 528, 140);
-  drawAxis(context, data.labels.instinct.toUpperCase(), data.scores.instinct, 842, 528, 140);
-  drawAxis(context, data.labels.resilience.toUpperCase(), data.scores.resilience, 1004, 528, 140);
-  drawRelations(context, data, 54, 566, 560);
+  drawAxis(context, data.labels.conviction, data.scores.conviction, 680, 528, 140, AXIS_THEME[0]);
+  drawAxis(context, data.labels.instinct, data.scores.instinct, 842, 528, 140, AXIS_THEME[1]);
+  drawAxis(context, data.labels.resilience, data.scores.resilience, 1004, 528, 140, AXIS_THEME[2]);
 }
 
 export async function renderResultCard(data: ResultCardExportData, format: ResultCardFormat): Promise<RenderedResultCard> {
-  const [, artwork] = await Promise.all([document.fonts.ready, loadImage(data.artSrc)]);
+  const [, artwork] = await Promise.all([
+    waitForFonts(),
+    loadArtwork(data.localArtSrc || data.artSrc, data.artSrc),
+  ]);
   const canvas = document.createElement("canvas");
-  canvas.width = format === "story" ? 1080 : 1200;
-  canvas.height = format === "story" ? 1920 : 630;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas is unavailable in this browser.");
-  if (format === "story") drawStory(context, data, artwork); else drawOg(context, data, artwork);
+  if (format === "story") {
+    canvas.width = STORY_WIDTH;
+    const height = measureStoryHeight(context, data);
+    canvas.height = height;
+    drawStory(context, data, artwork, height);
+  } else {
+    canvas.width = 1200;
+    canvas.height = 630;
+    drawOg(context, data, artwork);
+  }
   const blob = await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((result) => result ? resolve(result) : reject(new Error("Could not render the result card.")), "image/png");
+    canvas.toBlob((result) => result ? resolve(result) : reject(new Error("Could not render the result card.")), "image/jpeg", 0.92);
   });
   return {
     href: URL.createObjectURL(blob),
-    filename: `smartx-${data.code.toLowerCase()}-${format === "story" ? "1080x1920" : "1200x630"}.png`,
+    filename: `smartx-${data.code.toLowerCase()}-${canvas.width}x${canvas.height}`,
+    blob,
   };
 }

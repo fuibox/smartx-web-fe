@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { WaitlistExperience } from "@/components/waitlist/waitlist-experience";
+import { QUIZ_ART_SRCS } from "@/lib/waitlist/persona";
 
 export const metadata: Metadata = {
   title: "SmartX Waitlist | Find Your Trader Type",
@@ -13,8 +14,13 @@ export const metadata: Metadata = {
 
 export default function WaitlistPage() {
   return (
-    <Suspense>
-      <WaitlistExperience />
-    </Suspense>
+    <>
+      {QUIZ_ART_SRCS.map((src) => (
+        <link key={src} rel="preload" as="image" href={src} />
+      ))}
+      <Suspense>
+        <WaitlistExperience />
+      </Suspense>
+    </>
   );
 }

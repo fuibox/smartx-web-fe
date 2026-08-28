@@ -15,12 +15,16 @@ type Notice = {
 let nextId = 1;
 const listeners = new Set<(notice: Notice) => void>();
 
-export function notifyError(message: string) {
+export function notifyNotice(message: string) {
   const text = message.trim();
   if (!text) return;
   const notice = { id: nextId, message: text };
   nextId += 1;
   listeners.forEach((listener) => listener(notice));
+}
+
+export function notifyError(message: string) {
+  notifyNotice(message);
 }
 
 export function AppNoticeHost() {

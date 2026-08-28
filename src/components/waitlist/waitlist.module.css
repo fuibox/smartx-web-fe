@@ -1140,8 +1140,10 @@
   min-width: 0;
 }
 
-.downloadMenu > summary {
+.downloadButton {
   display: flex;
+  box-sizing: border-box;
+  width: 100%;
   min-height: 44px;
   cursor: pointer;
   align-items: center;
@@ -1152,25 +1154,22 @@
   border-radius: 999px;
   background: #202020;
   color: var(--text);
+  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.2;
-  list-style: none;
+  text-decoration: none;
   white-space: nowrap;
 }
 
-.downloadMenu > summary::-webkit-details-marker {
-  display: none;
+.downloadButton:disabled {
+  cursor: progress;
+  opacity: 0.72;
 }
 
-.downloadMenu > summary img {
+.downloadButton img {
   width: 18px;
   height: 18px;
-}
-
-.downloadMenu[open] > summary {
-  border-color: rgb(255 255 255 / 42%);
-  background: #292929;
 }
 
 .downloadOptions {
@@ -1189,20 +1188,28 @@
 }
 
 .downloadOptions a,
+.downloadOptions button,
 .downloadPending {
   display: flex;
+  width: 100%;
   min-height: 48px;
+  cursor: pointer;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
   padding: 0 14px;
+  border: 0;
   border-radius: 10px;
+  background: transparent;
   color: var(--text);
+  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
+  text-align: left;
 }
 
-.downloadOptions a small {
+.downloadOptions a small,
+.downloadOptions button small {
   color: var(--muted);
   font-size: 11px;
   font-weight: 400;
@@ -1212,6 +1219,56 @@
 .downloadPending {
   justify-content: center;
   color: var(--muted);
+}
+
+.artPrefetch {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.artPrefetch img {
+  width: 64px;
+  height: 64px;
+}
+
+.sharePreview {
+  position: fixed;
+  z-index: 320;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  background: rgb(1 1 1 / 92%);
+}
+
+.sharePreview p {
+  margin: 0;
+  color: #c4c4c4;
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.sharePreview img {
+  max-width: min(100%, 420px);
+  max-height: 72vh;
+  object-fit: contain;
+}
+
+.sharePreview button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  background: #202020;
+  color: var(--text);
 }
 
 .chemistryBlock {
@@ -1577,8 +1634,9 @@
 .posterLogo:focus-visible,
 .primaryButton:focus-visible,
 .shareButton:focus-visible,
-.downloadMenu > summary:focus-visible,
+.downloadButton:focus-visible,
 .downloadOptions a:focus-visible,
+.downloadOptions button:focus-visible,
 .shareInviteOption:focus-visible,
 .shareDialogShare:focus-visible,
 .textButton:focus-visible,
@@ -1648,11 +1706,18 @@
     transform: translateY(-2px);
   }
 
+  .downloadButton:not(:disabled):hover {
+    border-color: rgb(255 255 255 / 42%);
+    background: #292929;
+  }
+
   .textButton:hover,
   .testCodeButton:hover,
   .formMeta button:hover,
   .quizTopline button:hover,
-  .cardDownloads a:hover { color: var(--text); }
+  .cardDownloads a:hover,
+  .downloadOptions a:hover,
+  .downloadOptions button:hover { color: var(--text); background: rgb(255 255 255 / 8%); }
   .recoveryBack:hover { color: var(--text); }
   .accountStrip button:hover,
   .accountStrip button:hover span { color: var(--text); }
@@ -3040,7 +3105,7 @@
     margin-top: 40px;
   }
 
-  .page:is([data-stage="result"], [data-referral="true"]) .downloadMenu > summary {
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadButton {
     min-height: 56px;
     font-size: 20px;
   }
@@ -3051,6 +3116,7 @@
   }
 
   .page:is([data-stage="result"], [data-referral="true"]) .downloadOptions a,
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadOptions button,
   .page:is([data-stage="result"], [data-referral="true"]) .downloadPending {
     font-size: 16px;
   }
@@ -4324,7 +4390,7 @@
     margin-top: 28px;
   }
 
-  .page:is([data-stage="result"], [data-referral="true"]) .downloadMenu > summary {
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadButton {
     min-height: 54px;
     padding: 0 14px;
     font-size: 16px;
@@ -4397,6 +4463,49 @@
     min-height: 44px;
     padding: 0 14px;
     font-size: 14px;
+  }
+}
+
+@media (max-width: 750px) {
+  .page:is([data-stage="result"], [data-referral="true"]) .stage {
+    padding: 16px 20px 28px;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel,
+  .page[data-referral="true"] .referralResultPanel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel > *,
+  .page[data-referral="true"] .referralResultPanel > * {
+    width: 100%;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .accountStrip {
+    text-align: left;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > span,
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > strong,
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > small {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header {
+    align-items: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header .inviteCount {
+    text-align: center;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .eyebrow {
+    align-self: center;
   }
 }
 
@@ -4631,6 +4740,148 @@
     font-weight: 500;
     line-height: 1.35;
     overflow-wrap: break-word;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) {
+    --result-scale: clamp(0, (100vw - 750px) / 1170px, 1);
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .stage {
+    display: grid;
+    flex: 1 0 auto;
+    width: 100%;
+    min-height: max(720px, calc(100svh - 65px));
+    height: auto;
+    margin: 0;
+    padding: 0;
+    place-items: stretch;
+    align-items: stretch;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultStage {
+    display: grid;
+    width: 100%;
+    min-height: 100%;
+    align-items: stretch;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(max-content, 1fr);
+    gap: 0;
+    animation: none;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: auto;
+    min-height: 100%;
+    align-self: stretch;
+    flex-direction: column;
+    justify-self: stretch;
+    box-sizing: border-box;
+    padding: calc(24px + 16px * var(--result-scale)) calc(20px + 44px * var(--result-scale));
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .posterIdentity h2 {
+    font-size: calc(32px + 48px * var(--result-scale));
+    line-height: 1.06;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaArt {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: calc(180px + 150px * var(--result-scale));
+    height: auto;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .personaPoster blockquote {
+    font-size: calc(16px + 8px * var(--result-scale));
+    margin-top: calc(16px + 16px * var(--result-scale));
+    padding: calc(16px + 8px * var(--result-scale));
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel,
+  .page[data-referral="true"] .referralResultPanel {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 100%;
+    align-self: stretch;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: stretch;
+    box-sizing: border-box;
+    padding: calc(24px + 16px * var(--result-scale)) calc(20px + 44px * var(--result-scale));
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel > *,
+  .page[data-referral="true"] .referralResultPanel > * {
+    width: min(100%, calc(400px + 300px * var(--result-scale)));
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > strong {
+    font-size: calc(36px + 12px * var(--result-scale));
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .downloadButton,
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock .shareButton {
+    min-height: calc(48px + 8px * var(--result-scale));
+    font-size: calc(14px + 6px * var(--result-scale));
+  }
+
+  .page[data-referral="true"] .referralResultPanel {
+    text-align: center;
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .eyebrow {
+    align-self: center;
+  }
+
+  .page[data-referral="true"] .referralResultPanel h1 {
+    font-size: calc(32px + 32px * var(--result-scale));
+  }
+
+  .page[data-referral="true"] .referralResultPanel > .primaryButton,
+  .page[data-referral="true"] .referralResultPanel .referralReturn,
+  .page[data-referral="true"] .referralResultPanel .referralReturn .primaryButton {
+    width: min(100%, 600px);
+  }
+}
+
+@media (min-width: 751px) and (max-width: 1100px) {
+  .page:is([data-stage="result"], [data-referral="true"]) .chemistryBlock {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .resultPanel,
+  .page[data-referral="true"] .referralResultPanel {
+    text-align: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .accountStrip {
+    text-align: left;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > span,
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > strong,
+  .page:is([data-stage="result"], [data-referral="true"]) .rankBlock > small {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .page:is([data-stage="result"], [data-referral="true"]) .invitationDeck > header .inviteCount {
+    text-align: center;
   }
 }
 
