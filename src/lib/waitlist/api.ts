@@ -164,9 +164,9 @@ export const waitlistApi = {
     return isResultCard(data) ? data : null;
   },
 
-  getPublicResult(resultId: string) {
+  getPublicResult(invite: string) {
     return waitlistRequest<PublicResult>("/waitlist_public/result", {
-      query: { resultId },
+      query: { inviteCode: normalizeInviteCode(invite) },
     });
   },
 

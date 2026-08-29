@@ -121,6 +121,15 @@ const DEMO_OUTCOME: Outcome = {
   rival: PERSONAS_BY_CODE.DOC,
 };
 
+const HIDDEN_DEMO_OUTCOME: Outcome = {
+  resultId: "demo-result-rsk",
+  persona: PERSONAS_BY_CODE.RSK,
+  poles: ["SNIPER", "DATA", "LONE"],
+  stats: { conviction: 40, instinct: 38, resilience: 92 },
+  bestMatch: PERSONAS_BY_CODE.CHN,
+  rival: PERSONAS_BY_CODE.LQD,
+};
+
 // 状态与分支逻辑始终使用英文规范文案（与 API 返回值精确比较）；
 // 只在渲染时经此映射表转成当前语言，未知文案原样透出。
 const WAITLIST_MESSAGE_L10N: Record<string, MessageDescriptor> = {
@@ -206,10 +215,9 @@ function isExpiredSession(error: unknown) {
   return isUnauthorized(error) || isMissingUserError(error);
 }
 
-function makeInvitationUrl(code?: string, resultId?: string, useCurrentOrigin = false) {
+function makeInvitationUrl(code?: string, useCurrentOrigin = false) {
   const base = useCurrentOrigin && typeof window !== "undefined" ? new URL("/waitlist/", window.location.origin).toString() : WAITLIST_URL;
   const url = new URL(base);
-  if (resultId) url.searchParams.set("result", resultId);
   if (code) url.searchParams.set("invite", code);
   return url.toString();
 }
@@ -543,10 +551,9 @@ export function WaitlistExperience() {
       if (pendingNotice) setGateError(pendingNotice);
 
     const params = new URLSearchParams(window.location.search);
-      const resultId = params.get("result")?.trim() ?? "";
       const urlInviteRaw = (params.get("invite") ?? "").trim();
       const urlInvite = normalizeInviteCode(urlInviteRaw);
-      const shareEntry = Boolean(resultId || urlInviteRaw);
+      const shareEntry = Boolean(urlInviteRaw);
       const storedUserToken = getUserToken();
       const quizDraft = getQuizDraft();
       const storedInvite = getLandingInvite();
@@ -568,7 +575,7 @@ export function WaitlistExperience() {
       const [questionsResult, infoResult, publicResult, inviteCardResult, inviteStatusResult] = await Promise.allSettled([
         waitlistApi.getQuestions().then((data) => hydrateQuestions(data.questions)),
         storedUserToken ? waitlistApi.getUserInfo(storedUserToken) : Promise.resolve(null),
-        resultId ? waitlistApi.getPublicResult(resultId) : Promise.resolve(null),
+        shareEntry && isValidInviteCode(urlInvite) ? waitlistApi.getPublicResult(urlInvite) : Promise.resolve(null),
         shareEntry && isValidInviteCode(urlInvite) ? waitlistApi.getInviterCard(urlInvite) : Promise.resolve(null),
         isValidInviteCode(invite) ? waitlistApi.checkInvite(invite) : Promise.resolve(null),
       ]);
@@ -598,15 +605,6 @@ export function WaitlistExperience() {
         setUserInfo(info);
         setSessionEmail(info.email);
         if (info.inviteCode) setOwnInviteCode(info.inviteCode);
-      }
-
-      if (publicResult.status === "rejected") {
-        clearShareUrl({
-          hard: true,
-          notice: errorMessage(publicResult.reason),
-        });
-        setStage("gate");
-        return;
       }
 
       const friendCard =
@@ -831,7 +829,7 @@ export function WaitlistExperience() {
     }
 
     setSessionEmail("demo@smartx.io");
-    setOwnOutcome(DEMO_OUTCOME);
+    setOwnOutcome(target === "result-hidden" ? HIDDEN_DEMO_OUTCOME : DEMO_OUTCOME);
     setRank(8017);
     setShareCompleted(false);
     setVerifiedFriends(2);
@@ -1153,7 +1151,7 @@ export function WaitlistExperience() {
     const shareName = localizedPersonaName(ownOutcome.persona);
     const shareRoast = localizedPersonaRoast(ownOutcome.persona);
     shareUrl.searchParams.set("text", `${t`My SmartX trader type is ${shareName}.`}${shareRoast ? `\n\n“${shareRoast}”` : ""}\n\n${t`Find yours in six questions.`}`);
-    shareUrl.searchParams.set("url", makeInvitationUrl(ownInviteCode, ownOutcome.resultId, true));
+    shareUrl.searchParams.set("url", makeInvitationUrl(ownInviteCode, true));
     window.open(shareUrl.toString(), "_blank", "noopener,noreferrer");
     if (!userToken || shareCompleted || demoActive) return;
     try {
@@ -1167,9 +1165,9 @@ export function WaitlistExperience() {
   };
 
   const copyInvitation = async (code?: string) => {
-    if (!code || !ownOutcome) return;
+    if (!code) return;
     try {
-      await navigator.clipboard.writeText(makeInvitationUrl(code, ownOutcome.resultId, true));
+      await navigator.clipboard.writeText(makeInvitationUrl(code, true));
     setCopiedCode(code);
     window.setTimeout(() => setCopiedCode(null), 1400);
     } catch (error) {

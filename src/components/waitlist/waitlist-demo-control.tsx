@@ -9,7 +9,8 @@ export type WaitlistDemoTarget =
   | "verify"
   | "unlock"
   | "unlock-ready"
-  | "result";
+  | "result"
+  | "result-hidden";
 
 const STATIC_VIEWS: Array<{ value: WaitlistDemoTarget; label: string }> = [
   { value: "gate", label: "Entry · direct" },
@@ -20,6 +21,7 @@ const STATIC_VIEWS: Array<{ value: WaitlistDemoTarget; label: string }> = [
   { value: "unlock", label: "Unlock · incomplete" },
   { value: "unlock-ready", label: "Unlock · completed" },
   { value: "result", label: "Result" },
+  { value: "result-hidden", label: "Result · hidden" },
 ];
 
 export function WaitlistDemoControl({
