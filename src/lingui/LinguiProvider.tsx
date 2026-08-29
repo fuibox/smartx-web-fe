@@ -52,6 +52,8 @@ export function LinguiProvider({ children }: { children: ReactNode }) {
       i18n,
       _: i18n.t.bind(i18n),
     }),
+    // i18n 是可变单例；靠 locale 变化产出新 context 值，驱动消费组件重渲染。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [locale],
   );
 
