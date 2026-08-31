@@ -163,6 +163,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 - 可索引页面为 `/`、`/privacy-policy`、`/terms`、`/blog`、`/blog/page/[page]` 与已发布的 `/blog/[slug]`；`/v4` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
 - 构建产物是 `out/` 静态站点：`npm run build` 生成，`npm start` 只用于本地预览。生产环境直接发布该目录，不运行 `next dev`。
 - Google Search Console verification meta 必须长期保留；`robots.txt`、`sitemap.xml`、Open Graph 图片和自定义 404 随构建生成。
+- 自定义 404 必须跟随当前公开首页的共享 Header、纯黑画布、Playfair 标题、IBM Plex 正文与 teal 主 CTA；旧版蓝黑网格、像素标题、青色旧 logo 和点阵装饰均视为历史方案，不得恢复。
 - 首页输出 Organization / WebSite / SoftwareApplication JSON-LD；Blog 详情输出 BlogPosting JSON-LD。`sitemap.xml` 必须包含 `/`、Blog 列表、静态分页和全部已发布详情页，不能只提交首页。
 - CDN/静态托管层上线时必须验证安全响应头：CSP、`X-Content-Type-Options: nosniff`、点击劫持防护、`Referrer-Policy` 与适用的 `Permissions-Policy`。这些响应头不由静态页面本身代替。
 - 托管层若支持重定向，优先把 `/v4/*` 配置为指向 `/` 的 308；仓库中的客户端跳转仅作为跨平台兜底。
@@ -186,11 +187,13 @@ SEO 发布契约：所有可索引页面必须输出独立 title、description�
 - 像素字体 400 字重（必须 700）
 - CTA 切角样式（用原 smartx.io 双段按钮）
 - 全站产品 token 教条（只有产品 UI 切片需要保真，外壳守品牌色即可）
+- 404 的蓝黑网格、像素字体、青色旧 logo 与点阵装饰（属于已废弃的历史官网视觉）
 
 ## 6. 组件地图
 
 ```text
 src/app/page.tsx                 V4 公开首页组装
+src/app/not-found.tsx            当前品牌 404 恢复页
 src/app/v4/page.tsx              旧链接兼容跳转
 src/app/blog/page.tsx            Blog 列表首页
 src/app/blog/page/[page]/page.tsx Blog 静态分页

@@ -1,23 +1,39 @@
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import { SiteHeader } from "@/components/site/site-header";
 
 import styles from "./not-found.module.css";
 
+export const metadata: Metadata = {
+  title: "Page Not Found | SmartX",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default function NotFound() {
   return (
-    <main className={styles.page}>
-      <header>
-        <Image src="/assets/smartx-logo.svg" alt="SmartX" width={218} height={42} priority />
-      </header>
-      <section aria-labelledby="not-found-title">
-        <p>404 / SIGNAL LOST</p>
-        <h1 id="not-found-title">This market moved.</h1>
-        <span>The page you requested is no longer at this address.</span>
-        <Link href="/">Return to SmartX <i aria-hidden="true">→</i></Link>
-      </section>
-      <div className={styles.field} aria-hidden="true">
-        {Array.from({ length: 28 }).map((_, index) => <i key={index} />)}
-      </div>
-    </main>
+    <div className={styles.page}>
+      <a className={styles.skipLink} href="#not-found-content">
+        Skip to page message
+      </a>
+      <SiteHeader />
+
+      <main id="not-found-content" className={styles.main}>
+        <section className={styles.content} aria-labelledby="not-found-title">
+          <p className={styles.eyebrow}>404 / Page not found</p>
+          <h1 id="not-found-title">There&apos;s nothing here.</h1>
+          <p className={styles.description}>
+            The page you&apos;re looking for doesn&apos;t exist, or the link has
+            changed.
+          </p>
+          <Link className={styles.primaryAction} href="/">
+            Back to SmartX
+          </Link>
+        </section>
+      </main>
+    </div>
   );
 }

@@ -66,8 +66,9 @@ export default function PrivacyPolicyPage() {
               </div>
             </dl>
             <p className={styles.intro}>
-              This Privacy Policy for Edgewater Tech Limited (&quot;SmartX,&quot;
-              &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) explains how we
+              This Privacy Policy for Edgewater Tech Limited, a company
+              incorporated in the British Virgin Islands (&quot;SmartX,&quot;
+              &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;), explains how we
               collect, use, and share information when you use the SmartX mobile
               application, website, and related services (collectively, the
               &quot;Services&quot;).

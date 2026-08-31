@@ -85,9 +85,10 @@ export default function TermsPage() {
             </dl>
             <p className={styles.intro}>
               These Terms of Service (the &quot;Terms&quot;) are an agreement
-              between you and Edgewater Tech Limited (&quot;SmartX,&quot;
-              &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) governing your
-              access to and use of the SmartX mobile application, website at{" "}
+              between you and Edgewater Tech Limited, a company incorporated in
+              the British Virgin Islands (&quot;SmartX,&quot; &quot;we,&quot;
+              &quot;us,&quot; or &quot;our&quot;), governing your access to and use
+              of the SmartX mobile application, website at{" "}
               <a href="https://smartx.io">smartx.io</a>, and related services
               (collectively, the &quot;Services&quot;).
             </p>
@@ -423,11 +424,12 @@ export default function TermsPage() {
 
           <LegalSection number="15" title="Governing Law and Disputes">
             <p>
-              These Terms are governed by the laws of <strong>Singapore</strong>,
-              without regard to conflict-of-law rules. Subject to any rights you
-              have under mandatory consumer law, the courts of Singapore will
-              have exclusive jurisdiction over disputes arising out of or relating
-              to these Terms or the Services.
+              These Terms are governed by the laws of the{" "}
+              <strong>British Virgin Islands</strong>, without regard to
+              conflict-of-law rules. Subject to any rights you have under
+              mandatory consumer law, the courts of the British Virgin Islands
+              will have exclusive jurisdiction over disputes arising out of or
+              relating to these Terms or the Services.
             </p>
             <p>
               Before filing a formal claim, you and SmartX agree to try to resolve

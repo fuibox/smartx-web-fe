@@ -120,6 +120,23 @@ final result: passed
 
 ---
 
+### Current-brand 404 route · 2026-08-31
+
+- Scope: replace the historical blue-grid / pixel-font 404 with a current-brand recovery screen for every unmatched route.
+- Design source: the current public homepage at `/`, not the retired V4 error-page theme.
+- Before evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/01-current-404-desktop.jpg`.
+- Current-home reference: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/02-latest-home-reference.jpg`.
+- Desktop implementation: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/03-new-404-desktop.jpg` at `1440 × 900`.
+- Mobile implementation: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/04-new-404-mobile.jpg` at `390 × 844`.
+- Comparison evidence: old vs new `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/05-old-new-comparison.jpg`; current homepage vs new 404 `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/not-found/06-home-404-comparison.jpg`.
+- UX: the message now describes both nonexistent and changed links without implying a market moved. One primary action returns to the homepage; the shared Header preserves X, Community, Blog, and Launch Alpha escape routes.
+- Accessibility: semantic `main` / `section` / `h1`, skip link, 52px mobile CTA, visible keyboard focus, `noindex,nofollow`, and reduced-motion fallback are present.
+- Responsive behavior: no horizontal overflow at `1440 × 900` or `390 × 844`; both layouts stay within one viewport.
+
+final result: passed
+
+---
+
 ### Privacy Policy route · 2026-08-31
 
 - Scope: new static `/privacy-policy` legal-document route using the user-supplied SmartX policy as the content source. No header or footer navigation entry was added.
@@ -143,7 +160,7 @@ final result: passed
 - Mobile evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/terms/02-terms-mobile.jpg` at `390 × 844`.
 - Content: all 18 supplied sections render, with working Privacy Policy, website, and support-email links. The source document's hidden draft comment is not rendered.
 - Responsive behavior: all 18 sections render without horizontal overflow at desktop or mobile.
-- Publication note: Section 15 uses Singapore as the user-confirmed governing law and the courts of Singapore as the user-confirmed exclusive jurisdiction.
+- Publication note: Section 15 uses the British Virgin Islands as the governing law and the courts of the British Virgin Islands as the exclusive jurisdiction, aligned with the confirmed jurisdiction of incorporation for Edgewater Tech Limited.
 
 final result: passed
 
