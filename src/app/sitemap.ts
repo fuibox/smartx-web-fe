@@ -29,6 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: "https://smartx.io/privacy-policy/",
+      lastModified: "2026-08-01",
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
     ...Array.from(
       { length: Math.max(0, pageCount - 1) },
       (_, index) => ({

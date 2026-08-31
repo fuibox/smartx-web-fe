@@ -118,6 +118,21 @@ Scope: only `03 / Learn`. The supplied 1280×720 concept image is the visual sou
 
 final result: passed
 
+---
+
+### Privacy Policy route · 2026-08-31
+
+- Scope: new static `/privacy-policy/` legal-document route using the user-supplied SmartX policy as the content source. No header or footer navigation entry was added.
+- Visual direction: the reference page's quiet legal-document hierarchy is retained through a large title, visible effective/update dates, one readable text column, numbered sections, and restrained dividers; typography, header, footer, and teal accent remain SmartX-native.
+- Desktop evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/01-privacy-policy-desktop.png` at a `1440 × 900` viewport override.
+- Mobile evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/02-privacy-policy-mobile.png`; contact treatment `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/05-privacy-policy-mobile-contact.png`; footer `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/04-privacy-policy-mobile-footer-final.png` at a `390 × 844` viewport override.
+- Content: all 12 supplied sections render. The unresolved account-deletion placeholder was replaced with the user-approved sentence and a functional `mailto:support@smartx.io` link.
+- Accessibility: semantic heading order, lists, dates, contact address, keyboard focus states, and a skip link are present. Reduced-motion removes the only authored link transitions.
+- Responsive behavior: no horizontal overflow was detected at desktop or mobile; the mobile title, dates, section headings, contact rows, and shared footer remain readable without clipping.
+- Runtime: the browser reported no warnings or errors. The route has independent canonical, robots, Open Graph, and Twitter metadata and is included in the static sitemap.
+
+final result: passed
+
 ### Consumer homepage · Screen 5 SmartX Hub and demo identity pass · 2026-08-25
 
 - Source asset: `public/assets/consumer-network/account-hub-network-brand-teal.webp` (`1920 × 800`). The SmartX-owned glow and circuit traces use the website brand teal `#08DFB5`; Apple, Google, bank, Coinbase, Binance, Solana, Robinhood, Base, and BNB Chain retain their distinct colors.
