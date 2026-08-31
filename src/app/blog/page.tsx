@@ -16,14 +16,14 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: {
-    canonical: "/blog/",
+    canonical: "/blog",
   },
   robots: SMARTX_INDEXABLE_ROBOTS,
   openGraph: {
     ...SMARTX_OPEN_GRAPH_DEFAULTS,
     title,
     description,
-    url: "/blog/",
+    url: "/blog",
     type: "website",
     images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },

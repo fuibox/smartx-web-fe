@@ -94,14 +94,14 @@ export async function generateMetadata({
     publisher: "SmartX",
     category: post.category,
     alternates: {
-      canonical: `/blog/${post.slug}/`,
+      canonical: `/blog/${post.slug}`,
     },
     robots: SMARTX_INDEXABLE_ROBOTS,
     openGraph: {
       ...SMARTX_OPEN_GRAPH_DEFAULTS,
       title,
       description,
-      url: `/blog/${post.slug}/`,
+      url: `/blog/${post.slug}`,
       type: "article",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
@@ -141,7 +141,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const relatedPosts = await getRelatedBlogPosts(post.slug);
   const readingStats = getBlogReadingStats(post);
   const readTime = formatBlogReadTime(readingStats.minutes);
-  const articleUrl = `https://smartx.io/blog/${post.slug}/`;
+  const articleUrl = `https://smartx.io/blog/${post.slug}`;
   const socialImage = post.seo?.image ?? post.cover;
   const structuredData = {
     "@context": "https://schema.org",

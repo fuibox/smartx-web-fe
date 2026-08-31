@@ -40,7 +40,7 @@ export async function generateMetadata({
 
   if (pageNumber === 1) {
     return {
-      alternates: { canonical: "/blog/" },
+      alternates: { canonical: "/blog" },
       robots: {
         index: false,
         follow: true,
@@ -59,7 +59,7 @@ export async function generateMetadata({
 
   const title = `SmartX Journal: Prediction Market Research — Page ${pageNumber}`;
   const description = `Browse page ${pageNumber} of SmartX Journal for prediction-market guides, market intelligence, product updates, and practical research from SmartX.`;
-  const canonical = `/blog/page/${pageNumber}/`;
+  const canonical = `/blog/page/${pageNumber}`;
 
   return {
     title,
@@ -89,7 +89,7 @@ export default async function BlogArchivePage({
   const pageNumber = Number((await params).page);
   const pageCount = await getBlogArchivePageCount();
 
-  if (pageNumber === 1) redirect("/blog/");
+  if (pageNumber === 1) redirect("/blog");
 
   if (
     !Number.isInteger(pageNumber) ||

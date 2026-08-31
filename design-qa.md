@@ -122,7 +122,7 @@ final result: passed
 
 ### Privacy Policy route · 2026-08-31
 
-- Scope: new static `/privacy-policy/` legal-document route using the user-supplied SmartX policy as the content source. No header or footer navigation entry was added.
+- Scope: new static `/privacy-policy` legal-document route using the user-supplied SmartX policy as the content source. No header or footer navigation entry was added.
 - Visual direction: the reference page's quiet legal-document hierarchy is retained through a large title, visible effective/update dates, one readable text column, numbered sections, and restrained dividers; typography, header, footer, and teal accent remain SmartX-native.
 - Desktop evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/01-privacy-policy-desktop.png` at a `1440 × 900` viewport override.
 - Mobile evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/02-privacy-policy-mobile.png`; contact treatment `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/05-privacy-policy-mobile-contact.png`; footer `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/privacy-policy/04-privacy-policy-mobile-footer-final.png` at a `390 × 844` viewport override.

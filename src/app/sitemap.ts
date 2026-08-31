@@ -24,13 +24,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: "https://smartx.io/blog/",
+      url: "https://smartx.io/blog",
       lastModified: latestBlogUpdate,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: "https://smartx.io/privacy-policy/",
+      url: "https://smartx.io/privacy-policy",
       lastModified: "2026-08-01",
       changeFrequency: "yearly",
       priority: 0.3,
@@ -38,14 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...Array.from(
       { length: Math.max(0, pageCount - 1) },
       (_, index) => ({
-        url: `https://smartx.io/blog/page/${index + 2}/`,
+        url: `https://smartx.io/blog/page/${index + 2}`,
         lastModified: latestBlogUpdate,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       }),
     ),
     ...posts.map((post) => ({
-      url: `https://smartx.io/blog/${post.slug}/`,
+      url: `https://smartx.io/blog/${post.slug}`,
       lastModified: post.updatedAt ?? post.publishedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
