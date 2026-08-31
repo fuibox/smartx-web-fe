@@ -9,7 +9,7 @@ import {
   SMARTX_TWITTER_DEFAULTS,
 } from "@/lib/site-metadata";
 
-import styles from "./privacy-policy.module.css";
+import styles from "@/components/legal/legal-document.module.css";
 
 const title = "Privacy Policy | SmartX";
 const description =

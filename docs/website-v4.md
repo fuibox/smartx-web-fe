@@ -160,7 +160,7 @@ Hero → Index / The system → 01 Signals → 02 Execute → 03 Learn
 
 ### 正式发布合同
 
-- 可索引页面为 `/`、`/privacy-policy`、`/blog`、`/blog/page/[page]` 与已发布的 `/blog/[slug]`；`/v4` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
+- 可索引页面为 `/`、`/privacy-policy`、`/terms`、`/blog`、`/blog/page/[page]` 与已发布的 `/blog/[slug]`；`/v4` 只保留同源兼容跳转且声明 `noindex`，V3 与内部 stage preview 不进入生产路由。
 - 构建产物是 `out/` 静态站点：`npm run build` 生成，`npm start` 只用于本地预览。生产环境直接发布该目录，不运行 `next dev`。
 - Google Search Console verification meta 必须长期保留；`robots.txt`、`sitemap.xml`、Open Graph 图片和自定义 404 随构建生成。
 - 首页输出 Organization / WebSite / SoftwareApplication JSON-LD；Blog 详情输出 BlogPosting JSON-LD。`sitemap.xml` 必须包含 `/`、Blog 列表、静态分页和全部已发布详情页，不能只提交首页。
@@ -196,6 +196,7 @@ src/app/blog/page.tsx            Blog 列表首页
 src/app/blog/page/[page]/page.tsx Blog 静态分页
 src/app/blog/[slug]/page.tsx     Blog 详情
 src/app/privacy-policy/page.tsx  Privacy Policy 法律正文
+src/app/terms/page.tsx           Terms of Service 法律正文
 src/components/v4/
   hero.tsx                       Hero（滚动进度 + CTA）
   dither-field.tsx               签名抖动场（Canvas 2D）

@@ -53,7 +53,7 @@ const structuredData = {
       operatingSystem: "Web",
       inLanguage: "en",
       url: "https://app.smartx.io/",
-      image: "https://smartx.io/opengraph-image.png",
+      image: "https://smartx.io/smartx-social-share.png",
       description:
         "Follow verified traders and trade memes, perps, stocks, and prediction markets in one tap.",
       offers: {

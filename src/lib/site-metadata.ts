@@ -8,10 +8,10 @@ export const SMARTX_LOGO_URL = `${SMARTX_SITE_URL}assets/smartx-logo.svg`;
 export const SMARTX_TWITTER_HANDLE = "@SmartXTerminal";
 
 export const SMARTX_DEFAULT_SOCIAL_IMAGE = {
-  url: "/opengraph-image.png",
+  url: "/smartx-social-share.png",
   width: 1200,
   height: 630,
-  alt: "SmartX — The AI trading terminal that understands you",
+  alt: "SmartX — The personalized social trading app for memes, perps, stocks, and prediction markets. Backed by YZi Labs.",
 } as const;
 
 export const SMARTX_OPEN_GRAPH_DEFAULTS = {

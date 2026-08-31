@@ -133,6 +133,20 @@ final result: passed
 
 final result: passed
 
+---
+
+### Terms of Service route · 2026-08-31
+
+- Scope: new static `/terms` legal-document route using the user-supplied Terms of Service as the content source. No header or footer navigation entry was added.
+- Shared system: Privacy Policy and Terms now use one legal-document stylesheet, preserving the same header, dates, numbered-section rhythm, readable measure, link treatment, focus states, and reduced-motion behavior.
+- Desktop evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/terms/01-terms-desktop.jpg` at `1440 × 900`.
+- Mobile evidence: `/Users/wuxiuchen/.codex/visualizations/2026/08/28/01a0466f-fb75-7c50-9d73-f3e5eb1215e1/terms/02-terms-mobile.jpg` at `390 × 844`.
+- Content: all 18 supplied sections render, with working Privacy Policy, website, and support-email links. The source document's hidden draft comment is not rendered.
+- Responsive behavior: all 18 sections render without horizontal overflow at desktop or mobile.
+- Publication note: Section 15 uses Singapore as the user-confirmed governing law and the courts of Singapore as the user-confirmed exclusive jurisdiction.
+
+final result: passed
+
 ### Consumer homepage · Screen 5 SmartX Hub and demo identity pass · 2026-08-25
 
 - Source asset: `public/assets/consumer-network/account-hub-network-brand-teal.webp` (`1920 × 800`). The SmartX-owned glow and circuit traces use the website brand teal `#08DFB5`; Apple, Google, bank, Coinbase, Binance, Solana, Robinhood, Base, and BNB Chain retain their distinct colors.

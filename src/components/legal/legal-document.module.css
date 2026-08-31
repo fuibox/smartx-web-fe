@@ -109,6 +109,31 @@
   letter-spacing: -0.008em;
 }
 
+.introFollowup {
+  max-width: 720px;
+  margin: 22px 0 0;
+  color: var(--body);
+  font-size: 18px;
+  line-height: 1.72;
+  letter-spacing: -0.008em;
+}
+
+.intro a,
+.introFollowup a {
+  color: var(--teal);
+  text-decoration: underline;
+  text-decoration-color: rgb(8 223 181 / 38%);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.intro a:focus-visible,
+.introFollowup a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+  text-decoration: none;
+}
+
 .policySection {
   padding: 54px 0;
   border-bottom: 1px solid var(--rule);
@@ -248,12 +273,16 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .intro a,
+  .introFollowup a,
   .policySection a {
     transition:
       color 160ms cubic-bezier(0.23, 1, 0.32, 1),
       text-decoration-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
+  .intro a:hover,
+  .introFollowup a:hover,
   .policySection a:hover {
     color: var(--paper);
     text-decoration-color: var(--teal);
@@ -293,6 +322,11 @@
 
   .intro {
     margin-top: 36px;
+    font-size: 17px;
+    line-height: 1.68;
+  }
+
+  .introFollowup {
     font-size: 17px;
     line-height: 1.68;
   }
@@ -339,6 +373,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro a,
+  .introFollowup a,
   .policySection a {
     transition: none !important;
   }
