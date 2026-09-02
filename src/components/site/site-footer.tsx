@@ -1,70 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import styles from "./site-chrome.module.css";
 
-const ASSET_ROOT = "/assets/consumer-network";
-
-export function SiteFooter() {
+export function SiteFooter({ overlay = false }: { overlay?: boolean }) {
   return (
-    <footer className={styles.footer}>
-      <div className={styles.footerDirectory}>
-        <div className={styles.footerBrand}>
-          <Link className={styles.footerBrandLink} href="/" aria-label="SmartX home">
-            <Image
-              src={`${ASSET_ROOT}/logo-black.svg`}
-              alt=""
-              width={34}
-              height={28}
-            />
-            <span>SmartX</span>
-          </Link>
-
-          <div className={styles.socialLinks} aria-label="SmartX social links">
-            <a
-              href="https://x.com/SmartXTerminal"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="SmartX on X"
-            >
-              <Image
-                src={`${ASSET_ROOT}/social-x.svg`}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </a>
-            <a
-              href="https://t.me/+CTeuBkpOxSNkN2Y0"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="SmartX on Telegram"
-            >
-              <Image
-                src={`${ASSET_ROOT}/social-telegram.svg`}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </a>
-          </div>
-
-          <small className={styles.footerCopyright}>© SmartX 2026</small>
-        </div>
-
-        <div className={styles.footerLinks}>
-          <nav className={styles.footerGroup} aria-labelledby="footer-support-title">
-            <h2 id="footer-support-title">Support &amp; Legal</h2>
-            <Link href="/support">Support</Link>
-            <Link href="/privacy-policy">Privacy Policy</Link>
-            <Link href="/terms">Terms of Service</Link>
-          </nav>
-        </div>
-      </div>
-
-      <span className={styles.footerWordmark} aria-hidden="true">
-        SmartX
-      </span>
+    <footer className={`${styles.footer} ${overlay ? styles.footerOverlay : ""}`}>
+      <small>© 2026 SmartX</small>
+      <nav className={styles.footerLinks} aria-label="Support and legal">
+        <Link href="/support">Support</Link>
+        <Link href="/privacy-policy">Privacy Policy</Link>
+        <Link href="/terms">Terms of Service</Link>
+      </nav>
     </footer>
   );
 }

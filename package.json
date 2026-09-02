@@ -8,18 +8,16 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node tooling/finalize-static.mjs && npm test",
     "start": "serve out -l 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "npm run test:blog",
-    "test:blog": "tsc -p tsconfig.blog-tests.json && node --test .test-dist/tests/blog/*.test.js"
+    "test": "node --test tests/site/*.test.mjs"
   },
   "dependencies": {
     "next": "15.5.21",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "react-icons": "5.7.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

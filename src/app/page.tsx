@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { ConsumerHome } from "@/components/consumer-network/consumer-home";
 import {
+  SMARTX_APP_DESCRIPTION,
+  SMARTX_APP_TITLE,
   SMARTX_DEFAULT_SOCIAL_IMAGE,
   SMARTX_INDEXABLE_ROBOTS,
   SMARTX_LOGO_URL,
@@ -12,9 +14,8 @@ import {
   SMARTX_WEBSITE_ID,
 } from "@/lib/site-metadata";
 
-const title = "SmartX for iPhone | Trade your edge";
-const description =
-  "The social trading app for memes, perps, stocks, and prediction markets. Follow verified traders and trade in one tap.";
+const title = SMARTX_APP_TITLE;
+const description = SMARTX_APP_DESCRIPTION;
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -49,7 +50,7 @@ const structuredData = {
       operatingSystem: "iOS",
       inLanguage: "en",
       url: SMARTX_SITE_URL,
-      image: `${SMARTX_SITE_URL}assets/consumer-network/hero-product.webp`,
+      image: SMARTX_LOGO_URL,
       description,
       publisher: { "@id": SMARTX_ORGANIZATION_ID },
     },
