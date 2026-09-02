@@ -11,37 +11,34 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SMARTX_SITE_URL),
-  title: "SmartX | The AI Trading Terminal Built Around You",
+  title: "SmartX for iPhone | Trade your edge",
   description:
-    "SmartX connects live market signals, smart money context, watchlists, and trading in one AI-native terminal.",
+    "The social trading app for memes, perps, stocks, and prediction markets. Follow verified traders and trade in one tap.",
   creator: "SmartX",
   publisher: "SmartX",
   referrer: "strict-origin-when-cross-origin",
   icons: {
     icon: "/assets/favicon.ico",
   },
-  verification: {
-    google: "ULRDqnBcK_2XDkvPUK6-3ioSqEiAo-wibKnuIcaQYBs",
-  },
   openGraph: {
     ...SMARTX_OPEN_GRAPH_DEFAULTS,
-    title: "SmartX | The AI Trading Terminal Built Around You",
+    title: "SmartX for iPhone | Trade your edge",
     description:
-      "See the move, understand the context, and act from one AI-native trading terminal.",
+      "The social trading app for memes, perps, stocks, and prediction markets. Follow verified traders and trade in one tap.",
     type: "website",
     images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
     ...SMARTX_TWITTER_DEFAULTS,
-    title: "SmartX | The AI Trading Terminal Built Around You",
+    title: "SmartX for iPhone | Trade your edge",
     description:
-      "See the move, understand the context, and act from one AI-native trading terminal.",
+      "The social trading app for memes, perps, stocks, and prediction markets. Follow verified traders and trade in one tap.",
     images: [SMARTX_DEFAULT_SOCIAL_IMAGE],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#061b17",
+  themeColor: "#010101",
 };
 
 export default function RootLayout({

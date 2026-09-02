@@ -7,13 +7,14 @@ import {
   SMARTX_LOGO_URL,
   SMARTX_OPEN_GRAPH_DEFAULTS,
   SMARTX_ORGANIZATION_ID,
+  SMARTX_SITE_URL,
   SMARTX_TWITTER_DEFAULTS,
   SMARTX_WEBSITE_ID,
 } from "@/lib/site-metadata";
 
-const title = "SmartX | Trade your edge";
+const title = "SmartX for iPhone | Trade your edge";
 const description =
-  "The social trading app for memes, perps, stocks and prediction markets. Follow verified traders and trade in one tap.";
+  "The social trading app for memes, perps, stocks, and prediction markets. Follow verified traders and trade in one tap.";
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -21,46 +22,36 @@ const structuredData = {
       "@type": "Organization",
       "@id": SMARTX_ORGANIZATION_ID,
       name: "SmartX",
-      url: "https://smartx.io/",
+      url: SMARTX_SITE_URL,
       logo: {
         "@type": "ImageObject",
-        "@id": "https://smartx.io/#logo",
         url: SMARTX_LOGO_URL,
         contentUrl: SMARTX_LOGO_URL,
         width: 218,
         height: 42,
       },
       description,
-      sameAs: [
-        "https://x.com/SmartXTerminal",
-        "https://t.me/SmartX_Community",
-      ],
     },
     {
       "@type": "WebSite",
       "@id": SMARTX_WEBSITE_ID,
-      url: "https://smartx.io/",
-      name: "SmartX",
+      url: SMARTX_SITE_URL,
+      name: "SmartX for iPhone",
       inLanguage: "en",
       description,
       publisher: { "@id": SMARTX_ORGANIZATION_ID },
     },
     {
-      "@type": "SoftwareApplication",
-      "@id": "https://smartx.io/#app",
+      "@type": "MobileApplication",
+      "@id": `${SMARTX_SITE_URL}#ios-app`,
       name: "SmartX",
       applicationCategory: "FinanceApplication",
-      operatingSystem: "Web",
+      operatingSystem: "iOS",
       inLanguage: "en",
-      url: "https://app.smartx.io/",
-      image: "https://smartx.io/smartx-social-share.png",
-      description:
-        "Follow verified traders and trade memes, perps, stocks, and prediction markets in one tap.",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      url: SMARTX_SITE_URL,
+      image: `${SMARTX_SITE_URL}assets/consumer-network/hero-product.webp`,
+      description,
+      publisher: { "@id": SMARTX_ORGANIZATION_ID },
     },
   ],
 };

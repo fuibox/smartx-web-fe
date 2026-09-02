@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { createSmartXAppHref } from "@/lib/smartx-links";
-
 import styles from "./site-chrome.module.css";
 
 const ASSET_ROOT = "/assets/consumer-network";
@@ -55,16 +53,11 @@ export function SiteFooter() {
         </div>
 
         <div className={styles.footerLinks}>
-          <nav className={styles.footerGroup} aria-labelledby="footer-product-title">
-            <h2 id="footer-product-title">Product</h2>
-            <a
-              href={createSmartXAppHref("footer_link")}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              App
-            </a>
-            <Link href="/blog">Blog</Link>
+          <nav className={styles.footerGroup} aria-labelledby="footer-support-title">
+            <h2 id="footer-support-title">Support &amp; Legal</h2>
+            <Link href="/support">Support</Link>
+            <Link href="/privacy-policy">Privacy Policy</Link>
+            <Link href="/terms">Terms of Service</Link>
           </nav>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { resolveSmartXUrl, SMARTX_SITE_URL } from "@/lib/site-metadata";
+
 export const dynamic = "force-static";
 
 export default function robots(): MetadataRoute.Robots {
@@ -8,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://smartx.io/sitemap.xml",
-    host: "https://smartx.io",
+    sitemap: resolveSmartXUrl("/sitemap.xml"),
+    host: new URL(SMARTX_SITE_URL).origin,
   };
 }

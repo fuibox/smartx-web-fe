@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const SMARTX_SITE_URL = "https://smartx.io/";
+export const SMARTX_SITE_URL = "https://smartx.fun/";
 export const SMARTX_SITE_NAME = "SmartX";
 export const SMARTX_ORGANIZATION_ID = `${SMARTX_SITE_URL}#org`;
 export const SMARTX_WEBSITE_ID = `${SMARTX_SITE_URL}#site`;
@@ -11,7 +11,7 @@ export const SMARTX_DEFAULT_SOCIAL_IMAGE = {
   url: "/smartx-social-share.png",
   width: 1200,
   height: 630,
-  alt: "SmartX — The personalized social trading app for memes, perps, stocks, and prediction markets. Backed by YZi Labs.",
+  alt: "SmartX — The personalized social trading app for memes, perps, stocks, and prediction markets.",
 } as const;
 
 export const SMARTX_OPEN_GRAPH_DEFAULTS = {

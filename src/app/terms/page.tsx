@@ -89,7 +89,7 @@ export default function TermsPage() {
               the British Virgin Islands (&quot;SmartX,&quot; &quot;we,&quot;
               &quot;us,&quot; or &quot;our&quot;), governing your access to and use
               of the SmartX mobile application, website at{" "}
-              <a href="https://smartx.io">smartx.io</a>, and related services
+              <a href="https://smartx.fun">smartx.fun</a>, and related services
               (collectively, the &quot;Services&quot;).
             </p>
             <p className={styles.introFollowup}>
@@ -133,7 +133,7 @@ export default function TermsPage() {
               <li>all activity that occurs through your account; and</li>
               <li>
                 promptly contacting us at{" "}
-                <a href="mailto:support@smartx.io">support@smartx.io</a> if you
+                <a href="mailto:support@smartx.io">SmartX Support</a> if you
                 suspect unauthorized access.
               </li>
             </ul>
@@ -476,11 +476,11 @@ export default function TermsPage() {
             <address className={styles.contactDetails}>
               <div>
                 <span>Email</span>
-                <a href="mailto:support@smartx.io">support@smartx.io</a>
+                <a href="mailto:support@smartx.io">Email SmartX Support</a>
               </div>
               <div>
                 <span>Website</span>
-                <a href="https://smartx.io">smartx.io</a>
+                <a href="https://smartx.fun">smartx.fun</a>
               </div>
             </address>
           </LegalSection>

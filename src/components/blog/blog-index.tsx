@@ -45,7 +45,7 @@ export async function BlogIndex({ pageNumber }: BlogIndexProps) {
       <a className={styles.skipLink} href="#latest-stories">
         Skip to latest stories
       </a>
-      <SiteHeader active="blog" allowThemeToggle />
+      <SiteHeader />
 
       <main>
         <section className={styles.masthead} aria-labelledby="journal-title">

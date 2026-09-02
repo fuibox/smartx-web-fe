@@ -109,19 +109,6 @@ function Brand({ tone = "light" }: { tone?: "light" | "dark" }) {
   );
 }
 
-function LaunchAlphaLink() {
-  return (
-    <a
-      className={styles.waitlistButton}
-      href={createSmartXAppHref("hero_cta")}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Launch Alpha
-    </a>
-  );
-}
-
 function WaitlistButton({ placement }: { placement: "hero" | "closing" }) {
   const [comingSoon, setComingSoon] = useState(false);
 
@@ -217,21 +204,9 @@ function Hero() {
 
         <div className={styles.headerActions}>
           <nav className={styles.primaryNav} aria-label="Site navigation">
-            <a
-              href="https://x.com/SmartXTerminal"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              X
-            </a>
-            <a
-              href="https://t.me/+CTeuBkpOxSNkN2Y0"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Community
-            </a>
-            <Link href="/blog">Blog</Link>
+            <Link href="/support">Support</Link>
+            <Link href="/privacy-policy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
           </nav>
           <button
             className={styles.mobileMenuButton}
@@ -246,7 +221,6 @@ function Hero() {
             <span />
             <span />
           </button>
-          <LaunchAlphaLink />
         </div>
 
         <nav
@@ -255,24 +229,14 @@ function Hero() {
           aria-label="Mobile site navigation"
           hidden={!mobileNavOpen}
         >
-          <a
-            href="https://x.com/SmartXTerminal"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileNavOpen(false)}
-          >
-            X
-          </a>
-          <a
-            href="https://t.me/+CTeuBkpOxSNkN2Y0"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileNavOpen(false)}
-          >
-            Community
-          </a>
-          <Link href="/blog" onClick={() => setMobileNavOpen(false)}>
-            Blog
+          <Link href="/support" onClick={() => setMobileNavOpen(false)}>
+            Support
+          </Link>
+          <Link href="/privacy-policy" onClick={() => setMobileNavOpen(false)}>
+            Privacy
+          </Link>
+          <Link href="/terms" onClick={() => setMobileNavOpen(false)}>
+            Terms
           </Link>
         </nav>
       </header>
@@ -539,20 +503,27 @@ function ConsumerFooter() {
 }
 
 export function ConsumerHome() {
+  return (
+    <main className={styles.page}>
+      <a className={styles.skipLink} href="#consumer-hero-title">
+        Skip to SmartX
+      </a>
+      <Hero />
+    </main>
+  );
+}
+
+export function ConsumerNetworkArchive() {
   useSectionReveals();
 
   return (
-    <main className={styles.page}>
-      <a className={styles.skipLink} href="#network">
-        Skip to the SmartX network story
-      </a>
-      <Hero />
+    <>
       <NetworkSection />
       <PerformanceSection />
       <DiscoverySection />
       <AccountSection />
       <ClosingSection />
       <ConsumerFooter />
-    </main>
+    </>
   );
 }

@@ -374,7 +374,7 @@ export default function PrivacyPolicyPage() {
             <p>
               You may delete your SmartX account through{" "}
               <strong>Settings &gt; Account &gt; Delete Account</strong> or contact
-              us at <a href="mailto:support@smartx.io">support@smartx.io</a>.
+              us through <a href="mailto:support@smartx.io">SmartX Support</a>.
               Account deletion removes the account and associated personal data,
               subject to the limited retention described above.
             </p>
@@ -444,11 +444,11 @@ export default function PrivacyPolicyPage() {
             <address className={styles.contactDetails}>
               <div>
                 <span>Email</span>
-                <a href="mailto:support@smartx.io">support@smartx.io</a>
+                <a href="mailto:support@smartx.io">Email SmartX Support</a>
               </div>
               <div>
                 <span>Website</span>
-                <a href="https://smartx.io">smartx.io</a>
+                <a href="https://smartx.fun">smartx.fun</a>
               </div>
             </address>
           </section>
