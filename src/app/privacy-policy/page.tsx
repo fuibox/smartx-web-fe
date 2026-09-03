@@ -158,7 +158,7 @@ export default function PrivacyPolicyPage() {
               and third-party data providers. This may include blockchain
               addresses and transactions; token, contract, holder, price,
               volume, and liquidity data; public wallet labels and risk
-              indicators; estimated trading or position metrics; public profile
+              indicators; estimated on-chain activity and performance metrics; public profile
               information; market commentary; and trader rankings.
             </p>
             <p>
