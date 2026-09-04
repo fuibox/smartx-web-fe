@@ -6,6 +6,167 @@ import type { BlogPostSource } from "./blog-types";
  */
 export const BLOG_POST_SOURCES = [
   {
+    slug: "every-trader-verified-every-signal-matched-every-trade-one-tap",
+    status: "published",
+    category: "Product",
+    publishedAt: "2026-09-02",
+    title: "Every Trader, Verified. Every Signal, Matched. Every Trade, One Tap.",
+    dek: "Why verified trader identities, personalized matching, and one-tap execution form the foundation of SmartX’s social trading network.",
+    excerpt: "SmartX turns verified on-chain performance into personalized signals and one-tap trading across prediction markets, memes, perps, and stocks.",
+    seo: {
+      title: "SmartX: Verified Social Trading in One Tap",
+      description:
+        "Discover how SmartX verifies on-chain traders, matches personalized signals, and turns each opportunity into a one-tap trade across prediction markets and more.",
+    },
+    cover: {
+      src: "/assets/updates/every-trader-verified.webp",
+      alt: "Every Trader, Verified. Every Signal, Matched. Every Trade, One Tap.",
+      width: 1400,
+      height: 788,
+    },
+    sourceUrl: "https://medium.com/@smartxofficial/every-trader-verified-every-signal-matched-every-trade-one-tap-6c7895975fe2",
+    sections: [
+      {
+        id: "the-gap-smartx-is-built-to-close",
+        heading: "The gap SmartX is built to close",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "If you actively trade on-chain, you already know the drill.",
+          },
+          {
+            type: "paragraph",
+            text: "You open Twitter to see what the sharpest wallets are doing. You open Telegram to see what the group chats caught. You open Polymarket for the political and sports markets. You open a perps venue for leverage. You open Jupiter or a meme tool for what’s launching this hour. You open your wallet, bridge, swap, sign, resign, and by the time you have a position on, the edge is gone.",
+          },
+          {
+            type: "paragraph",
+            text: "That’s the game today. Five tabs, three wallets, unlimited spreadsheets, and a nagging feeling that whichever wallet you should have been watching, you weren’t.",
+          },
+          {
+            type: "paragraph",
+            text: "We built SmartX to end that.",
+          },
+        ],
+      },
+      {
+        id: "what-smartx-is-now",
+        heading: "What SmartX is now",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "SmartX is the personalized social trading app for memes, perps, stocks and prediction markets. One product, one feed, one tap. Backed by YZi Labs · EASY Residency S4.",
+          },
+          {
+            type: "paragraph",
+            text: "We’re built on three simple ideas that only became possible in the last twelve months:",
+          },
+          {
+            type: "unordered-list",
+            items: [
+              "Verified social. You discover traders through real positions and on-chain performance, not screenshots.",
+              "Personalized matching. You get matched with the traders and signals that fit how you actually trade.",
+              "One-tap execution. Trade straight from a signal. No gas tokens, no bridges.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "And when your own record is worth following, people follow you.",
+          },
+        ],
+      },
+      {
+        id: "why-verified-is-the-whole-thing",
+        heading: "Why “verified” is the whole thing",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Every previous generation of social trading broke on the same rock: trust. Someone posts a screenshot of a 40x winner and you have no way to check whether they took the trade at all, at what size, or whether they were also running the other side. So the space either turned into a coordinated shill economy or a copy-trading product that flattened everyone into an average.",
+          },
+          {
+            type: "paragraph",
+            text: "On-chain markets are different. A wallet’s history is public. Its winners, its losers, its size, its speed, its style — all sitting there for anyone who can read it.",
+          },
+          {
+            type: "paragraph",
+            text: "The reason we haven’t already had a great social trading product is that “anyone who can read it” is a very small group. You need to build a behavioral fingerprint from raw on-chain data, cluster wallets by real style, and surface the ones a specific user would actually learn from. That’s a real engineering problem.",
+          },
+          {
+            type: "paragraph",
+            text: "We’ve been building the engine for that. Verified profiles, style tags, activity tiers, category strengths — every trader on the platform gets a real, on-chain-derived identity, not a persona.",
+          },
+        ],
+      },
+      {
+        id: "why-personalization-changes-the-shape-of-alpha",
+        heading: "Why personalization changes the shape of alpha",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "A “signal” is worthless if it isn’t a signal for you.",
+          },
+          {
+            type: "paragraph",
+            text: "A short-term market maker running 8,000 sports bets a week isn’t giving you a call — that’s a machine, and copying it will bury you. A patient sniper making nine bets a month with 6-figure conviction isn’t giving you scale — that’s a specialist, and impatience will price you out.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX matches you with traders whose style, cadence and asset preferences fit yours, then surfaces the signals from those traders first. The feed learns from what you actually trade, not what you claim you’ll trade. It’s the difference between a magazine that mails you every issue and one that only shows up when it’s about a market you’d actually take a position in.",
+          },
+        ],
+      },
+      {
+        id: "why-one-tap-matters-more-than-anyone-admits",
+        heading: "Why one tap matters more than anyone admits",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Alpha in on-chain markets decays in seconds. The gap between “I see the trade” and “I have the position” is where most edge dies. Bridges, gas top-ups, wallet switches, chain switches — every extra step is a tax.",
+          },
+          {
+            type: "quote",
+            text: "Trade straight from a signal. No gas tokens, no bridges.",
+          },
+          {
+            type: "paragraph",
+            text: "That’s not a UI polish. It’s a structural choice. When execution collapses to a single tap, the value of every signal on the platform goes up, and the whole loop — spot a trader, match a signal, take the position — becomes something you can do at market speed instead of homework speed.",
+          },
+        ],
+      },
+      {
+        id: "the-roadmap-memes-perps-stocks-and-prediction-markets",
+        heading: "The roadmap: memes, perps, stocks and prediction markets",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "We’re launching with prediction markets and expanding across memes, perps and stocks. Each new asset class multiplies the value of the network: the same personalization and one-tap layer, more markets for traders to prove edge in, more surface for followers to find people who match their style.",
+          },
+          {
+            type: "paragraph",
+            text: "Every asset class we add is another axis on which a trader can be a specialist worth following — and another axis on which you can find someone who plays the exact game you play.",
+          },
+        ],
+      },
+      {
+        id: "whats-next",
+        heading: "What’s next",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Alpha is closed. App coming soon.",
+          },
+          {
+            type: "quote",
+            text: "See you on the leaderboard.",
+          },
+          {
+            type: "paragraph",
+            text: "SmartX is the personalized social trading app for memes, perps, stocks and prediction markets. Backed by @YZiLabs @EASYResidency (S4).",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-to-build-a-polymarket-trading-strategy-that-actually-works",
     status: "draft",
     category: "Guide",
