@@ -50,7 +50,7 @@ function makeSource(
 test("the production source validates into canonical body blocks", () => {
   const posts = normalizeBlogPosts(BLOG_POST_SOURCES);
 
-  assert.equal(posts.length, 29);
+  assert.equal(posts.length, 30);
   assert.ok(
     posts.every((post) =>
       post.sections.every(
@@ -76,18 +76,18 @@ test("the production source validates into canonical body blocks", () => {
   const firstPage = paginateBlogPosts(published, 1, 6);
   const secondPage = paginateBlogPosts(published, 2, 6);
 
-  assert.equal(published.length, 8);
+  assert.equal(published.length, 9);
   assert.equal(drafts.length, 21);
   assert.equal(firstPage.items.length, 6);
-  assert.equal(secondPage.items.length, 2);
+  assert.equal(secondPage.items.length, 3);
   assert.equal(firstPage.totalPages, 2);
   assert.equal(secondPage.items.at(-1)?.slug, "smartx-ambassador-program");
   assert.deepEqual(
     firstPage.items.slice(0, 3).map((post) => post.slug),
     [
+      "copy-trading-is-dead-verified-social-is-what-replaces-it",
       "every-trader-verified-every-signal-matched-every-trade-one-tap",
       "the-state-of-prediction-markets-in-2026-what-serious-traders-need-to-know",
-      "what-does-it-actually-mean-to-have-edge-in-prediction-markets",
     ],
   );
 });
