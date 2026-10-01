@@ -79,7 +79,7 @@ export default function TermsPage() {
               <div>
                 <dt>Last updated</dt>
                 <dd>
-                  <time dateTime="2026-08">August 2026</time>
+                  <time dateTime="2026-09-30">September 30, 2026</time>
                 </dd>
               </div>
             </dl>
@@ -269,6 +269,16 @@ export default function TermsPage() {
           </LegalSection>
 
           <LegalSection number="08" title="Prohibited Conduct">
+            <p>
+              SmartX has zero tolerance for objectionable content and abusive
+              behavior. Users must not post, upload, transmit, or otherwise make
+              available content that is unlawful, abusive, harassing, threatening,
+              hateful, sexually explicit, violent, fraudulent, or otherwise
+              objectionable. SmartX reserves the right to remove offending content
+              and suspend or terminate users who violate these requirements.
+              Reports of objectionable content will be reviewed and acted upon
+              within 24 hours.
+            </p>
             <p>You agree not to:</p>
             <ul>
               <li>
